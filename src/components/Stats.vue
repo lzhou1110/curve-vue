@@ -10,26 +10,37 @@
 	            <div class='loading matrix' v-show='loading'></div>
 				<highcharts :constructor-type="'stockChart'" :options="chartdata" ref='highcharts'></highcharts>
 	        </fieldset>
-	        <p>Recent daily APY: 
+	        <div class='apys'>Recent daily APY: 
 	        	<span id="daily-apr" :class="{'loading line': loading}">
 		        	<span v-show='!loading'> {{daily_apr*100 | toFixed2}}% </span>
 		    	</span>
-	    	</p>
-	    	<p v-show = "pool != 'susd'">Daily trading volume: 
+	    	</div class='apys'>
+	    	<div class='apys' v-show = "pool != 'susd'">Daily trading volume: 
 	    		<span :class="{'loading line': volumeData < 0}">
 	    			<span v-show='volumeData >= 0'> {{(volumeData | 0) | formatNumber}}$</span>	
 	    		</span>
-	    	</p>
-	        <p>Recent weekly APY: 
+	    	</div class='apys'>
+	        <div class='apys'>Recent weekly APY: 
 	        	<span id="weekly-apr" :class="{'loading line': loading}">
 		        	<span v-show='!loading'> {{weekly_apr*100 | toFixed2}}% </span>
 		    	</span>
-	    	</p>
-	    	<p>Recent monthly APY: 
+	    	</div class='apys'>
+	    	<div class='apys'>Recent monthly APY: 
 	        	<span id="monthly-apr" :class="{'loading line': loading}">
 		        	<span v-show='!loading'> {{monthly_apr*100 | toFixed2}}% </span>
 		    	</span>
-	    	</p>
+	    	</div class='apys'>
+	    	<div class='apys'>Total APY: 
+	    		<span class='tooltip'>
+	    			[?]
+	    			<span class='tooltiptext'>
+	    				Total APY since pool was deployed
+	    			</span>
+	    		</span>
+	        	<span id="total-apr" :class="{'loading line': loading}">
+		        	<span v-show='!loading'> {{total_apr*100 | toFixed2}}% </span>
+		    	</span>
+	    	</div class='apys'>
 	    	<daily-chart :data='data' :pool='pool || currentPool' v-if='!pool'/>
 	    </div>
 	</div>
@@ -71,6 +82,7 @@
 			daily_apr: '',
 			weekly_apr: '',
 			monthly_apr: '',
+			total_apr: '',
 			chartdata: {
 				chart: {
 					panning: true,
@@ -210,6 +222,7 @@
 					this.daily_apr = apydata.apy.day[subdomain];
 					this.weekly_apr = apydata.apy.week[subdomain];
 					this.monthly_apr = apydata.apy.month[subdomain];
+					this.total_apr = apydata.apy.total[subdomain];
 					let period = 1440
 					//if(subdomain == 'susd') period = 30
 			        let newdata = await fetch(`${window.domain}/raw-stats/${subdomain}-${period}m.json`)
@@ -277,3 +290,9 @@
 		}
 	}
 </script>
+
+<style scoped>
+	.apys {
+		margin-top: 0.3em;
+	}
+</style>
