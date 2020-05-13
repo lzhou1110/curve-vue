@@ -135,7 +135,6 @@
 					data = Object.keys(data).reduce((obj, key) => {
 						return {...obj, [key]: (new Array(Math.max(...Object.values(data).map(arr=>arr.length))-data[key].length).fill({})).concat(data[key])}
 					}, {})
-					console.log(data, "THE DATA")
 					data.susdv2 = data.susd
 					for(let i = 0; i < data[maxlenpool].length; i++) {
 						volumeSeries.push([
