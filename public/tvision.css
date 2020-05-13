@@ -960,3 +960,11 @@ input[type=range]:focus::-ms-fill-upper {
 .walletlink {
   margin-top: 3px;
 }
+
+#profit-info .showinoptions {
+  margin-top: 0.3em;
+}
+
+#profit-info label[for='showintokens'] {
+  margin-left: 0.5em;
+}
