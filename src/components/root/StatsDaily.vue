@@ -126,15 +126,16 @@
 			}
 		},
 		async mounted() {
-			this.$watch(()=>volumeStore.state.allVolume.susd.length, val => {
+			this.$watch(()=>volumeStore.state.allVolume.pax.length, val => {
 				if(val) {
 					let volumeSeries = []
-					let allPools = ['compound', 'usdt', 'y', 'busd', 'susd']
+					let allPools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax']
 					let data = volumeStore.state.allVolume
 					let maxlenpool = Object.keys(data).reduce((a, b) => data[a].length > data[b].length ? a : b)
 					data = Object.keys(data).reduce((obj, key) => {
 						return {...obj, [key]: (new Array(Math.max(...Object.values(data).map(arr=>arr.length))-data[key].length).fill({})).concat(data[key])}
 					}, {})
+					console.log(data, "THE DATA")
 					data.susdv2 = data.susd
 					for(let i = 0; i < data[maxlenpool].length; i++) {
 						volumeSeries.push([
