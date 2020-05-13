@@ -385,8 +385,8 @@
 				let data = []
 				for(let res of requests) {
 					let json = await res.json()
+					if(res.url.includes('pax')) json = json.slice(10)
 					if(json.length != 1000 && requests.length > 1) {
-						if(res.url.includes('pax')) json = json.slice(10)
 						let fill = new Array(1000-json.length).fill({})
 						json = fill.concat(json)
 					}
