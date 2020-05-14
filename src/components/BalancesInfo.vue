@@ -92,9 +92,9 @@
             <b>{{currency | capitalize}}:</b> 
             <span> {{l_info && l_info[i] | toFixed2 | formatNumber}}</span></li>
           <li>
-            <b>{{totalCurrencies(currencies)}}:</b> 
+            <b>USD balance:</b> 
 
-            <span> {{totalShare | toFixed2 | formatNumber}}</span>
+            <span> {{realShare | toFixed2 | formatNumber}}</span>
           </li>
           <li>
             <b>Averaged USD balance:</b> {{(usdShare1) | toFixed2 | formatNumber }}
@@ -108,15 +108,14 @@
             <b>{{currency | capitalize}}:</b> 
             <span> {{staked_info && staked_info[i] | toFixed2 | formatNumber}}</span></li>
           <li>
-            <b>{{totalCurrencies(currencies)}}:</b> 
+            <b>USD balance:</b> 
 
-            <span> {{totalStake | toFixed2 | formatNumber}}</span>
+            <span> {{realStake | toFixed2 | formatNumber}}</span>
           </li>
 
           <li>
             <b>Averaged USD balance:</b> {{(usdStake1) | toFixed2 | formatNumber}}
           </li>
-
       </ul>
     </fieldset>
 
@@ -125,13 +124,23 @@
 
 <script>
   import { getters, allCurrencies, contract as currentContract } from '../contract'
+  import allabis from '../allabis'
   import * as helpers from '../utils/helpers'
   import * as volumeStore from './common/volumeStore'
+  import stableswap_fns from '../utils/stableswap_fns'
+  import * as Comlink from 'comlink'
+  import Worker from 'worker-loader!./graphs/worker.js';
+  const worker = new Worker();
+  const calcWorker = Comlink.wrap(worker);
 
   export default {
     props: ['pool', 'bal_info', 'total', 'l_info', 'totalShare', 'fee', 'admin_fee', 'currencies', 'tokenSupply', 'tokenBalance', 'usdShare', 'staked_info', 'totalStake', 'usdStake', 'combinedstats', 'virtual_price', 'A', 'future_A', 'admin_actions_deadline'],
     data: () => ({
       volumes: [],
+      realShare: 0,
+      realStake: 0,
+      lastPoint: null,
+      lastPool: null,
     }),
     methods: {
       totalCurrencies(currencies) {
@@ -142,13 +151,39 @@
       formatNumber(number) {
         return helpers.formatNumber(number)
       },
+      async updateShares() {
+        let pool = currentContract.currentContract == 'iearn' ? 'y' : currentContract.currentContract == 'susdv2' ? 'susd' : currentContract.currentContract
+        let req = await fetch(`${window.domain}/raw-stats/${pool}-1m.json`)
+        this.lastPoint = await req.json()
+        this.lastPoint = this.lastPoint[this.lastPoint.length - 1]
+        let N_COINS = allabis[currentContract.currentContract].N_COINS;
+        this.realShare = 0;
+        this.realStake = 0;
+        for(let i = 0; i < N_COINS; i++) {
+          let price = 1
+          if(i != 1) {
+            let dy = await calcWorker.calcPrice({ 
+              ...this.lastPoint, 
+              N_COINS: allabis[currentContract.currentContract].N_COINS,
+              PRECISION_MUL: allabis[currentContract.currentContract].coin_precisions.map(p=>1e18/p),
+              PRECISION: 1e18,
+            }, i, 1, 1 * allabis[currentContract.currentContract].coin_precisions[i])
+            price = dy / 1e6
+          }
+          this.realShare += +this.l_info[i] * price
+          this.realStake += +this.staked_info[i] * price
+        }
+      },
     },
     async created() {
       if(this.poolVolume == -1) {
-        let stats = await fetch(`${window.domain}/raw-stats/apys.json`)
-        stats = await stats.json()
+        let req = await fetch(`${window.domain}/raw-stats/apys.json`)
+        let stats = await req.json()
         this.volumes = stats.volume;
         volumeStore.state.volumes = stats.volume
+
+        let N_COINS = allabis[currentContract.currentContract].N_COINS;
+        this.$watch(() => currentContract.currentContract && this.l_info[N_COINS-1] !== undefined, val => this.updateShares())
       }
     },
     computed: {
