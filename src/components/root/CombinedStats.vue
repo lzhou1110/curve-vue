@@ -317,17 +317,17 @@
 				    	if(key == 'susd') ind -= 4
 				    }
 					if(key == 'susdv2') {
-						let slice = decoded.slice(71, 80)
+						let slice = decoded.slice(ind-4, ind)
 						for(let i = 0; i < 4; i++) {
 							let calcBalance = this.all_c_rates.susdv2.c_rates[i] * (slice[i])
 							this.bal_infos.susdv2.push(calcBalance)
 							total += calcBalance
 						}
-						ind-=8
+						ind -= 8
 					}
 					if(key == 'pax') {
-						let slice = decoded.slice(-15)
-						helpers.chunkArr(slice.slice(0,7), 2).map((v, i) => {
+						let slice = decoded.slice(ind-8, ind-1)
+						helpers.chunkArr(slice, 2).map((v, i) => {
 				    		//v is [rate, balance] or just [balance] for PAX in pax pool
 				    		if(v[1] === undefined) {
 				    			let balance = +v[0]
@@ -344,7 +344,7 @@
 					    		total += calcBalance
 				    		}
 				    	})
-				    	ind = 82;
+				    	ind -= 9;
 					}
 				    this.totals.push(total)
 				    this.virtual_prices.push(+decoded[ind+8] / 1e18)
