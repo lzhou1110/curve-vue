@@ -152,11 +152,11 @@
         return helpers.formatNumber(number)
       },
       async updateShares() {
-        let pool = currentContract.currentContract == 'iearn' ? 'y' : currentContract.currentContract == 'susdv2' ? 'susd' : currentContract.currentContract
+        let pool = this.currentPool == 'iearn' ? 'y' : this.currentPool == 'susdv2' ? 'susd' : this.currentPool
         let req = await fetch(`${window.domain}/raw-stats/${pool}-1m.json`)
         this.lastPoint = await req.json()
         this.lastPoint = this.lastPoint[this.lastPoint.length - 1]
-        let N_COINS = allabis[currentContract.currentContract].N_COINS;
+        let N_COINS = allabis[this.currentPool].N_COINS;
         this.realShare = 0;
         this.realStake = 0;
         for(let i = 0; i < N_COINS; i++) {
@@ -164,10 +164,10 @@
           if(i != 1) {
             let dy = await calcWorker.calcPrice({ 
               ...this.lastPoint, 
-              N_COINS: allabis[currentContract.currentContract].N_COINS,
-              PRECISION_MUL: allabis[currentContract.currentContract].coin_precisions.map(p=>1e18/p),
+              N_COINS: allabis[this.currentPool].N_COINS,
+              PRECISION_MUL: allabis[this.currentPool].coin_precisions.map(p=>1e18/p),
               PRECISION: 1e18,
-            }, i, 1, 1 * allabis[currentContract.currentContract].coin_precisions[i])
+            }, i, 1, 1 * allabis[this.currentPool].coin_precisions[i])
             price = dy / 1e6
           }
           this.realShare += +this.l_info[i] * price
@@ -181,10 +181,9 @@
         let stats = await req.json()
         this.volumes = stats.volume;
         volumeStore.state.volumes = stats.volume
-
-        let N_COINS = allabis[currentContract.currentContract].N_COINS;
-        this.$watch(() => currentContract.currentContract && this.l_info[N_COINS-1] !== undefined, val => this.updateShares())
       }
+      let N_COINS = allabis[this.currentPool].N_COINS;
+      this.$watch(() => this.currentPool && this.l_info && this.l_info[N_COINS-1] !== undefined, val => this.updateShares())
     },
     computed: {
       showShares: getters.showShares,
