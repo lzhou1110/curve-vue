@@ -94,7 +94,11 @@
           <li>
             <b>USD balance:</b> 
 
-            <span> {{realShare | toFixed2 | formatNumber}}</span>
+            <span :class="{'loading line': realShare === null}"> 
+              <span v-show="realShare !== null">
+                {{realShare | toFixed2 | formatNumber}}
+              </span>
+            </span>
           </li>
           <li>
             <b>Averaged USD balance:</b> {{(usdShare1) | toFixed2 | formatNumber }}
@@ -110,7 +114,11 @@
           <li>
             <b>USD balance:</b> 
 
-            <span> {{realStake | toFixed2 | formatNumber}}</span>
+            <span :class="{'loading line': realStake === null}">
+              <span v-show="realStake !== null">
+                {{realStake | toFixed2 | formatNumber}}
+              </span>
+            </span>
           </li>
 
           <li>
@@ -137,8 +145,8 @@
     props: ['pool', 'bal_info', 'total', 'l_info', 'totalShare', 'fee', 'admin_fee', 'currencies', 'tokenSupply', 'tokenBalance', 'usdShare', 'staked_info', 'totalStake', 'usdStake', 'combinedstats', 'virtual_price', 'A', 'future_A', 'admin_actions_deadline'],
     data: () => ({
       volumes: [],
-      realShare: 0,
-      realStake: 0,
+      realShare: null,
+      realStake: null,
       lastPoint: null,
       lastPool: null,
     }),
@@ -183,6 +191,7 @@
         volumeStore.state.volumes = stats.volume
       }
       let N_COINS = allabis[this.currentPool].N_COINS;
+      this.currentPool && this.l_info && this.l_info[N_COINS-1] !== undefined && this.updateShares()
       this.$watch(() => this.currentPool && this.l_info && this.l_info[N_COINS-1] !== undefined, val => this.updateShares())
     },
     computed: {
