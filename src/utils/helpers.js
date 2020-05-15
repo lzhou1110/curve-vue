@@ -81,6 +81,10 @@ export async function retry(fn, retryDelay = 100, numRetries = 3) {
   }
 }
 
+export function generateID() {
+  return '_' + Math.random().toString(36).substr(2, 9);
+}
+
 export function formatDate(date) {
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
   return monthNames[date.getMonth()] + String(date.getDate()).padStart(2, '0');

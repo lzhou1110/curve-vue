@@ -111,8 +111,8 @@ let routes = [
         component: ycTokens,
       },
       {
-        path: 'ren',
-        name: 'Ren',
+        path: 'renjs',
+        name: 'RenJS',
         component: RenIndex,
       }
     ]
@@ -219,6 +219,10 @@ router.beforeEach(async (to, from, next) => {
   if(from.path.includes('/compound/withdraw_old')) await common.update_fee_info()
   //if(from.path.includes('profit') && to.path.includes('profit')) return window.location.href = to.path
   if(['Donate', 'StatsDaily', 'Audits'].includes(to.name)) return next();
+  if(to.name == 'RenJS') {
+    init(false)
+    return next();
+  }
   if(to.name == 'RootIndex') {
     init('compound');
     return next();

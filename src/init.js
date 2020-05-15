@@ -91,7 +91,7 @@ if(window.web3 && window.web3.currentProvider.isTrust) {
 
 export const onboard = Onboard({
   dappId: 'c68d8ec3-9b9a-4ba5-a3eb-6232eff79030',       // [String] The API key created by step one above
-  networkId: 1,  // [Integer] The Ethereum network ID your Dapp uses.
+  networkId: 42,  // [Integer] The Ethereum network ID your Dapp uses.
   subscriptions: {
     wallet: wallet => {
       state.contract.web3 = window.web3 = new Web3(wallet.provider)
@@ -142,7 +142,6 @@ async function init(init = true, name, walletlink = false) {
     else window.web3 = new Web3(infura_url)
     state.contract.web3 = window.web3
     state.contract.multicall = new state.contract.web3.eth.Contract(multicall_abi, multicall_address)
-
     var default_account = (await state.contract.web3.eth.getAccounts())[0];
     state.contract.default_account = default_account;
     if(init) await state.init(name);
