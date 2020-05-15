@@ -22,6 +22,7 @@ const Contracts = () => import('../views/Contracts.vue')
 const CurvePay = () => import('../components/CurvePay.vue')
 const Events = () => import('../components/Events.vue')
 const VolumePerCoin = () => import('../components/VolumePerCoin.vue')
+const RenIndex = () => import('../components/ren/Index.vue')
 
 const ycTokens = () => import('../components/ycTokens/Index.vue')
 
@@ -108,6 +109,11 @@ let routes = [
         path: 'yctokens',
         name: 'ycTokens',
         component: ycTokens,
+      },
+      {
+        path: 'ren',
+        name: 'Ren',
+        component: RenIndex,
       }
     ]
   },
