@@ -48,6 +48,7 @@
 	import BigNumber from 'bignumber.js'
 	import TxState from './TxState.vue'
 	import * as helpers from '../../utils/helpers'
+	import Box from '3box'
 
 	const adapterABI = [{"inputs":[{"internalType":"contract ICurveExchange","name":"_exchange","type":"address"},{"internalType":"contract IGatewayRegistry","name":"_registry","type":"address"},{"internalType":"contract IERC20","name":"_wbtc","type":"address"},{"internalType":"address","name":"_owner","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"oldRelayHub","type":"address"},{"indexed":true,"internalType":"address","name":"newRelayHub","type":"address"}],"name":"RelayHubChanged","type":"event"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"address","name":"","type":"address"},{"internalType":"bytes","name":"","type":"bytes"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bytes","name":"","type":"bytes"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"acceptRelayedCall","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bytes","name":"","type":"bytes"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"exchange","outputs":[{"internalType":"contract ICurveExchange","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getHubAddr","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_minWbtcAmount","type":"uint256"},{"internalType":"address payable","name":"_wbtcDestination","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"},{"internalType":"bytes32","name":"_nHash","type":"bytes32"},{"internalType":"bytes","name":"_sig","type":"bytes"}],"name":"mintDontSwap","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_minWbtcAmount","type":"uint256"},{"internalType":"address payable","name":"_wbtcDestination","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"},{"internalType":"bytes32","name":"_nHash","type":"bytes32"},{"internalType":"bytes","name":"_sig","type":"bytes"}],"name":"mintThenSwap","outputs":[{"internalType":"uint256","name":"wbtcBought","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"bytes","name":"context","type":"bytes"},{"internalType":"bool","name":"success","type":"bool"},{"internalType":"uint256","name":"actualCharge","type":"uint256"},{"internalType":"bytes32","name":"preRetVal","type":"bytes32"}],"name":"postRelayedCall","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"bytes","name":"context","type":"bytes"}],"name":"preRelayedCall","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"registry","outputs":[{"internalType":"contract IGatewayRegistry","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"relayHubVersion","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"bytes","name":"_btcDestination","type":"bytes"},{"internalType":"uint256","name":"_amount","type":"uint256"},{"internalType":"uint256","name":"_minRenbtcAmount","type":"uint256"}],"name":"swapThenBurn","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]
 
@@ -66,6 +67,8 @@
 		btcTxVOut: '',
 		renResponse: '',
 		signature: '',
+		box: null,
+		space: null,
 	})
 
 	export default {
@@ -95,6 +98,8 @@
 			confirmations: 0,
 			// 1 - getting btc deposit address, 2 - waiting to confirm on btc network, 3 - 
 			state: null,
+			box: null,
+			space: null,
 		}),
 		watch: {
 			type() {
@@ -102,25 +107,32 @@
 				this.address = ''
 			},
 			transactions: {
-				handler: (val) => {
+				async handler(val) {
 					//use 3box
+					//console.log(this.space)
+					//await this.space.private.set(JSON.stringify(val))
 					localStorage.setItem('transactions', JSON.stringify(val))
 				},
 				deep: true,
 			}
 		},
 		created() {
-			this.$watch(() => contract.web3, val => {
+			this.$watch(() => contract.web3 && contract.default_account, val => {
+				if(!val) return;
 				this.mounted()
 			})
 		},
 		mounted() {
-			contract.web3 && this.mounted()
+			contract.web3 && contract.default_account && this.mounted()
 		},
 		methods: {
 			async mounted() {
+				// this.box = await Box.openBox(contract.default_account, contract.web3.currentProvider)
+				// this.space = await this.box.openSpace('curvebtc')
+				// await this.space.syncDone
+
 				this.adapterContract = new web3.eth.Contract(adapterABI, adapterAddress)
-				this.default_account = (await web3.eth.getAccounts())[0]
+				this.default_account = contract.default_account
 				//resume only transactions submitted to btc network
 				this.transactions = JSON.parse(localStorage.getItem('transactions')) || []
 				console.log(this.transactions)
@@ -190,8 +202,9 @@
 
 				let transaction = this.transactions.find(t => t.id == transfer.id)
 				//transaction is ready to be sent to eth network
-				if(transaction.renResponse && transaction.renSignature) {
+				if(transaction.renResponse && transaction.signature) {
 					transaction.state = 6
+					transaction.confirmations = 'Confirmed'
 					//await this.mintThenSwap(transfer)
 				}
 				else {
@@ -211,6 +224,14 @@
 						deposit = await mint.wait(this.confirmations, {
 							txHash: transaction.btcTxHash,
 							vOut: transaction.btcTxVOut,
+						})
+						.on('deposit', deposit => {
+							if(deposit.utxo) {
+								transaction.state = 3;
+								transaction.confirmations = deposit.utxo.confirmations
+								transaction.btcTxHash = deposit.utxo.txHash
+								transaction.btcTxVOut = deposit.utxo.vOut
+							}
 						})
 					}
 					//trasaction not submitted to btc network
@@ -239,13 +260,13 @@
 				}
 			},
 
-			async mintThenSwap({ id, params, utxoAmount, renHash, renSignature }) {
+			async mintThenSwap({ id, params, utxoAmount, renResponse, signature }) {
 				await this.adapterContract.methods.mintThenSwap(
 					params.contractCalls[0].contractParams[0].value,
 					params.contractCalls[0].contractParams[1].value,
 					utxoAmount,
-					renHash,
-					renSignature,
+					renResponse.autogen.nhash,
+					signature,
 				).send({
 					from: this.default_account
 				})
