@@ -99,7 +99,7 @@ export const onboard = Onboard({
       localStorage.setItem('selectedWallet', wallet.name)
     },
     network: network => {
-      if(network != 1) {
+      if(network != 42) {
         state.contract.error = 'Error: wrong network type. Please switch to mainnet';
         state.contract.showShares = false
         window.web3 = new Web3(infura_url)

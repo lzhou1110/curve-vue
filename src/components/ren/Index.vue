@@ -14,7 +14,7 @@
 		</div>
 
 		<div class='input'>
-			<label for='address'>{{ type == 1 ? 'WBTC' : 'BTC' }} address</label>
+			<label for='address'>{{ type == 1 ? 'BTC' : 'ETH' }} address</label>
 			<input id='address' type='text' v-model='address' placeholder='Address'>
 		</div>
 
@@ -23,17 +23,28 @@
 		<table class='tui-table'>
 			<thead>
 				<tr>
-					<th>Address</th>
+					<th>BTC Address</th>
 					<th>Confirmations</th>
 					<th>Status</th>
+					<th>Progress</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr v-for='transaction in transactions'>
-					<td>{{ transaction.gatewayAddress }}</td>
+					<td>
+						<span :class="{'loading line': !transaction.gatewayAddress }"></span>
+						{{ transaction.gatewayAddress }}
+					</td>
 					<td>{{ transaction.confirmations }}</td>
 					<td>
-						<tx-state :state='transaction.state' :transaction='transaction'/>
+						<tx-state 
+							:state='transaction.state' 
+							:transaction='transaction'
+							@mint='mintThenSwap'/>
+					</td>
+					<td>
+						{{ (transaction.state / 6 * 100 | 0) }}
+						<span :class="{'loading line': transaction.state != 6}"></span>
 					</td>
 				</tr>
 			</tbody>
@@ -48,6 +59,8 @@
 	import BigNumber from 'bignumber.js'
 	import TxState from './TxState.vue'
 	import * as helpers from '../../utils/helpers'
+	import * as common from '../../utils/common'
+	import allabis, { ERC20_abi } from '../../allabis'
 	import Box from '3box'
 
 	const adapterABI = [{"inputs":[{"internalType":"contract ICurveExchange","name":"_exchange","type":"address"},{"internalType":"contract IGatewayRegistry","name":"_registry","type":"address"},{"internalType":"contract IERC20","name":"_wbtc","type":"address"},{"internalType":"address","name":"_owner","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"oldRelayHub","type":"address"},{"indexed":true,"internalType":"address","name":"newRelayHub","type":"address"}],"name":"RelayHubChanged","type":"event"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"address","name":"","type":"address"},{"internalType":"bytes","name":"","type":"bytes"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bytes","name":"","type":"bytes"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"acceptRelayedCall","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bytes","name":"","type":"bytes"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"exchange","outputs":[{"internalType":"contract ICurveExchange","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getHubAddr","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_minWbtcAmount","type":"uint256"},{"internalType":"address payable","name":"_wbtcDestination","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"},{"internalType":"bytes32","name":"_nHash","type":"bytes32"},{"internalType":"bytes","name":"_sig","type":"bytes"}],"name":"mintDontSwap","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_minWbtcAmount","type":"uint256"},{"internalType":"address payable","name":"_wbtcDestination","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"},{"internalType":"bytes32","name":"_nHash","type":"bytes32"},{"internalType":"bytes","name":"_sig","type":"bytes"}],"name":"mintThenSwap","outputs":[{"internalType":"uint256","name":"wbtcBought","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"bytes","name":"context","type":"bytes"},{"internalType":"bool","name":"success","type":"bool"},{"internalType":"uint256","name":"actualCharge","type":"uint256"},{"internalType":"bytes32","name":"preRetVal","type":"bytes32"}],"name":"postRelayedCall","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"bytes","name":"context","type":"bytes"}],"name":"preRelayedCall","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"registry","outputs":[{"internalType":"contract IGatewayRegistry","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"relayHubVersion","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"bytes","name":"_btcDestination","type":"bytes"},{"internalType":"uint256","name":"_amount","type":"uint256"},{"internalType":"uint256","name":"_minRenbtcAmount","type":"uint256"}],"name":"swapThenBurn","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]
@@ -94,6 +107,7 @@
 
 			default_account: '',
 			adapterContract: null,
+			wbtccontract: null,
 
 			confirmations: 0,
 			// 1 - getting btc deposit address, 2 - waiting to confirm on btc network, 3 - 
@@ -131,8 +145,11 @@
 				// this.space = await this.box.openSpace('curvebtc')
 				// await this.space.syncDone
 
-				this.adapterContract = new web3.eth.Contract(adapterABI, adapterAddress)
+				this.adapterContract = new contract.web3.eth.Contract(adapterABI, adapterAddress)
+				this.wbtccontract = new contract.web3.eth.Contract(ERC20_abi, '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599')
 				this.default_account = contract.default_account
+				console.log(contract.default_account)
+				console.log(await this.wbtccontract.methods.allowance(contract.default_account, adapterAddress).call())
 				//resume only transactions submitted to btc network
 				this.transactions = JSON.parse(localStorage.getItem('transactions')) || []
 				console.log(this.transactions)
@@ -255,12 +272,13 @@
 					transaction.state = 4
 					transaction.renResponse = signature.renVMResponse;
 					transaction.signature = signature.signature
-					transaction.utxoAmount = renResponse.autogen.amount
+					transaction.utxoAmount = transaction.renResponse.autogen.amount
 					this.mintThenSwap(transaction)
 				}
 			},
 
 			async mintThenSwap({ id, params, utxoAmount, renResponse, signature }) {
+				console.log(this.adapterContract.methods.mintThenSwap)
 				await this.adapterContract.methods.mintThenSwap(
 					params.contractCalls[0].contractParams[0].value,
 					params.contractCalls[0].contractParams[1].value,
@@ -277,6 +295,9 @@
 			},
 
 			async burn() {
+				await common.approveAmount(this.wbtccontract, 
+					RenJS.utils.value(this.amount, "btc").sats().toNumber(), 
+					this.default_account, '0x0000000000000000000000000000000000000000')
 				await this.adapterContract.methods.swapThenBurn(
 					RenJS.utils.BTC.addressToHex(this.address),
 					RenJS.utils.value(this.amount, "btc").sats().toNumber(),
@@ -314,6 +335,7 @@
 		margin-top: 1em;
 	}
 	.tui-table {
+		width: 100%;
 		margin-top: 1em;
 	}
 </style>

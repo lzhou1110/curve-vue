@@ -23,7 +23,7 @@
 		</span>
 		<span v-show='state == 6'>
 			Got BTC, {{ transaction.utxoAmount }}, do you want to 
-			<span @click='mintThenSwap(transaction)'>mint and swap now?</span>
+			<span @click="$emit('mint', transaction)">mint and swap now?</span>
 		</span>
 	</div>
 </template>
