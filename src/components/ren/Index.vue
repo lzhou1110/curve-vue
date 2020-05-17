@@ -1,6 +1,12 @@
 <template>
 	<div class='window white'>
 		<div>
+			<button class='simplebutton' @click='use3Box'>
+				<span v-show='space === null'>Use 3Box Storage</span>
+				<span v-show='space !== null'>3Box Storage loaded</span>
+			</button>
+		</div>
+		<div>
 			<input type='radio' id='getwbtc' :value='0' v-model='type'>
 			<label for='getwbtc'>Get WBTC</label>
 
@@ -43,7 +49,7 @@
 							@mint='mintThenSwap'/>
 					</td>
 					<td>
-						{{ (transaction.state / 6 * 100 | 0) }}
+						{{ transaction.state == 6 ? 100 : (transaction.state / 5 * 100 | 0) }}%
 						<span :class="{'loading line': transaction.state != 6}"></span>
 					</td>
 				</tr>
@@ -120,15 +126,6 @@
 				this.amount = ''
 				this.address = ''
 			},
-			transactions: {
-				async handler(val) {
-					//use 3box
-					//console.log(this.space)
-					//await this.space.private.set(JSON.stringify(val))
-					localStorage.setItem('transactions', JSON.stringify(val))
-				},
-				deep: true,
-			}
 		},
 		created() {
 			this.$watch(() => contract.web3 && contract.default_account, val => {
@@ -141,19 +138,56 @@
 		},
 		methods: {
 			async mounted() {
-				// this.box = await Box.openBox(contract.default_account, contract.web3.currentProvider)
-				// this.space = await this.box.openSpace('curvebtc')
-				// await this.space.syncDone
 
 				this.adapterContract = new contract.web3.eth.Contract(adapterABI, adapterAddress)
 				this.wbtccontract = new contract.web3.eth.Contract(ERC20_abi, '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599')
 				this.default_account = contract.default_account
-				console.log(contract.default_account)
-				console.log(await this.wbtccontract.methods.allowance(contract.default_account, adapterAddress).call())
 				//resume only transactions submitted to btc network
-				this.transactions = JSON.parse(localStorage.getItem('transactions')) || []
-				console.log(this.transactions)
+				this.loadTransactions()
+			},
+
+			async loadTransactions() {
+				let items = await this.getAllItems()
+				this.transactions = Object.values(await this.getAllItems()).reverse()
 				await Promise.all(this.transactions.filter(t => t.btcTxHash).map(t=>this.sendMint(t)))
+			},
+
+			async use3Box() {
+				if(this.box !== null) return;
+				this.box = await Box.openBox(contract.default_account, contract.web3.currentProvider)
+				this.space = await this.box.openSpace('curvebtc')
+				await this.space.syncDone
+				this.loadTransactions();
+			},
+
+			async setItem(key, item) {
+				if(this.space !== null) {
+					return await this.space.private.set(key, JSON.stringify(item))
+				}
+				return localStorage.setItem(key, JSON.stringify(item))
+			},
+
+			async getItem(key) {
+				if(this.space !== null) return await this.space.private.get(key)
+				return localStorage.getItem(key)
+			},
+
+			async getAllItems() {
+				let storage = localStorage
+				if(this.space !== null) {
+					storage = await this.space.private.all();
+				}
+				return Object.keys(storage).filter(key => key.startsWith('curvebtc_')).map(k => JSON.parse(storage[k]))
+			},
+
+			upsertTx(transaction) {
+				let key = 'curvebtc_' + transaction.id
+				transaction.web3Provider = null;
+				if(transaction.params && transaction.params.web3Provider)
+					transaction.params.web3Provider = null;
+				transaction.box = null;
+				transaction.space = null
+				this.setItem(key, transaction)
 			},
 
 			async mint() {
@@ -163,7 +197,6 @@
 			},
 
 			async initMint(transaction) {
-				console.log(transaction, "TX")
 				if(transaction) {
 					var { id, amount, nonce, address } = transaction
 				}
@@ -208,8 +241,9 @@
 					transfer.id = helpers.generateID();
 					transfer.amount = this.amount;
 					transfer.address = this.address;
-					this.transactions.unshift({...txObject(), ...transfer})
-					console.log(this.transactions[0])
+					let tx = {...txObject(), ...transfer}
+					this.upsertTx(tx)
+					this.transactions.unshift(tx)
 				}
 
 				return mint;
@@ -222,6 +256,7 @@
 				if(transaction.renResponse && transaction.signature) {
 					transaction.state = 6
 					transaction.confirmations = 'Confirmed'
+					this.upsertTx(transaction)
 					//await this.mintThenSwap(transfer)
 				}
 				else {
@@ -232,12 +267,12 @@
 						transaction.params = mint.params;
 						transaction.gatewayAddress = await mint.gatewayAddress()
 						transaction.state = 1
+						this.upsertTx(transaction)
 					}
 
 					let deposit
 					//transaction was submitted to btc network
 					if(transaction.btcTxHash && String(transaction.btcTxVOut) !== 'undefined') {
-						console.log('here')
 						deposit = await mint.wait(this.confirmations, {
 							txHash: transaction.btcTxHash,
 							vOut: transaction.btcTxVOut,
@@ -248,6 +283,7 @@
 								transaction.confirmations = deposit.utxo.confirmations
 								transaction.btcTxHash = deposit.utxo.txHash
 								transaction.btcTxVOut = deposit.utxo.vOut
+								this.upsertTx(transaction)
 							}
 						})
 					}
@@ -262,6 +298,7 @@
 												transaction.confirmations = deposit.utxo.confirmations
 												transaction.btcTxHash = deposit.utxo.txHash
 												transaction.btcTxVOut = deposit.utxo.vOut
+												this.upsertTx(transaction)
 											}
 										})
 					}
@@ -273,12 +310,12 @@
 					transaction.renResponse = signature.renVMResponse;
 					transaction.signature = signature.signature
 					transaction.utxoAmount = transaction.renResponse.autogen.amount
+					this.upsertTx(transaction)
 					this.mintThenSwap(transaction)
 				}
 			},
 
 			async mintThenSwap({ id, params, utxoAmount, renResponse, signature }) {
-				console.log(this.adapterContract.methods.mintThenSwap)
 				await this.adapterContract.methods.mintThenSwap(
 					params.contractCalls[0].contractParams[0].value,
 					params.contractCalls[0].contractParams[1].value,
@@ -290,6 +327,7 @@
 				})
 
 				transaction.state = 5
+				this.upsertTx(transaction)
 
 				this.transactions = this.transactions.filter(t => t.id != id)
 			},
@@ -337,5 +375,8 @@
 	.tui-table {
 		width: 100%;
 		margin-top: 1em;
+	}
+	.simplebutton {
+		margin-bottom: 1em;
 	}
 </style>
