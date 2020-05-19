@@ -25,6 +25,9 @@
 			Got BTC, {{ transaction.utxoAmount }}, do you want to 
 			<span @click="$emit('mint', transaction)">mint and swap now?</span>
 		</span>
+		<span v-show='state == 100'>
+			Exchange rates expired, do you want to continue with the swap?
+		</span>
 	</div>
 </template>
 
