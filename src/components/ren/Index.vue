@@ -26,9 +26,10 @@
 
 		<div id='result'>
 			<div>Exchange amount: {{ exchangeAmount }}</div>
-			<div>Ren fees: {{ renFee(type, amount) }}</div>
-			<div>Total received amount: {{ (exchangeAmount - renFee(type, amount)).toFixed(8) }}</div>
-			<div>Exchange rate: {{ exchangeAmount / amount}}</div>
+			<div>Ren fees: {{ renFee }}</div>
+			<div>BTC miner's fee: {{ this.minersFee / 1e8 }}</div>
+			<div>Total received amount: {{ receivedAmount }}</div>
+			<div>Exchange rate: {{ exchangeRate }}</div>
 		</div>
 
 
@@ -83,6 +84,9 @@
 	const adapterABI = [{"inputs":[{"internalType":"contract ICurveExchange","name":"_exchange","type":"address"},{"internalType":"contract IGatewayRegistry","name":"_registry","type":"address"},{"internalType":"contract IERC20","name":"_wbtc","type":"address"},{"internalType":"address","name":"_owner","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"oldRelayHub","type":"address"},{"indexed":true,"internalType":"address","name":"newRelayHub","type":"address"}],"name":"RelayHubChanged","type":"event"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"address","name":"","type":"address"},{"internalType":"bytes","name":"","type":"bytes"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bytes","name":"","type":"bytes"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"acceptRelayedCall","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bytes","name":"","type":"bytes"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"exchange","outputs":[{"internalType":"contract ICurveExchange","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getHubAddr","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_minWbtcAmount","type":"uint256"},{"internalType":"address payable","name":"_wbtcDestination","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"},{"internalType":"bytes32","name":"_nHash","type":"bytes32"},{"internalType":"bytes","name":"_sig","type":"bytes"}],"name":"mintDontSwap","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_minWbtcAmount","type":"uint256"},{"internalType":"address payable","name":"_wbtcDestination","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"},{"internalType":"bytes32","name":"_nHash","type":"bytes32"},{"internalType":"bytes","name":"_sig","type":"bytes"}],"name":"mintThenSwap","outputs":[{"internalType":"uint256","name":"wbtcBought","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"bytes","name":"context","type":"bytes"},{"internalType":"bool","name":"success","type":"bool"},{"internalType":"uint256","name":"actualCharge","type":"uint256"},{"internalType":"bytes32","name":"preRetVal","type":"bytes32"}],"name":"postRelayedCall","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"bytes","name":"context","type":"bytes"}],"name":"preRelayedCall","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"registry","outputs":[{"internalType":"contract IGatewayRegistry","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"relayHubVersion","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"bytes","name":"_btcDestination","type":"bytes"},{"internalType":"uint256","name":"_amount","type":"uint256"},{"internalType":"uint256","name":"_minRenbtcAmount","type":"uint256"}],"name":"swapThenBurn","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]
 
 	const adapterAddress = '0x3973b2acdfac17171315e49ef19a0758b8b6f104'
+
+	const wbtcAddress = '0x8Cc301A58c03FF01b83116FCa618560414eC2A97'
+
 	const txObject = () => ({
 		id: '',
 		amount: '',
@@ -123,6 +127,7 @@
 			renResponse: '',
 			renSignature: '',
 			utxoAmount: 0,
+			minersFee: 5000,
 
 			default_account: '',
 			adapterContract: null,
@@ -138,6 +143,19 @@
 		computed: {
 			exchangeAmount() {
 				return BN(this.toInput).div(1e8).toFixed()
+			},
+			receivedAmount() {
+				return BN(this.exchangeAmount).minus(this.totalFee).toFixed(8)
+			},
+			exchangeRate() {
+				return BN(this.exchangeAmount).div(this.amount).toFixed(8)
+			},
+			totalFee() {
+				let amount = BN(this.amount).times(1e8)
+				return BN(this.minersFee).plus(amount.times(0.001)).div(1e8).toFixed()
+			},
+			renFee() {
+				return BN(this.amount).times(1e8).times(0.001).div(1e8).toFixed()
 			},
 		},
 		watch: {
@@ -161,7 +179,7 @@
 
 				this.swap = new contract.web3.eth.Contract(swap_abi, swap_address)
 				this.adapterContract = new contract.web3.eth.Contract(adapterABI, adapterAddress)
-				this.wbtccontract = new contract.web3.eth.Contract(ERC20_abi, '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599')
+				this.wbtccontract = new contract.web3.eth.Contract(ERC20_abi, this.wbtcAddress)
 				this.address = this.default_account = contract.default_account
 				this.setAmount()
 				//resume only transactions submitted to btc network
@@ -172,17 +190,11 @@
 				let i = 0;
 				let j = 1;
 				if(this.type == 1) [i, j] = [j, i]
-				console.log(+this.renFee(0, this.amount), "REN FEE")
-				let amount = (BN(this.amount).minus(BN(this.renFee(0, this.amount)))).times(1e8).toFixed(0, 1)
+				console.log(+this.totalFee, "REN FEE")
+				let amount = (BN(this.amount).minus(BN(this.totalFee))).times(1e8).toFixed(0, 1)
 				console.log(i, j, amount, "I J AMOUNT")
 				let get_dy = await this.swap.methods.get_dy(i, j, amount).call()
 				this.toInput = get_dy;
-			},
-
-			renFee(type, amount) {
-				amount = BN(amount)
-				if(type == 0) return ((BN(amount).times(1e8)).minus(5000)).minus(amount * 0.001).div(1e8).toFixed()
-				if(type == 1) return ((BN(amount).times(1e8).minus(amount * 0.001))).plus(5000).div(1e8).toFixed()
 			},
 
 			async loadTransactions() {
@@ -397,11 +409,11 @@
 			async burn() {
 				await common.approveAmount(this.wbtccontract, 
 					RenJS.utils.value(this.amount, "btc").sats().toNumber(), 
-					this.default_account, '0x0000000000000000000000000000000000000000')
+					this.default_account, this.wbtcAddress)
 				await this.adapterContract.methods.swapThenBurn(
 					RenJS.utils.BTC.addressToHex(this.address),
 					RenJS.utils.value(this.amount, "btc").sats().toNumber(),
-					0
+					BN(this.toInput).times(0.99).toFixed(0, 1),
 				).send({
 					from: this.default_account
 				})
@@ -440,5 +452,11 @@
 	}
 	.simplebutton {
 		margin-bottom: 1em;
+	}
+	#result {
+		margin-top: 1em;
+	}
+	#result > div {
+		margin-top: 0.3em;
 	}
 </style>
