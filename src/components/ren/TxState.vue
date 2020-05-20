@@ -23,7 +23,11 @@
 		</span>
 		<span v-show='state == 6'>
 			Got BTC, {{ transaction.utxoAmount }}, do you want to 
+<<<<<<< Updated upstream
 			<button @click="$emit('mint', transaction)">mint and swap now?</button>
+=======
+			<button @click="$emit('mint', transaction)">mint and swap now</button>?
+>>>>>>> Stashed changes
 		</span>
 		<span v-show='state == 7'>
 			Exchange rates expired, you'll get {{ (transaction.utxoAmount - renFee*1e18) }} BTC shifted to renBTC.
@@ -44,3 +48,9 @@
 		}
 	}
 </script>
+
+<style scoped>
+	button {
+		box-shadow: none;
+	}
+</style>

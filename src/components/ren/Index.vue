@@ -25,11 +25,10 @@
 		</div>
 
 		<div id='result'>
-			<div>Exchange amount: {{ exchangeAmount }}</div>
+			<div>Exchange rate: {{ exchangeRate }}</div>
 			<div>Ren fees: {{ renFee }}</div>
 			<div>BTC miner's fee: {{ this.minersFee / 1e8 }}</div>
-			<div>Total received amount: {{ receivedAmount }}</div>
-			<div>Exchange rate: {{ exchangeRate }}</div>
+			<div>Total received amount: {{ (toInput / 1e8).toFixed(8) }}</div>
 		</div>
 
 
