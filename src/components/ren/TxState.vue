@@ -23,19 +23,24 @@
 		</span>
 		<span v-show='state == 6'>
 			Got BTC, {{ transaction.utxoAmount }}, do you want to 
-			<span @click="$emit('mint', transaction)">mint and swap now?</span>
+			<button @click="$emit('mint', transaction)">mint and swap now?</button>
 		</span>
-		<span v-show='state == 100'>
-			Exchange rates expired, do you want to continue with the swap?
+		<span v-show='state == 7'>
+			Exchange rates expired, you'll get {{ (transaction.utxoAmount - renFee*1e18) }} BTC shifted to renBTC.
+			If you want to continue swapping to WBTC, go to the <router-link to="/ren/swap">swap page</router-link>
 		</span>
 	</div>
 </template>
 
 <script>
-	// 0 - waiting for renVM gateway address, 1 - waiting for deposit on BTC address, 2 - got BTC transaction, waiting for confirmation
-	// 3 - waiting for renVM to do it's magic and shift, 4 - got renBTC, now initiating swap, 5 - swap ready
-	// 6 - has renBTC, left the page, so need to confirm eth swap tx
+	import BN from 'bignumber.js'
+
 	export default {
 		props: ['state', 'transaction'],
+		computed: {
+			renFee() {
+				return BN(this.transaction.utxoAmount).times(1e8).times(0.001).div(1e8).toFixed()
+			},
+		}
 	}
 </script>

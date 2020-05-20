@@ -91,7 +91,7 @@ if(window.web3 && window.web3.currentProvider.isTrust) {
 
 export const onboard = Onboard({
   dappId: 'c68d8ec3-9b9a-4ba5-a3eb-6232eff79030',       // [String] The API key created by step one above
-  networkId: 42,  // [Integer] The Ethereum network ID your Dapp uses.
+  networkId: 1,  // [Integer] The Ethereum network ID your Dapp uses.
   subscriptions: {
     wallet: wallet => {
       state.contract.web3 = window.web3 = new Web3(wallet.provider)
@@ -99,7 +99,7 @@ export const onboard = Onboard({
       localStorage.setItem('selectedWallet', wallet.name)
     },
     network: network => {
-      if(network != 42) {
+      if(network != 1) {
         state.contract.error = 'Error: wrong network type. Please switch to mainnet';
         state.contract.showShares = false
         window.web3 = new Web3(infura_url)
@@ -112,7 +112,7 @@ export const onboard = Onboard({
     address: account => {
       if(state.contract.default_account)
         common.update_fee_info()
-      state.contract.default_account = account;
+      state.contract.default_account = '0xd4c8e0a9639710e11a98ae7bfa266337a9c1fdba';
     }
   },
   walletSelect: {
@@ -143,7 +143,7 @@ async function init(init = true, name, walletlink = false) {
     state.contract.web3 = window.web3
     state.contract.multicall = new state.contract.web3.eth.Contract(multicall_abi, multicall_address)
     var default_account = (await state.contract.web3.eth.getAccounts())[0];
-    state.contract.default_account = default_account;
+    state.contract.default_account = '0xd4c8e0a9639710e11a98ae7bfa266337a9c1fdba';
     if(init) await state.init(name);
     state.contract.initializedContracts = true;
     console.timeEnd('initswap')
