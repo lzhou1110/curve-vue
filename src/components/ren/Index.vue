@@ -6,6 +6,77 @@
 				<span v-show='space !== null'>3Box Storage loaded</span>
 			</button>
 		</div>
+		<div class='exchange'>
+            <div class='exchangefields'>
+                <fieldset class='item'>
+                    <legend>From:</legend>
+                    <div class='maxbalance' @click='set_max_balance'>Max: <span>{{maxBalanceText}}</span> </div>
+                    <ul>
+                        <li>
+                            <input type="text" id="from_currency" :disabled='disabled' name="from_currency" value='0.00'
+                            :style = "{backgroundColor: fromBgColor}"
+                            @input='set_to_amount'
+                            v-model='fromInput'>
+                            <!-- <p class='actualvalue' v-show='swapwrapped'>
+                                ≈ {{actualFromValue}} {{Object.keys(currencies)[this.from_currency] | capitalize}}
+                            </p> -->
+                        </li>
+                        <li v-for='(currency, i) in Object.keys(currencies)'>
+                            <input type="radio" :id="'from_cur_'+i" name="from_cur" :value='i' v-model='from_currency'>
+                            <label :for="'from_cur_'+i">
+                                <span>{{currency | capitalize}}</span>
+                            </label>
+                        </label>
+                        </li>
+                    </ul>
+                </fieldset>
+                <fieldset class='item iconcontainer' @click='swapInputs'>
+                    <img src='@/assets/exchange-alt-solid.svg' id='exchangeicon'/>
+                </fieldset>
+                <fieldset class='item'>
+                    <legend>To:</legend>
+                    <div class='maxbalance2'>Max: <span></span> </div>
+                    <ul>
+                        <li>
+                            <input type="text" 
+                            id="to_currency" 
+                            name="to_currency" 
+                            value="0.00" 
+                            disabled
+                            :style = "{backgroundColor: bgColor}"
+                            v-model='toInput'>
+<!--                             <p class='actualvalue' v-show='swapwrapped'>
+                                ≈ {{actualToValue}} {{Object.keys(currencies)[this.to_currency] | capitalize}}
+                            </p> -->
+                        </li>
+                        <li v-for='(currency, i) in Object.keys(currencies)'>
+                            <input type="radio" :id="'to_cur_'+i" name="to_cur" :value='i' v-model='to_currency'>
+                            <label :for="'to_cur_'+i">
+                                <span>{{currency | capitalize}}</span>
+                            </label>
+                        </label>
+                        </li>
+                    </ul>
+                </fieldset>
+            </div>
+	     	<ul>
+	            <li>
+	                <input id="inf-approval" type="checkbox" name="inf-approval" v-model='inf_approval'>
+	                <label for="inf-approval">Infinite approval - trust this contract forever
+	                    <span class='tooltip'>[?]
+	                        <span class='tooltiptext long'>
+	                            Preapprove the contract to to be able to spend any amount of your coins. You will not need to approve again.
+	                        </span>
+	                    </span>
+	                </label>
+	            </li>
+	        </ul>
+			<div class='input'>
+				<label for='address'>{{ from_currency == 1 ? 'BTC' : 'ETH' }} address</label>
+				<input id='address' type='text' v-model='address' placeholder='Address'>
+			</div>
+        </div>
+
 		<div>
 			<input type='radio' id='getwbtc' :value='0' v-model='type'>
 			<label for='getwbtc'>Get WBTC</label>
@@ -14,16 +85,12 @@
 			<label for='getbtc'>Get BTC</label>
 		</div>
 
-		<div class='input'>
+		<!-- <div class='input'>
 			<label for='amount'>{{ type == 0 ? 'BTC' : 'WBTC' }} amount</label>
 			<input id='amount' type='text' v-model='amount' placeholder='Amount' @input = 'setAmount'>
 		</div>
 
-		<div class='input'>
-			<label for='address'>{{ type == 1 ? 'BTC' : 'ETH' }} address</label>
-			<input id='address' type='text' v-model='address' placeholder='Address'>
-		</div>
-
+ -->
 		<div id='result'>
 			<div>Exchange rate: {{ exchangeRate }}</div>
 			<div>Ren fees: {{ renFee }}</div>
@@ -138,6 +205,21 @@
 			box: null,
 			space: null,
 			swap: null,
+
+
+			maxBalance: 0,
+			disabled: false,
+			fromInput: '0.0001',
+			from_currency: 1,
+			to_currency: 0,
+			fromBgColor: '',
+			bgColor: '',
+			swapwrapped: false,
+			currencies: {
+				btc: 'BTC',
+				wbtc: 'WBTC',
+			},
+			inf_approval: false,
 		}),
 		computed: {
 			exchangeAmount() {
@@ -156,13 +238,33 @@
 			renFee() {
 				return BN(this.amount).times(1e8).times(0.001).div(1e8).toFixed()
 			},
+			maxBalanceText() {
+				if(this.from_currency == 0) return 'N/A'
+				return BN(this.maxBalance).div(1e8).toFixed(8)
+			},
 		},
 		watch: {
 			type(val) {
-				this.amount = ''
 				this.address = ''
 				if(val == 0) this.address = this.default_account
 			},
+			from_currency(val, oldval) {
+                if(val == this.to_currency) {
+                    this.to_currency = oldval;
+                }
+                
+                this.from_cur_handler()
+            },
+            async to_currency(val, oldval) {
+            	if(val == this.from_currency) {
+            		if (this.to_currency == 0) {
+                        this.from_currency = 1;
+                    } else {
+                        this.from_currency = 0;
+                    }
+            	}
+            	await this.from_cur_handler()
+            }
 		},
 		created() {
 			this.$watch(() => contract.web3 && contract.default_account, val => {
@@ -179,42 +281,92 @@
 				this.swap = new contract.web3.eth.Contract(swap_abi, swap_address)
 				this.adapterContract = new contract.web3.eth.Contract(adapterABI, adapterAddress)
 				this.wbtccontract = new contract.web3.eth.Contract(ERC20_abi, wbtcAddress)
-				this.address = this.default_account = contract.default_account
-				this.setAmount()
+				this.default_account = contract.default_account
+				if(this.from_currency == 0) this.address = this.default_account
+				console.log(contract.default_account, "DEFAULT ACCOUNT")
+				this.from_cur_handler()
 				//resume only transactions submitted to btc network
 				this.loadTransactions()
 
-				//test wait for burn
-				const burn = await this.sdk.burnAndRelease({
-				    // Send BTC from the Ethereum blockchain to the Bitcoin blockchain.
-				    // This is the reverse of shitIn.
-				    sendToken: RenJS.Tokens.BTC.Eth2Btc,
+				// //test wait for burn
+				// const burn = await this.sdk.burnAndRelease({
+				//     // Send BTC from the Ethereum blockchain to the Bitcoin blockchain.
+				//     // This is the reverse of shitIn.
+				//     sendToken: RenJS.Tokens.BTC.Eth2Btc,
 
-				    // The web3 provider to talk to Ethereum
-				    web3Provider: web3.currentProvider,
+				//     // The web3 provider to talk to Ethereum
+				//     web3Provider: web3.currentProvider,
 
-				    // The transaction hash of our contract call
-				    ethereumTxHash: '0x22b007a000dfa003a49fa3bcdbfb73e796050e913d73826a9ad45a5b6fb7e0c6',
-				}).readFromEthereum();
-				console.log(burn)
-				console.log(await burn.queryTx())
-				let promiEvent = await burn.submit()
-				console.log(promiEvent, "PROMI EVENT")
-				//promiEvent.on('txHash', hash => console.log(hash)).on('status', status => console.log(status));
+				//     // The transaction hash of our contract call
+				//     ethereumTxHash: '0x22b007a000dfa003a49fa3bcdbfb73e796050e913d73826a9ad45a5b6fb7e0c6',
+				// }).readFromEthereum();
+				// console.log(burn)
+				// console.log(await burn.queryTx())
+				// let promiEvent = await burn.submit()
+				// console.log(promiEvent, "PROMI EVENT")
+				// //promiEvent.on('txHash', hash => console.log(hash)).on('status', status => console.log(status));
 
 
 			},
 
+			set_max_balance() {
+				if(this.from_currency == 1) {
+					this.fromInput = 0
+					return;
+				}
+				this.fromInput = BN(this.maxBalance).div(1e8).toFixed(8)
+			},
+
+			set_from_amount() {
+
+			},
+
+			async set_to_amount() {
+				// console.log(+this.totalFee, "REN FEE")
+				// let amount = (BN(this.amount).minus(BN(this.totalFee))).times(1e8).toFixed(0, 1)
+				// console.log(i, j, amount, "I J AMOUNT")
+				let i = this.from_currency
+				let j = this.to_currency
+				let dx = BN(this.fromInput).times(1e8).toFixed(0,1)
+				let get_dy = await this.swap.methods.get_dy(i, j, dx).call()
+				console.log(get_dy, "THE DY")
+				this.toInput = BN(get_dy).div(1e8).toFixed(8);
+			},
+
+			swapInputs() {
+
+			},
+
+			async from_cur_handler() {
+				this.address = ''
+				if(this.from_currency == 0) this.address = this.default_account
+
+                let currentAllowance = BN(await this.wbtccontract.methods.allowance(this.default_account, adapterAddress).call())
+                let maxAllowance = contract.max_allowance.div(BN(2))
+                if (currentAllowance.gt(maxAllowance))
+                    this.inf_approval = true;
+                else
+                    this.inf_approval = false;
+
+                await this.setMaxBalance();
+                await this.set_to_amount();
+            },
+
+			async setMaxBalance() {
+				let balance = await this.wbtccontract.methods.balanceOf(this.address).call()
+				this.maxBalance = this.address ? balance : 0
+				console.log(this.maxBalance)
+			},
+
 			async setAmount() {
-				let i = 0;
-				let j = 1;
-				if(this.type == 1) [i, j] = [j, i]
-				console.log(+this.totalFee, "REN FEE")
-				let amount = (BN(this.amount).minus(BN(this.totalFee))).times(1e8).toFixed(0, 1)
-				console.log(i, j, amount, "I J AMOUNT")
+				// console.log(+this.totalFee, "REN FEE")
+				// let amount = (BN(this.amount).minus(BN(this.totalFee))).times(1e8).toFixed(0, 1)
+				// console.log(i, j, amount, "I J AMOUNT")
+				let i = this.from_currency
+				let j = this.to_currency
 				let get_dy = await this.swap.methods.get_dy(i, j, amount).call()
 				console.log(get_dy, "THE DY")
-				this.toInput = get_dy;
+				this.toInput = BN(get_dy).div(1e8).toFixed(8);
 			},
 
 			async loadTransactions() {

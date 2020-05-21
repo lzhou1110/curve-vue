@@ -112,7 +112,7 @@ export const onboard = Onboard({
     address: account => {
       if(state.contract.default_account)
         common.update_fee_info()
-      state.contract.default_account = '0xd4c8e0a9639710e11a98ae7bfa266337a9c1fdba';
+      state.contract.default_account = account;
     }
   },
   walletSelect: {
@@ -143,7 +143,7 @@ async function init(init = true, name, walletlink = false) {
     state.contract.web3 = window.web3
     state.contract.multicall = new state.contract.web3.eth.Contract(multicall_abi, multicall_address)
     var default_account = (await state.contract.web3.eth.getAccounts())[0];
-    state.contract.default_account = '0xd4c8e0a9639710e11a98ae7bfa266337a9c1fdba';
+    state.contract.default_account = default_account;
     if(init) await state.init(name);
     state.contract.initializedContracts = true;
     console.timeEnd('initswap')
