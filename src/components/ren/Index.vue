@@ -30,7 +30,9 @@
                             </label>
                         </label>
                         </li>
-                        Amount after renVM fees: {{actualFromAmount}}
+                        <span v-show='from_currency == 0'> 
+                        	Amount after renVM fees: {{amountAfterBTC.toFixed(8)}}
+                        </span>
                     </ul>
                 </fieldset>
                 <fieldset class='item iconcontainer' @click='swapInputs'>
@@ -47,7 +49,7 @@
                             value="0.00" 
                             disabled
                             :style = "{backgroundColor: bgColor}"
-                            v-model='toInput'>
+                            :value = 'toInputFormat'>
 <!--                             <p class='actualvalue' v-show='swapwrapped'>
                                 ≈ {{actualToValue}} {{Object.keys(currencies)[this.to_currency] | capitalize}}
                             </p> -->
@@ -59,6 +61,9 @@
                             </label>
                         </label>
                         </li>
+                        <span v-show='from_currency == 1'>
+                        	Amount after renVM fees: {{amountAfterWBTC.toFixed(8)}}
+                        </span>
                     </ul>
                 </fieldset>
             </div>
@@ -188,8 +193,9 @@
 			type: 0,
 			amount: '0.001',
 			toInput: '0.00',
+			toInputOriginal: 0,
 			address: '',
-			sdk: new RenSDK('testnet'),
+			sdk: new RenSDK(),
 			transactions: [],
 
 
@@ -238,9 +244,6 @@
 			receivedAmount() {
 				return BN(this.exchangeAmount).minus(this.totalFee).toFixed(8)
 			},
-			exchangeRate() {
-				return BN(this.exchangeAmount).div(this.amount).toFixed(8)
-			},
 			totalFee() {
 				let amount = BN(this.amount).times(1e8)
 				return BN(this.minersFee).plus(amount.times(0.001)).div(1e8).toFixed()
@@ -256,18 +259,25 @@
             	return this.toInput / this.fromInput
             },
             exchangeRateOriginal() {
-            	return this.get_dy_original / 1e8  / this.fromInput
+            	return this.toInputOriginal / this.fromInput
             },
             renVMfee() {
             	return BN(this.fromInput).times(0.001).div(1e8).toFixed(0)
             },
             actualFromAmount() {
-            	if(this.from_currency == 0)
+            	if(this.from_currency == 1) return ''
+            	if(this.from_currency == 1)
             		return BN(this.fromInput).times(0.999).toFixed(8)
             	return BN(this.fromInput).times(1e8).times(0.999).minus(this.minersFee).toFixed(0)
             },
             actualToAmount() {
             	return BN(this.fromInput).times()
+            },
+            amountAfterBTC() {
+            	return (this.fromInput * 1e8 * 0.999 - this.minersFee) / 1e8 
+            },
+            amountAfterWBTC() {
+            	return (this.toInputOriginal * 1e8 * 0.999 - this.minersFee) / 1e8
             },
             minOrderSize() {
             	return 35001
@@ -276,6 +286,10 @@
             	if(this.from_currency == 0) return false
             	if(this.from_currency == 1 && BN(this.fromInput).times(1e8).lt(BN(this.minOrderSize))) return true	
             },
+        	toInputFormat() {
+        		if(!this.toInput || typeof this.toInput == 'string') return '0.00'
+        		return +this.toInput.toFixed(8) 
+        	}
 		},
 		watch: {
 			type(val) {
@@ -318,28 +332,29 @@
 				this.address = this.default_account = contract.default_account
 				if(this.from_currency == 1) this.address = this.default_account
 				console.log(contract.default_account, "DEFAULT ACCOUNT")
-				console.log(await this.sdk.renVM.sendMessage('ren_queryFees', {}))
+				//console.log(await this.sdk.renVM.sendMessage('ren_queryFees', {}))
 				this.from_cur_handler()
 				//resume only transactions submitted to btc network
 				this.loadTransactions()
 
-				// //test wait for burn
-				// const burn = await this.sdk.burnAndRelease({
-				//     // Send BTC from the Ethereum blockchain to the Bitcoin blockchain.
-				//     // This is the reverse of shitIn.
-				//     sendToken: RenJS.Tokens.BTC.Eth2Btc,
+				//test wait for burn
+				const burn = this.sdk.burnAndRelease({
+				    // Send BTC from the Ethereum blockchain to the Bitcoin blockchain.
+				    // This is the reverse of shitIn.
+				    sendToken: RenJS.Tokens.BTC.Eth2Btc,
 
-				//     // The web3 provider to talk to Ethereum
-				//     web3Provider: web3.currentProvider,
+				    // The web3 provider to talk to Ethereum
+				    web3Provider: web3.currentProvider,
 
-				//     // The transaction hash of our contract call
-				//     ethereumTxHash: '0x22b007a000dfa003a49fa3bcdbfb73e796050e913d73826a9ad45a5b6fb7e0c6',
-				// }).readFromEthereum();
-				// console.log(burn)
-				// console.log(await burn.queryTx())
-				// let promiEvent = await burn.submit()
-				// console.log(promiEvent, "PROMI EVENT")
-				// //promiEvent.on('txHash', hash => console.log(hash)).on('status', status => console.log(status));
+				    // The transaction hash of our contract call
+				    ethereumTxHash: '0x63d85ac854fb1100ed7d8c44531d39cbd13a116ff4d09888d7dac1f0f7a7caa8',
+				})
+				await burn.readFromEthereum()
+				console.log(burn)
+				console.log(await burn.queryTx())
+				let promiEvent = await burn.submit()
+				console.log(promiEvent, "PROMI EVENT")
+				//promiEvent.on('txHash', hash => console.log(hash)).on('status', status => console.log(status));
 
 
 			},
@@ -364,22 +379,37 @@
 				let j = this.to_currency
 				let dx = BN(this.fromInput).times(1e8).toFixed(0,1)
 				let original_dx = dx
+				dx = BN(this.fromInput).times(1e8).times(0.999).minus(this.minersFee).toFixed(0,1)
+				// if(this.from_currency == 0) {
+				// 	dx = BN(this.fromInput).times(1e8).times(0.999).minus(this.minersFee).toFixed(0,1)
+				// }
+				// if(this.from_currency == 1) {
+				// 	dx = BN(this.fromInput).times(1e8).times(0.999).minus(this.minersFee).toFixed(0,1)
+				// }
+
+				//case WBTC -> BTC
+					//swapping the entered WBTC amount and then from result subtract fees
+				//case BTC -> WBTC
+					//subtract fees and then do SWAP
+				let get_dy_original = this.swap.methods.get_dy(i, j, BN(this.fromInput).times(1e8).toFixed(0,1)).call()
+				let get_dys = [get_dy_original]
 				if(this.from_currency == 0) {
-					dx = BN(this.fromInput).times(0.999).times(1e8).toFixed(0,1)
+					get_dys.push(this.swap.methods.get_dy(i, j, BN(this.fromInput).times(1e8).minus(this.minersFee).times(0.999).toFixed(0,1)).call())
 				}
-				if(this.from_currency == 1) {
-					dx = BN(this.fromInput).times(1e8).minus(this.minersFee).toFixed(0,1)
-				}
-				console.log(dx, "THE DX")
-				let get_dys = [this.swap.methods.get_dy(i, j, original_dx).call(), this.swap.methods.get_dy(i, j, dx).call()]
-				console.log(get_dys)
 				this.promise.cancel()
 				let promise = Promise.all(get_dys)
 				this.promise = helpers.makeCancelable(promise)
-				let [get_dy_original, get_dy] = await promise
-				console.log(get_dy_original, get_dy, "THE DY")
-				this.get_dy_original = get_dy_original
-				this.toInput = BN(get_dy).div(1e8).toFixed(8);
+				let result = await promise
+				if(this.from_currency == 0) {
+					let [dy_original, dy] = result.map(v=>v / 1e8)
+					console.log(dy_original)
+					this.toInput = dy
+					this.toInputOriginal = dy_original
+				}
+				else {
+					this.toInput = (result - this.minersFee)*0.999 / 1e8
+					this.toInputOriginal = result / 1e8
+				}
 			},
 
 			swapInputs() {
@@ -513,7 +543,7 @@
 				const mint = this.sdk.lockAndMint(transfer);
 				if(!id) {
 					transfer.id = helpers.generateID();
-					transfer.amount = this.amount;
+					transfer.amount = this.from_currency == 0 ? this.amountAfterBTC : this.fromInput;
 					transfer.address = this.address;
 					transfer.toInput = this.toInput;
 					let tx = {...txObject(), ...transfer}
@@ -592,12 +622,11 @@
 				}
 			},
 
-			async mintThenSwap({ id, params, utxoAmount, renResponse, signature }) {
+			async mintThenSwap({ id, amount, params, utxoAmount, renResponse, signature }) {
 				let transaction = this.transactions.find(t => t.id == id);
 				let min_amount = params.contractCalls[0].contractParams[0].value
 				
-				let amount = BN(this.amount).times(1e8).minus(BN(this.renFee(0, this.amount))).toFixed(0, 1)
-				let get_dy = await this.swap.methods.get_dy(i, j, amount).call()
+				let get_dy = await this.swap.methods.get_dy(0, 1, BN(amount).times(1e8).toFixed(0, 1)).call()
 
 				await this.adapterContract.methods.mintThenSwap(
 					params.contractCalls[0].contractParams[0].value,
@@ -619,23 +648,45 @@
 
 			async burn() {
 				await common.approveAmount(this.wbtccontract, 
-					BN(this.amount).times(1e8), 
+					BN(this.fromInput).times(1e8), 
 					this.default_account, adapterAddress)
 				console.log(RenJS.utils.BTC.addressToHex(this.address),
-					BN(this.amount).times(1e8),
-					BN(this.toInput).times(0.99).toFixed(0, 1))
-				await this.adapterContract.methods.swapThenBurn(
-					RenJS.utils.BTC.addressToHex(this.address),
-					BN(this.amount).times(1e8),
-					BN(this.toInput).times(0.99).toFixed(0, 1),
-				).send({
-					from: this.default_account
+					BN(this.fromInput).times(1e8),
+					BN(this.toInputOriginal))
+				let txhash = await new Promise((resolve, reject) => {
+					return this.adapterContract.methods.swapThenBurn(
+						RenJS.utils.BTC.addressToHex(this.address),
+						BN(this.fromInput).times(1e8),
+						BN(this.toInputOriginal).times(0.97).toFixed(0, 1),
+					).send({
+						from: this.default_account,
+						gas: 600000,
+					})
+					.once('transactionHash', resolve)
+					.catch(err => reject(err))
 				})
+
+				const burn = await this.sdk.burnAndRelease({
+				    // Send BTC from the Ethereum blockchain to the Bitcoin blockchain.
+				    // This is the reverse of shitIn.
+				    sendToken: RenJS.Tokens.BTC.Eth2Btc,
+
+				    // The web3 provider to talk to Ethereum
+				    web3Provider: web3.currentProvider,
+
+				    // The transaction hash of our contract call
+				    ethereumTxHash: txhash,
+				}).readFromEthereum();
+				console.log(burn)
+				console.log(await burn.queryTx())
+				let promiEvent = await burn.submit()
+				console.log(promiEvent, "PROMI EVENT")
+				//promiEvent.on('txHash', hash => console.log(hash)).on('status', status => console.log(status));
 			},
 
 			async submit() {
-				if(this.type == 0) this.mint()
-				if(this.type == 1) this.burn()
+				if(this.from_currency == 0) this.mint()
+				if(this.from_currency == 1) this.burn()
 			}
 		}
 	}
