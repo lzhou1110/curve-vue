@@ -22,14 +22,15 @@
 		                    	</span>
 		                    </span>
                     	<span :class="{'loading line': !daily_apy[0]}">{{daily_apy[0]}}</span>%</span>
-	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.compound < 0}">
-	                    	<span v-show='volumes.compound >= 0'>${{(volumes.compound | 0) | formatNumber}}</span>
+	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.compound && volumes.compound[0] < 0}">
+	                    	<span v-show='volumes.compound && volumes.compound[0] >= 0'>${{(volumes.compound && volumes.compound[0] | 0) | formatNumber(0)}}</span>
+	                    	<span v-show='!volumes.compound && volumes.compound[0]'>$0</span>
                	 		</span></span>
                	 		<span class='balance'>
-           	 				<span class='showmobile' v-show='balances[0]'>Balance: ${{balances[0] && balances[0].toFixed(2)}} </span>
-               	 			<span class='tooltip' v-show='balances[0]'>
+           	 				<span class='showmobile' v-show='balances.compound > 0'>Balance: ${{balances.compound && balances.compound.toFixed(2)}} </span>
+               	 			<span class='tooltip' v-show='balances.compound > 0'>
                	 				<img src='../../assets/dollar-sign-solid.svg'>
-               	 				<span class='tooltiptext'>Balance: ${{balances[0] && balances[0].toFixed(2)}}</span>
+               	 				<span class='tooltiptext'>Balance: ${{balances.compound && balances.compound.toFixed(2)}}</span>
                	 			</span>
                	 		</span>
 	                </router-link>
@@ -51,14 +52,14 @@
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[1]}">{{daily_apy[1]}}</span>%
 	                    </span>
-	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.usdt < 0}">
-	                    	<span v-show='volumes.usdt >= 0'>${{(volumes.usdt | 0) | formatNumber}}</span>
+	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.usdt && volumes.usdt[0] < 0}">
+	                    	<span v-show='volumes.usdt && volumes.usdt[0] >= 0'>${{(volumes.usdt && volumes.usdt[0] | 0) | formatNumber(0)}}</span>
                	 		</span></span>
                	 		<span class='balance'>
-           	 				<span class='showmobile' v-show='balances[1]'>Balance: ${{balances[1] && balances[1].toFixed(2)}} </span>
-               	 			<span class='tooltip' v-show='balances[1]'>
+           	 				<span class='showmobile' v-show='balances.usdt > 0'>Balance: ${{balances.usdt && balances.usdt.toFixed(2)}} </span>
+               	 			<span class='tooltip' v-show='balances.usdt > 0'>
                	 				<img src='../../assets/dollar-sign-solid.svg'>
-               	 				<span class='tooltiptext'>Balance: ${{balances[1] && balances[1].toFixed(2)}}</span>
+               	 				<span class='tooltiptext'>Balance: ${{balances.usdt && balances.usdt.toFixed(2)}}</span>
                	 			</span>
                	 		</span>
 	                </router-link>
@@ -97,14 +98,15 @@
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[5]}">{{daily_apy[5]}}</span>%
 	                    </span>
-	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.pax < 0}">
-	                    	<span v-show='volumes.pax >= 0'>${{(volumes.pax | 0) | formatNumber}}</span>
+	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.pax && volumes.pax[0] < 0}">
+	                    	<span v-show='volumes.pax && volumes.pax[0] >= 0'>${{(volumes.pax && volumes.pax[0] | 0) | formatNumber(0)}}</span>
+	                    	<span v-show='!volumes.pax && volumes.pax[0]'>$0</span>
                	 		</span></span>
                	 		<span class='balance'>
-           	 				<span class='showmobile' v-show='balances[5]'>Balance: ${{balances[5] && balances[5].toFixed(2)}} </span>
-               	 			<span class='tooltip' v-show='balances[5]'>
+           	 				<span class='showmobile' v-show='balances.pax > 0'>Balance: ${{balances.pax && balances.pax.toFixed(2)}} </span>
+               	 			<span class='tooltip' v-show='balances.pax > 0'>
                	 				<img src='../../assets/dollar-sign-solid.svg'>
-               	 				<span class='tooltiptext'>Balance: ${{balances[5] && balances[5].toFixed(2)}}</span>
+               	 				<span class='tooltiptext'>Balance: ${{balances.pax && balances.pax.toFixed(2)}}</span>
                	 			</span>
                	 		</span>
 	                </router-link>
@@ -126,14 +128,15 @@
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[2]}">{{daily_apy[2]}}</span>%
 	                    </span>
-	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.y < 0}">
-	                    	<span v-show='volumes.y >= 0'>${{(volumes.y | 0) | formatNumber}}</span>
+	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.y && volumes.y[0] < 0}">
+	                    	<span v-show='volumes.y && volumes.y[0] >= 0'>${{(volumes.y && volumes.y[0] | 0) | formatNumber(0)}}</span>
+	                    	<span v-show='!volumes.y && volumes.y[0]'>$0</span>
                	 		</span></span>
                	 		<span class='balance'>
-           	 				<span class='showmobile' v-show='balances[2]'>Balance: ${{balances[2] && balances[2].toFixed(2)}} </span>
-               	 			<span class='tooltip' v-show='balances[2]'>
+           	 				<span class='showmobile' v-show='balances.y > 0'>Balance: ${{balances.y && balances.y.toFixed(2)}} </span>
+               	 			<span class='tooltip' v-show='balances.y > 0'>
                	 				<img src='../../assets/dollar-sign-solid.svg'>
-               	 				<span class='tooltiptext'>Balance: ${{balances[2] && balances[2].toFixed(2)}}</span>
+               	 				<span class='tooltiptext'>Balance: ${{balances.y && balances.y.toFixed(2)}}</span>
                	 			</span>
                	 		</span>
 	                </router-link>
@@ -155,14 +158,15 @@
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[3]}">{{daily_apy[3]}}</span>%
 	                    </span>
-	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.busd < 0}">
-	                    	<span v-show='volumes.busd >= 0'>${{(volumes.busd | 0) | formatNumber}}</span>
+	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.busd && volumes.busd[0] < 0}">
+	                    	<span v-show='volumes.busd && volumes.busd[0] >= 0'>${{(volumes.busd && volumes.busd[0] | 0) | formatNumber(0)}}</span>
+	                    	<span v-show='!volumes.busd && volumes.busd[0]'>$0</span>
                	 		</span></span>
                	 		<span class='balance'>
-           	 				<span class='showmobile' v-show='balances[3]'>Balance: ${{balances[3] && balances[3].toFixed(2)}} </span>
-               	 			<span class='tooltip' v-show='balances[3]'>
+           	 				<span class='showmobile' v-show='balances.busd > 0'>Balance: ${{balances.busd && balances.busd.toFixed(2)}} </span>
+               	 			<span class='tooltip' v-show='balances.busd > 0'>
                	 				<img src='../../assets/dollar-sign-solid.svg'>
-               	 				<span class='tooltiptext'>Balance: ${{balances[3] && balances[3].toFixed(2)}}</span>
+               	 				<span class='tooltiptext'>Balance: ${{balances.busd && balances.busd.toFixed(2)}}</span>
                	 			</span>
                	 		</span>
 	                </router-link>
@@ -175,7 +179,7 @@
 	                    <span class='apr'>APY: <span :class="{'loading line': !daily_apy[4]}">{{daily_apy[4]}}</span>%</span>
 	                    <span class='volume'>
 	                    	Vol: <span :class="{'loading line': volumesData.busd < 0}">
-	                    	<span v-show='volumesData.busd >= 0'>${{(volumesData.busd | 0) | formatNumber}}</span>
+	                    	<span v-show='volumesData.busd >= 0'>${{(volumesData.busd | 0) | formatNumber(0)}}</span>
                	 		</span></span>
 	                </router-link>
 	            </div> -->
@@ -205,18 +209,77 @@
 	                    		</span>
 	                    	</span>
 	                    </span>
-	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.susd < 0}">
-	                    	<span v-show='volumes.susd >= 0'>${{(volumes.susd | 0) | formatNumber}}</span>
+	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.susd && volumes.susd[0] < 0}">
+	                    	<span v-show='volumes.susd && volumes.susd[0] >= 0'>${{(volumes.susd && volumes.susd[0] | 0) | formatNumber(0)}}</span>
+	                    	<span v-show='!volumes.susd && volumes.susd[0]'>$0</span>
                	 		</span></span>
                	 		<span class='balance'>
-           	 				<span class='showmobile' v-show='balances[4]'>Balance: ${{balances[4] && balances[4].toFixed(2)}} </span>
-               	 			<span class='tooltip' v-show='balances[4]'>
+           	 				<span class='showmobile' v-show='balances.susdv2 > 0'>Balance: ${{balances.susdv2 && balances.susdv2.toFixed(2)}} </span>
+               	 			<span class='tooltip' v-show='balances.susdv2 > 0'>
                	 				<img src='../../assets/dollar-sign-solid.svg'>
-               	 				<span class='tooltiptext'>Balance: ${{balances[4] && balances[4].toFixed(2)}}</span>
+               	 				<span class='tooltiptext'>Balance: ${{balances.susdv2 && balances.susdv2.toFixed(2)}}</span>
                	 			</span>
                	 		</span>
 	                </router-link>
 	            </div>
+	            <!-- <div :class="{selected: activePoolLink == 5}">
+	                <router-link to = '/tbtc'>
+	                	<span class='index'>5.</span>  
+	                    <span class='pooltext'>tBTC</span>
+	                    <span class='pools'>[tBTC, hBTC, wBTC]</span>  
+	                    <span class='apr'>
+	                    	<span class='tooltip'>APY:
+	                    		<span class='tooltiptext long'>
+		                    		<div>Pool APY + Lending APY (annualized)</div>
+		                    		<div>Daily APY: {{daily_apy[6]}}%</div>
+		                    		<div>Weekly APY: {{weekly_apy[6]}}%</div>
+		                    		<div>Monthly APY: {{monthly_apy[6]}}%</div>
+		                    		<div>Total APY: {{apy[6]}}%</div>
+		                    	</span>
+	                    	</span> 
+	                    	<span :class="{'loading line': !daily_apy[6]}">{{daily_apy[6]}}</span>%
+	                    </span>
+	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.tbtc && volumes.tbtc[0] < 0}">
+	                    	<span v-show='volumes.tbtc && volumes.tbtc[0] >= 0'>${{(volumes.tbtc && volumes.tbtc[0] | 0) | formatNumber(0)}}</span>
+               	 		</span></span>
+               	 		<span class='balance'>
+           	 				<span class='showmobile' v-show='balances.tbtc > 0'>Balance: ${{balances.tbtc && balances.tbtc.toFixed(2)}} </span>
+               	 			<span class='tooltip' v-show='balances.tbtc > 0'>
+               	 				<img src='../../assets/dollar-sign-solid.svg'>
+               	 				<span class='tooltiptext'>Balance: ${{balances.tbtc && balances.tbtc.toFixed(2)}}</span>
+               	 			</span>
+               	 		</span>
+	                </router-link>
+	            </div> -->
+	            <!-- <div :class="{selected: activePoolLink == 6}">
+	                <router-link to = '/ren'>
+	                	<span class='index'>5.</span>  
+	                    <span class='pooltext'>ren</span>
+	                    <span class='pools'>[renBTC, wBTC]</span>  
+	                    <span class='apr'>
+	                    	<span class='tooltip'>APY:
+	                    		<span class='tooltiptext long'>
+		                    		<div>Pool APY + Lending APY (annualized)</div>
+		                    		<div>Daily APY: {{daily_apy[7]}}%</div>
+		                    		<div>Weekly APY: {{weekly_apy[7]}}%</div>
+		                    		<div>Monthly APY: {{monthly_apy[7]}}%</div>
+		                    		<div>Total APY: {{apy[7]}}%</div>
+		                    	</span>
+	                    	</span> 
+	                    	<span :class="{'loading line': !daily_apy[7]}">{{daily_apy[7]}}</span>%
+	                    </span>
+	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.ren && volumes.ren[0] < 0}">
+	                    	<span v-show='volumes.ren && volumes.ren[0] >= 0'>${{(volumes.ren && volumes.ren[0] | 0) | formatNumber(0)}}</span>
+               	 		</span></span>
+               	 		<span class='balance'>
+           	 				<span class='showmobile' v-show='balances.ren > 0'>Balance: ${{balances.ren && balances.ren.toFixed(2)}} </span>
+               	 			<span class='tooltip' v-show='balances.ren > 0'>
+               	 				<img src='../../assets/dollar-sign-solid.svg'>
+               	 				<span class='tooltiptext'>Balance: ${{balances.ren && balances.ren.toFixed(2)}}</span>
+               	 			</span>
+               	 		</span>
+	                </router-link>
+	            </div> -->
 	        </fieldset>
 	    </div>
 
@@ -226,6 +289,7 @@
 </template>
 
 <script>
+	import Vue from 'vue'
 	import TotalBalances from './TotalBalances.vue'
 	import BasicTrade from '../graphs/BasicTrade.vue'
 	import allabis, { ERC20_abi, sCurveRewards_abi, sCurveRewards_address } from '../../allabis'
@@ -242,18 +306,37 @@
 		},
 		data: () => ({
 			activePoolLink: -1,
-			pools: ['compound','usdt','y','busd'],
+			pools: ['compound','usdt','y','busd','susdv2','pax','tbtc','ren'],
 			daily_apy: [],
 			weekly_apy: [],
 			monthly_apy: [],
 			apy: [],
 			start: 0,
 			end: 0,
-			volumes: [],
-			balances: [],
+			volumes: {
+				compound: [-1, -1],
+				usdt: [-1, -1],
+				y: [-1, -1],
+				busd: [-1, -1],
+				susd: [-1, -1],
+				pax: [-1, -1],
+				tbtc: [-1, -1],
+				ren: [-1, -1],
+			},
+			balances: {
+				compound: -1,
+				usdt: -1,
+				y: -1,
+				busd: -1,
+				susdv2: -1,
+				pax: -1,
+				tbtc: -1,
+				ren: -1,
+			},
 			snxRewards: null,
+			btcPrice: null,
 		}),
-		created() {
+		async created() {
 			var start = new Date();
 			start.setHours(0,0,0,0);
 			this.start = start.getTime() / 1000
@@ -261,6 +344,7 @@
 			var end = new Date();
 			end.setHours(23,59,59,999);
 			this.end = end.getTime() / 1000
+
 			this.$watch(() => contract.web3 && contract.multicall, val => {
 				if(!val) return;
 				this.getCurveRewards()
@@ -277,7 +361,7 @@
 		},
 		computed: {
 			totalVolume() {
-				return Object.values(this.volumes).reduce((a, b) => a + b, 0)
+				return volumeStore.totalVolume()
 			},
 		},
 		methods: {
@@ -298,21 +382,24 @@
 			async getBalances() {
 				if(!contract.default_account) return;
 				contract.contracts.compound = contract;
-				let calls = Object.entries(contract.contracts).flatMap(([k, v]) => 
-					[
+				let calls = this.pools.flatMap(k => {
+					return [
 						//balanceOf(address)
 						[allabis[k].token_address, '0x70a08231000000000000000000000000' + contract.default_account.slice(2)],
 						//get_virtual_price
 						[allabis[k].swap_address, "0xbb7b8b80"]
-					])
+					]})
 				calls.push([sCurveRewards_address, '0x70a08231000000000000000000000000' + contract.default_account.slice(2)])
 				let aggcalls = await contract.multicall.methods.aggregate(calls).call()
 				let decoded = aggcalls[1].map(hex => web3.eth.abi.decodeParameter('uint256', hex))
 				this.balances = []
-				helpers.chunkArr(decoded, 2).slice(0,6).map(v => {
-					this.balances.push(+v[0] * (+v[1]) / 1e36);
+				helpers.chunkArr(decoded, 2).slice(0,this.pools.length).map((v, i) => {
+					let key = this.pools[i]
+					this.balances[key] = +v[0] * (+v[1]) / 1e36;
+					if(['tbtc', 'ren'].includes(key)) this.balances[key] *= this.btcPrice
 				})
-				this.balances[4] += (+decoded[10] * decoded[9]) / 1e36
+				let len = decoded.length
+				this.balances.susdv2 += (+decoded[len-1] * decoded[len-2]) / 1e36
 			},
 			handle_pool_change(e) {
 				if(document.querySelector('#from_currency') == document.activeElement 
@@ -338,11 +425,19 @@
 	            }
 			},
 			async getAPY() {
-				let pools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax']
+				let pools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc','ren']
 	            let stats = await fetch(`${window.domain}/raw-stats/apys.json`)
 	            stats = await stats.json()
-                this.volumes = stats.volume;
-                volumeStore.state.volumes = stats.volume
+                for(let [key, value] of Object.entries(volumeStore.state.volumes)) {
+                	if(volumeStore.state.volumes[key] && volumeStore.state.volumes[key][0] == -1) {
+                		Vue.set(volumeStore.state.volumes[key], 0, stats.volume[key] || 0)
+                		if(['tbtc', 'ren'].includes(key)) {
+                			Vue.set(volumeStore.state.volumes[key], 0, stats.volume[key] * this.btcPrice || 0)
+                			Vue.set(volumeStore.state.volumes[key], 1, stats.volume[key] || 0)
+                		}
+                	}
+                }
+                this.volumes = volumeStore.state.volumes;
 	            for(let [i, pool] of pools.entries()) {
 	                var daily_apy = stats.apy.day[pool];
 	                var weekly_apy = stats.apy.week[pool];

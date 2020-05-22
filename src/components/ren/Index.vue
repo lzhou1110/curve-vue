@@ -7,6 +7,11 @@
 			</button>
 		</div>
 		<div class='exchange'>
+
+			<div class='input'>
+				<label for='address'>{{ from_currency == 1 ? 'BTC' : 'ETH' }} address</label>
+				<input id='address' type='text' v-model='address' placeholder='Address'>
+			</div>
             <div class='exchangefields'>
                 <fieldset class='item'>
                     <legend>From:</legend>
@@ -17,9 +22,6 @@
                             :style = "{backgroundColor: fromBgColor}"
                             @input='set_to_amount'
                             v-model='fromInput'>
-                            <!-- <p class='actualvalue' v-show='swapwrapped'>
-                                ≈ {{actualFromValue}} {{Object.keys(currencies)[this.from_currency] | capitalize}}
-                            </p> -->
                         </li>
                         <li v-for='(currency, i) in Object.keys(currencies)'>
                             <input type="radio" :id="'from_cur_'+i" name="from_cur" :value='i' v-model='from_currency'>
@@ -28,6 +30,7 @@
                             </label>
                         </label>
                         </li>
+                        Amount after renVM fees: {{actualFromAmount}}
                     </ul>
                 </fieldset>
                 <fieldset class='item iconcontainer' @click='swapInputs'>
@@ -71,10 +74,10 @@
 	                </label>
 	            </li>
 	        </ul>
-			<div class='input'>
-				<label for='address'>{{ from_currency == 1 ? 'BTC' : 'ETH' }} address</label>
-				<input id='address' type='text' v-model='address' placeholder='Address'>
-			</div>
+            <p class='exchange-rate'>Exchange rate (including fees and renVM fee): <span id="exchange-rate">{{ exchangeRate && exchangeRate.toFixed(4) }}</span></p>
+            <p class='simple-error' v-show='from_currency == 1 && lessThanMinOrder'>
+            	Minimum order size is {{ minOrderSize / 1e8 }} 
+            </p>
         </div>
 
 		<div>
@@ -193,7 +196,7 @@
 			renResponse: '',
 			renSignature: '',
 			utxoAmount: 0,
-			minersFee: 5000,
+			minersFee: 35000,
 
 			default_account: '',
 			adapterContract: null,
@@ -242,6 +245,27 @@
 				if(this.from_currency == 0) return 'N/A'
 				return BN(this.maxBalance).div(1e8).toFixed(8)
 			},
+			exchangeRate() {
+            	return this.toInput / this.fromInput
+            },
+            renVMfee() {
+            	return BN(this.fromInput).times(0.001).div(1e8).toFixed(0)
+            },
+            actualFromAmount() {
+            	if(this.from_currency == 0)
+            		return BN(this.fromInput).times(0.999).toFixed(8)
+            	return BN(this.fromInput).times(1e8).times(0.999).minus(this.minersFee).toFixed(0)
+            },
+            actualToAmount() {
+            	return BN(this.fromInput).times()
+            },
+            minOrderSize() {
+            	return 35001
+            },
+            lessThanMinOrder() {
+            	if(this.from_currency == 0) return false
+            	if(this.from_currency == 1 && BN(this.fromInput).times(1e8).lt(BN(this.minOrderSize))) return true	
+            },
 		},
 		watch: {
 			type(val) {
@@ -264,7 +288,7 @@
                     }
             	}
             	await this.from_cur_handler()
-            }
+            },
 		},
 		created() {
 			this.$watch(() => contract.web3 && contract.default_account, val => {
@@ -281,8 +305,8 @@
 				this.swap = new contract.web3.eth.Contract(swap_abi, swap_address)
 				this.adapterContract = new contract.web3.eth.Contract(adapterABI, adapterAddress)
 				this.wbtccontract = new contract.web3.eth.Contract(ERC20_abi, wbtcAddress)
-				this.default_account = contract.default_account
-				if(this.from_currency == 0) this.address = this.default_account
+				this.address = this.default_account = contract.default_account
+				if(this.from_currency == 1) this.address = this.default_account
 				console.log(contract.default_account, "DEFAULT ACCOUNT")
 				this.from_cur_handler()
 				//resume only transactions submitted to btc network
@@ -328,6 +352,12 @@
 				let i = this.from_currency
 				let j = this.to_currency
 				let dx = BN(this.fromInput).times(1e8).toFixed(0,1)
+				if(this.from_currency == 0) {
+					dx = BN(this.fromInput).times(0.999).times(1e8).toFixed(0,1)
+				}
+				if(this.from_currency == 1) {
+					dx = BN(this.fromInput).times(1e8).minus(this.minersFee).toFixed(0,1)
+				}
 				let get_dy = await this.swap.methods.get_dy(i, j, dx).call()
 				console.log(get_dy, "THE DY")
 				this.toInput = BN(get_dy).div(1e8).toFixed(8);
@@ -353,8 +383,9 @@
             },
 
 			async setMaxBalance() {
-				let balance = await this.wbtccontract.methods.balanceOf(this.address).call()
-				this.maxBalance = this.address ? balance : 0
+				console.log(this.address, "THE ADDRESS")
+				let balance = await this.wbtccontract.methods.balanceOf(this.default_account).call()
+				this.maxBalance = this.default_account ? balance : 0
 				console.log(this.maxBalance)
 			},
 
@@ -622,5 +653,8 @@
 	}
 	#result > div {
 		margin-top: 0.3em;
+	}
+	.exchange-rate {
+		text-align: left;
 	}
 </style>
