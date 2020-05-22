@@ -74,7 +74,12 @@
 	                </label>
 	            </li>
 	        </ul>
-            <p class='exchange-rate'>Exchange rate (including fees and renVM fee): <span id="exchange-rate">{{ exchangeRate && exchangeRate.toFixed(4) }}</span></p>
+            <p class='exchange-rate'>Exchange rate (including fees and renVM fee): 
+            	<span id="exchange-rate">{{ exchangeRate && exchangeRate.toFixed(4) }}</span>
+            </p>
+            <p class='exchange-rate'>Exchange rate (including fees): 
+            	<span id="exchange-rate">{{ exchangeRateOriginal && exchangeRateOriginal.toFixed(4) }}</span>
+            </p>
             <p class='simple-error' v-show='from_currency == 1 && lessThanMinOrder'>
             	Minimum order size is {{ minOrderSize / 1e8 }} 
             </p>
@@ -181,10 +186,10 @@
 		},
 		data: () => ({
 			type: 0,
-			amount: '0.0001',
+			amount: '0.001',
 			toInput: '0.00',
 			address: '',
-			sdk: new RenSDK(),
+			sdk: new RenSDK('testnet'),
 			transactions: [],
 
 
@@ -212,9 +217,10 @@
 
 			maxBalance: 0,
 			disabled: false,
-			fromInput: '0.0001',
+			fromInput: '0.001',
 			from_currency: 1,
 			to_currency: 0,
+			get_dy_original: '',
 			fromBgColor: '',
 			bgColor: '',
 			swapwrapped: false,
@@ -223,6 +229,7 @@
 				wbtc: 'WBTC',
 			},
 			inf_approval: false,
+			promise: helpers.makeCancelable(Promise.resolve()),
 		}),
 		computed: {
 			exchangeAmount() {
@@ -247,6 +254,9 @@
 			},
 			exchangeRate() {
             	return this.toInput / this.fromInput
+            },
+            exchangeRateOriginal() {
+            	return this.get_dy_original / 1e8  / this.fromInput
             },
             renVMfee() {
             	return BN(this.fromInput).times(0.001).div(1e8).toFixed(0)
@@ -308,6 +318,7 @@
 				this.address = this.default_account = contract.default_account
 				if(this.from_currency == 1) this.address = this.default_account
 				console.log(contract.default_account, "DEFAULT ACCOUNT")
+				console.log(await this.sdk.renVM.sendMessage('ren_queryFees', {}))
 				this.from_cur_handler()
 				//resume only transactions submitted to btc network
 				this.loadTransactions()
@@ -352,14 +363,22 @@
 				let i = this.from_currency
 				let j = this.to_currency
 				let dx = BN(this.fromInput).times(1e8).toFixed(0,1)
+				let original_dx = dx
 				if(this.from_currency == 0) {
 					dx = BN(this.fromInput).times(0.999).times(1e8).toFixed(0,1)
 				}
 				if(this.from_currency == 1) {
 					dx = BN(this.fromInput).times(1e8).minus(this.minersFee).toFixed(0,1)
 				}
-				let get_dy = await this.swap.methods.get_dy(i, j, dx).call()
-				console.log(get_dy, "THE DY")
+				console.log(dx, "THE DX")
+				let get_dys = [this.swap.methods.get_dy(i, j, original_dx).call(), this.swap.methods.get_dy(i, j, dx).call()]
+				console.log(get_dys)
+				this.promise.cancel()
+				let promise = Promise.all(get_dys)
+				this.promise = helpers.makeCancelable(promise)
+				let [get_dy_original, get_dy] = await promise
+				console.log(get_dy_original, get_dy, "THE DY")
+				this.get_dy_original = get_dy_original
 				this.toInput = BN(get_dy).div(1e8).toFixed(8);
 			},
 
