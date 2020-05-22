@@ -8,7 +8,7 @@
 		</div>
 		<div class='exchange'>
 
-			<div class='input'>
+			<div class='input address'>
 				<label for='address'>{{ from_currency == 1 ? 'BTC' : 'ETH' }} address</label>
 				<input id='address' type='text' v-model='address' placeholder='Address'>
 			</div>
@@ -67,7 +67,7 @@
                     </ul>
                 </fieldset>
             </div>
-	     	<ul>
+	     	<ul class='infiniteapproval'>
 	            <li>
 	                <input id="inf-approval" type="checkbox" name="inf-approval" v-model='inf_approval'>
 	                <label for="inf-approval">Infinite approval - trust this contract forever
@@ -90,13 +90,13 @@
             </p>
         </div>
 
-		<div>
+		<!-- <div>
 			<input type='radio' id='getwbtc' :value='0' v-model='type'>
 			<label for='getwbtc'>Get WBTC</label>
 
 			<input type='radio' id='getbtc' :value='1' v-model='type'>
 			<label for='getbtc'>Get BTC</label>
-		</div>
+		</div> -->
 
 		<!-- <div class='input'>
 			<label for='amount'>{{ type == 0 ? 'BTC' : 'WBTC' }} amount</label>
@@ -104,12 +104,12 @@
 		</div>
 
  -->
-		<div id='result'>
+		<!-- <div id='result'>
 			<div>Exchange rate: {{ exchangeRate }}</div>
 			<div>Ren fees: {{ renFee }}</div>
 			<div>BTC miner's fee: {{ this.minersFee / 1e8 }}</div>
 			<div>Total received amount: {{ (toInput / 1e8).toFixed(8) }}</div>
-		</div>
+		</div> -->
 
 
 		<button @click='submit'>Submit</button>
@@ -155,7 +155,7 @@
 	import * as helpers from '../../utils/helpers'
 	import * as common from '../../utils/common'
 	import allabis, { ERC20_abi } from '../../allabis'
-	//import Box from '3box'
+	import Box from '3box'
 
 	const swap_address = '0x8474c1236F0Bc23830A23a41aBB81B2764bA9f4F'
 	const swap_abi = [{"name":"TokenExchange","inputs":[{"type":"address","name":"buyer","indexed":true},{"type":"int128","name":"sold_id","indexed":false},{"type":"uint256","name":"tokens_sold","indexed":false},{"type":"int128","name":"bought_id","indexed":false},{"type":"uint256","name":"tokens_bought","indexed":false}],"anonymous":false,"type":"event"},{"name":"AddLiquidity","inputs":[{"type":"address","name":"provider","indexed":true},{"type":"uint256[2]","name":"token_amounts","indexed":false},{"type":"uint256[2]","name":"fees","indexed":false},{"type":"uint256","name":"invariant","indexed":false},{"type":"uint256","name":"token_supply","indexed":false}],"anonymous":false,"type":"event"},{"name":"RemoveLiquidity","inputs":[{"type":"address","name":"provider","indexed":true},{"type":"uint256[2]","name":"token_amounts","indexed":false},{"type":"uint256[2]","name":"fees","indexed":false},{"type":"uint256","name":"token_supply","indexed":false}],"anonymous":false,"type":"event"},{"name":"RemoveLiquidityOne","inputs":[{"type":"address","name":"provider","indexed":true},{"type":"uint256","name":"token_amount","indexed":false},{"type":"uint256","name":"coin_amount","indexed":false}],"anonymous":false,"type":"event"},{"name":"RemoveLiquidityImbalance","inputs":[{"type":"address","name":"provider","indexed":true},{"type":"uint256[2]","name":"token_amounts","indexed":false},{"type":"uint256[2]","name":"fees","indexed":false},{"type":"uint256","name":"invariant","indexed":false},{"type":"uint256","name":"token_supply","indexed":false}],"anonymous":false,"type":"event"},{"name":"CommitNewAdmin","inputs":[{"type":"uint256","name":"deadline","indexed":true,"unit":"sec"},{"type":"address","name":"admin","indexed":true}],"anonymous":false,"type":"event"},{"name":"NewAdmin","inputs":[{"type":"address","name":"admin","indexed":true}],"anonymous":false,"type":"event"},{"name":"CommitNewFee","inputs":[{"type":"uint256","name":"deadline","indexed":true,"unit":"sec"},{"type":"uint256","name":"fee","indexed":false},{"type":"uint256","name":"admin_fee","indexed":false}],"anonymous":false,"type":"event"},{"name":"NewFee","inputs":[{"type":"uint256","name":"fee","indexed":false},{"type":"uint256","name":"admin_fee","indexed":false}],"anonymous":false,"type":"event"},{"name":"RampA","inputs":[{"type":"uint256","name":"old_A","indexed":false},{"type":"uint256","name":"new_A","indexed":false},{"type":"uint256","name":"initial_time","indexed":false,"unit":"sec"},{"type":"uint256","name":"future_time","indexed":false,"unit":"sec"}],"anonymous":false,"type":"event"},{"name":"StopRampA","inputs":[{"type":"uint256","name":"A","indexed":false},{"type":"uint256","name":"t","indexed":false,"unit":"sec"}],"anonymous":false,"type":"event"},{"outputs":[],"inputs":[{"type":"address[2]","name":"_coins"},{"type":"address","name":"_pool_token"},{"type":"uint256","name":"_A"},{"type":"uint256","name":"_fee"}],"constant":false,"payable":false,"type":"constructor"},{"name":"A","outputs":[{"type":"uint256","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":5227},{"name":"get_virtual_price","outputs":[{"type":"uint256","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":967716},{"name":"calc_token_amount","outputs":[{"type":"uint256","name":""}],"inputs":[{"type":"uint256[2]","name":"amounts"},{"type":"bool","name":"deposit"}],"constant":true,"payable":false,"type":"function","gas":3810860},{"name":"add_liquidity","outputs":[],"inputs":[{"type":"uint256[2]","name":"amounts"},{"type":"uint256","name":"min_mint_amount"}],"constant":false,"payable":false,"type":"function","gas":5858197},{"name":"get_dy","outputs":[{"type":"uint256","name":""}],"inputs":[{"type":"int128","name":"i"},{"type":"int128","name":"j"},{"type":"uint256","name":"dx"}],"constant":true,"payable":false,"type":"function","gas":2327087},{"name":"get_dy_underlying","outputs":[{"type":"uint256","name":""}],"inputs":[{"type":"int128","name":"i"},{"type":"int128","name":"j"},{"type":"uint256","name":"dx"}],"constant":true,"payable":false,"type":"function","gas":2326882},{"name":"exchange","outputs":[],"inputs":[{"type":"int128","name":"i"},{"type":"int128","name":"j"},{"type":"uint256","name":"dx"},{"type":"uint256","name":"min_dy"}],"constant":false,"payable":false,"type":"function","gas":4783971},{"name":"remove_liquidity","outputs":[],"inputs":[{"type":"uint256","name":"_amount"},{"type":"uint256[2]","name":"min_amounts"}],"constant":false,"payable":false,"type":"function","gas":153460},{"name":"remove_liquidity_imbalance","outputs":[],"inputs":[{"type":"uint256[2]","name":"amounts"},{"type":"uint256","name":"max_burn_amount"}],"constant":false,"payable":false,"type":"function","gas":5857985},{"name":"calc_withdraw_one_coin","outputs":[{"type":"uint256","name":""}],"inputs":[{"type":"uint256","name":"_token_amount"},{"type":"int128","name":"i"}],"constant":true,"payable":false,"type":"function","gas":10920},{"name":"remove_liquidity_one_coin","outputs":[],"inputs":[{"type":"uint256","name":"_token_amount"},{"type":"int128","name":"i"},{"type":"uint256","name":"min_amount"}],"constant":false,"payable":false,"type":"function","gas":3677379},{"name":"ramp_A","outputs":[],"inputs":[{"type":"uint256","name":"_future_A"},{"type":"uint256","unit":"sec","name":"_future_time"}],"constant":false,"payable":false,"type":"function","gas":151937},{"name":"stop_ramp_A","outputs":[],"inputs":[],"constant":false,"payable":false,"type":"function","gas":148697},{"name":"commit_new_fee","outputs":[],"inputs":[{"type":"uint256","name":"new_fee"},{"type":"uint256","name":"new_admin_fee"}],"constant":false,"payable":false,"type":"function","gas":110521},{"name":"apply_new_fee","outputs":[],"inputs":[],"constant":false,"payable":false,"type":"function","gas":97220},{"name":"revert_new_parameters","outputs":[],"inputs":[],"constant":false,"payable":false,"type":"function","gas":21955},{"name":"commit_transfer_ownership","outputs":[],"inputs":[{"type":"address","name":"_owner"}],"constant":false,"payable":false,"type":"function","gas":74632},{"name":"apply_transfer_ownership","outputs":[],"inputs":[],"constant":false,"payable":false,"type":"function","gas":60688},{"name":"revert_transfer_ownership","outputs":[],"inputs":[],"constant":false,"payable":false,"type":"function","gas":22045},{"name":"withdraw_admin_fees","outputs":[],"inputs":[],"constant":false,"payable":false,"type":"function","gas":12424},{"name":"kill_me","outputs":[],"inputs":[],"constant":false,"payable":false,"type":"function","gas":37998},{"name":"unkill_me","outputs":[],"inputs":[],"constant":false,"payable":false,"type":"function","gas":22135},{"name":"coins","outputs":[{"type":"address","name":""}],"inputs":[{"type":"int128","name":"arg0"}],"constant":true,"payable":false,"type":"function","gas":2310},{"name":"balances","outputs":[{"type":"uint256","name":""}],"inputs":[{"type":"int128","name":"arg0"}],"constant":true,"payable":false,"type":"function","gas":2340},{"name":"fee","outputs":[{"type":"uint256","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":2171},{"name":"admin_fee","outputs":[{"type":"uint256","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":2201},{"name":"owner","outputs":[{"type":"address","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":2231},{"name":"initial_A","outputs":[{"type":"uint256","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":2261},{"name":"future_A","outputs":[{"type":"uint256","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":2291},{"name":"initial_A_time","outputs":[{"type":"uint256","unit":"sec","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":2321},{"name":"future_A_time","outputs":[{"type":"uint256","unit":"sec","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":2351},{"name":"admin_actions_deadline","outputs":[{"type":"uint256","unit":"sec","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":2381},{"name":"transfer_ownership_deadline","outputs":[{"type":"uint256","unit":"sec","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":2411},{"name":"future_fee","outputs":[{"type":"uint256","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":2441},{"name":"future_admin_fee","outputs":[{"type":"uint256","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":2471},{"name":"future_owner","outputs":[{"type":"address","name":""}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":2501}]
@@ -213,7 +213,7 @@
 			adapterContract: null,
 			wbtccontract: null,
 
-			confirmations: 0,
+			confirmations: 6,
 			// 1 - getting btc deposit address, 2 - waiting to confirm on btc network, 3 - 
 			state: null,
 			box: null,
@@ -331,7 +331,7 @@
 				this.wbtccontract = new contract.web3.eth.Contract(ERC20_abi, wbtcAddress)
 				this.address = this.default_account = contract.default_account
 				if(this.from_currency == 1) this.address = this.default_account
-				console.log(contract.default_account, "DEFAULT ACCOUNT")
+				////console.log(contract.default_account, "DEFAULT ACCOUNT")
 				//console.log(await this.sdk.renVM.sendMessage('ren_queryFees', {}))
 				this.from_cur_handler()
 				//resume only transactions submitted to btc network
@@ -350,11 +350,11 @@
 				    ethereumTxHash: '0x63d85ac854fb1100ed7d8c44531d39cbd13a116ff4d09888d7dac1f0f7a7caa8',
 				})
 				await burn.readFromEthereum()
-				console.log(burn)
-				console.log(await burn.queryTx())
+				//console.log(burn)
+				//console.log(await burn.queryTx())
 				let promiEvent = await burn.submit()
 				console.log(promiEvent, "PROMI EVENT")
-				//promiEvent.on('txHash', hash => console.log(hash)).on('status', status => console.log(status));
+				////promiEvent.on('txHash', hash => console.log(hash)).on('status', status => console.log(status));
 
 
 			},
@@ -432,10 +432,10 @@
             },
 
 			async setMaxBalance() {
-				console.log(this.address, "THE ADDRESS")
+				//console.log(this.address, "THE ADDRESS")
 				let balance = await this.wbtccontract.methods.balanceOf(this.default_account).call()
 				this.maxBalance = this.default_account ? balance : 0
-				console.log(this.maxBalance)
+				//console.log(this.maxBalance)
 			},
 
 			async setAmount() {
@@ -445,22 +445,23 @@
 				let i = this.from_currency
 				let j = this.to_currency
 				let get_dy = await this.swap.methods.get_dy(i, j, amount).call()
-				console.log(get_dy, "THE DY")
+				//console.log(get_dy, "THE DY")
 				this.toInput = BN(get_dy).div(1e8).toFixed(8);
 			},
 
 			async loadTransactions() {
+				console.log('load transactions')
 				let items = await this.getAllItems()
 				this.transactions = Object.values(await this.getAllItems()).reverse()
 				await Promise.all(this.transactions.filter(t => t.btcTxHash).map(t=>this.sendMint(t)))
 			},
 
 			async use3Box() {
-				// if(this.box !== null) return;(1e8-500)*0.999
-				// this.box = await Box.openBox(contract.default_account, contract.web3.currentProvider)
-				// this.space = await this.box.openSpace('curvebtc')
-				// await this.space.syncDone
-				// this.loadTransactions();
+				if(this.box !== null) return;(1e8-500)*0.999
+				this.box = await Box.openBox(contract.default_account, contract.web3.currentProvider)
+				this.space = await this.box.openSpace('curvebtc')
+				this.loadTransactions();
+				await this.space.syncDone
 			},
 
 			async setItem(key, item) {
@@ -500,7 +501,8 @@
 			},
 
 			async initMint(transaction) {
-				console.log(BN(this.toInput).times(0.99).toFixed(0, 1), "MIN VALUE")
+				//console.log(BN(this.toInput).times(1e8).times(0.99).toFixed(0, 1), "MIN VALUE")
+				//console.log(BN(this.toInput).toFixed(0), "BN")
 				if(transaction) {
 					var { id, amount, nonce, address } = transaction
 				}
@@ -528,7 +530,7 @@
 				        {
 			                name: "_minWbtcAmount",
 			                type: "uint256",
-			                value: BN(this.toInput).times(0.99).toFixed(0, 1),
+			                value: BN(this.toInput).times(1e8).times(0.99).toFixed(0, 1),
 			            },
 			            {
 			                name: "_wbtcDestination",
@@ -540,6 +542,7 @@
 				    // Web3 provider for submitting mint to Ethereum
 				    web3Provider: web3.currentProvider,
 				}
+				//console.log(transfer, "TRANSFER")
 				const mint = this.sdk.lockAndMint(transfer);
 				if(!id) {
 					transfer.id = helpers.generateID();
@@ -677,10 +680,10 @@
 				    // The transaction hash of our contract call
 				    ethereumTxHash: txhash,
 				}).readFromEthereum();
-				console.log(burn)
-				console.log(await burn.queryTx())
+				//console.log(burn)
+				//console.log(await burn.queryTx())
 				let promiEvent = await burn.submit()
-				console.log(promiEvent, "PROMI EVENT")
+				//console.log(promiEvent, "PROMI EVENT")
 				//promiEvent.on('txHash', hash => console.log(hash)).on('status', status => console.log(status));
 			},
 
@@ -726,5 +729,11 @@
 	}
 	.exchange-rate {
 		text-align: left;
+	}
+	.input.address {
+		margin-bottom: 1em;
+	}
+	.infiniteapproval {
+		margin-top: 1em;
 	}
 </style>

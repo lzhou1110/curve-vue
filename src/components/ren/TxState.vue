@@ -13,7 +13,7 @@
 			Waiting for renVM to do it's magic and shift
 		</span>
 		<span v-show='state == 4'>
-			Got BTC {{ transaction.utxoAmount }}, now initiating swap
+			Got BTC {{ (transaction.utxoAmount / 1e8).toFixed(8) }}, now initiating swap
 		</span>
 		<span v-show='state == 5'>
 			Swap ready
@@ -22,11 +22,11 @@
 			Swap ready
 		</span>
 		<span v-show='state == 6'>
-			Got BTC, {{ transaction.utxoAmount }}, do you want to 
+			Got {{ (transaction.utxoAmount / 1e8).toFixed(8) }} renBTC, do you want to 
 			<button @click="$emit('mint', transaction)">mint and swap now</button>?
 		</span>
 		<span v-show='state == 7'>
-			Exchange rates expired, you'll get {{ (transaction.utxoAmount - renFee*1e18) }} BTC shifted to renBTC.
+			Exchange rates expired, you got {{ (transaction.utxoAmount / 1e8).toFixed(8) }} BTC shifted to renBTC.
 			If you want to continue swapping to WBTC, go to the <router-link to="/ren/swap">swap page</router-link>
 		</span>
 	</div>
