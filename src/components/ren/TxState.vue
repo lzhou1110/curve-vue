@@ -29,6 +29,10 @@
 			Exchange rates expired, you got {{ (transaction.utxoAmount / 1e8).toFixed(8) }} BTC shifted to renBTC.
 			If you want to continue swapping to WBTC, go to the <router-link to="/ren/swap">swap page</router-link>
 		</span>
+
+		<span v-show='state == 10'>
+			Started swap WBTC->BTC
+		</span>
 	</div>
 </template>
 

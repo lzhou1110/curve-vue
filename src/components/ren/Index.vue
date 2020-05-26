@@ -1,18 +1,17 @@
 <template>
 	<div class='window white'>
 		<div>
-			<button class='simplebutton' @click='use3Box'>
-				<span v-show='space === null'>Use 3Box Storage</span>
-				<span v-show='space !== null'>3Box Storage loaded</span>
-			</button>
 		</div>
 		<div class='exchange'>
 
-			<div class='input address'>
-				<label for='address'>{{ from_currency == 1 ? 'BTC' : 'ETH' }} address</label>
-				<input id='address' type='text' v-model='address' placeholder='Address'>
-			</div>
             <div class='exchangefields'>
+				<button class='simplebutton' @click='use3Box'>
+					<span v-show='space === null'>Use permanent storage</span>
+					<span v-show='space !== null'>Permanent storage loaded</span>
+				</button>
+
+				<div class='flexbreak'></div>
+
                 <fieldset class='item'>
                     <legend>From:</legend>
                     <div class='maxbalance' @click='set_max_balance'>Max: <span>{{maxBalanceText}}</span> </div>
@@ -30,9 +29,9 @@
                             </label>
                         </label>
                         </li>
-                        <span v-show='from_currency == 0'> 
+                        <div v-show='from_currency == 0' class='amount-after-fees'> 
                         	Amount after renVM fees: {{amountAfterBTC.toFixed(8)}}
-                        </span>
+                        </div>
                     </ul>
                 </fieldset>
                 <fieldset class='item iconcontainer' @click='swapInputs'>
@@ -61,12 +60,25 @@
                             </label>
                         </label>
                         </li>
-                        <span v-show='from_currency == 1'>
+                        <div v-show='from_currency == 1' class='amount-after-fees'>
                         	Amount after renVM fees: {{amountAfterWBTC.toFixed(8)}}
-                        </span>
+                        </div>
                     </ul>
                 </fieldset>
             </div>
+            <p class='exchange-rate'>Exchange rate (including fees and renVM fee): 
+            	<span id="exchange-rate">{{ exchangeRate && exchangeRate.toFixed(4) }}</span>
+            </p>
+            <p class='exchange-rate'>Exchange rate (including fees): 
+            	<span id="exchange-rate">{{ exchangeRateOriginal && exchangeRateOriginal.toFixed(4) }}</span>
+            </p>
+            <p class='simple-error' v-show='from_currency == 1 && lessThanMinOrder'>
+            	Minimum order size is {{ minOrderSize / 1e8 }} 
+            </p>
+            <div class='input address'>
+				<label for='address'>{{ from_currency == 1 ? 'BTC withdrawal' : 'ETH' }} address</label>
+				<input id='address' type='text' v-model='address' placeholder='Address' :style='addressStyle'>
+			</div>
 	     	<ul class='infiniteapproval'>
 	            <li>
 	                <input id="inf-approval" type="checkbox" name="inf-approval" v-model='inf_approval'>
@@ -79,15 +91,6 @@
 	                </label>
 	            </li>
 	        </ul>
-            <p class='exchange-rate'>Exchange rate (including fees and renVM fee): 
-            	<span id="exchange-rate">{{ exchangeRate && exchangeRate.toFixed(4) }}</span>
-            </p>
-            <p class='exchange-rate'>Exchange rate (including fees): 
-            	<span id="exchange-rate">{{ exchangeRateOriginal && exchangeRateOriginal.toFixed(4) }}</span>
-            </p>
-            <p class='simple-error' v-show='from_currency == 1 && lessThanMinOrder'>
-            	Minimum order size is {{ minOrderSize / 1e8 }} 
-            </p>
         </div>
 
 		<!-- <div>
@@ -112,11 +115,12 @@
 		</div> -->
 
 
-		<button @click='submit'>Submit</button>
+		<button class='swap' @click='submit'>Swap</button>
 
 		<table class='tui-table'>
 			<thead>
 				<tr>
+					<th>Type</th>
 					<th>BTC Address</th>
 					<th>Confirmations</th>
 					<th>Status</th>
@@ -125,11 +129,18 @@
 			</thead>
 			<tbody>
 				<tr v-for='transaction in transactions'>
+					<td class='shifttype'>
+						{{ transaction.type == 0 ? 'BTC->WBTC' : 'WBTC->BTC' }}
+					</td>
 					<td>
 						<span :class="{'loading line': !transaction.gatewayAddress }"></span>
 						{{ transaction.gatewayAddress }}
 					</td>
-					<td>{{ transaction.confirmations }}</td>
+					<td>
+						<a :href="getTxHashLink(transaction)"> 
+							{{ transaction.confirmations }} / {{ confirmations }}
+						</a>
+					</td>
 					<td>
 						<tx-state 
 							:state='transaction.state' 
@@ -137,8 +148,14 @@
 							@mint='mintThenSwap'/>
 					</td>
 					<td>
-						{{ transaction.state == 6 ? 100 : (transaction.state / 5 * 100 | 0) }}%
-						<span :class="{'loading line': transaction.state != 6}"></span>
+						<span v-show='transaction.type == 0'>
+							{{ transaction.state == 6 ? 100 : (transaction.state / 5 * 100 | 0) }}%
+							<span :class="{'loading line': transaction.state != 6}"></span>
+						</span>
+						<span v-show='transaction.type == 1'>
+							{{ transaction.state == 14 ? 100 : ((transaction.state - 10) * 100 | 0) }}%
+							<span :class="{'loading line': transaction.state != 14}"></span>
+						</span>
 					</td>
 				</tr>
 			</tbody>
@@ -168,10 +185,12 @@
 
 	const txObject = () => ({
 		id: '',
+		type: '',
 		amount: '',
 		toAmount: 0,
 		address: '',
 		params: '',
+		ethTxHash: '',
 		gatewayAddress: '',
 		confirmations: 0,
 		// 0 - waiting for renVM gateway address, 1 - waiting for deposit on BTC address, 2 - got BTC transaction, waiting for confirmation
@@ -195,7 +214,7 @@
 			toInput: '0.00',
 			toInputOriginal: 0,
 			address: '',
-			sdk: new RenSDK(),
+			sdk: new RenSDK('mainnet', { logLevel: 'debug' }),
 			transactions: [],
 
 
@@ -289,6 +308,15 @@
         	toInputFormat() {
         		if(!this.toInput || typeof this.toInput == 'string') return '0.00'
         		return +this.toInput.toFixed(8) 
+        	},
+        	addressStyle() {
+        		if(this.from_currency == 0) {
+        			return {
+        				background: '#505070',
+    					color: '#d0d0d0',
+        			}
+        		}
+        		else return {}
         	}
 		},
 		watch: {
@@ -331,61 +359,60 @@
 				this.wbtccontract = new contract.web3.eth.Contract(ERC20_abi, wbtcAddress)
 				this.address = this.default_account = contract.default_account
 				if(this.from_currency == 1) this.address = this.default_account
-				////console.log(contract.default_account, "DEFAULT ACCOUNT")
 				//console.log(await this.sdk.renVM.sendMessage('ren_queryFees', {}))
 				this.from_cur_handler()
 				//resume only transactions submitted to btc network
 				this.loadTransactions()
 
 				//test wait for burn
-				const burn = this.sdk.burnAndRelease({
-				    // Send BTC from the Ethereum blockchain to the Bitcoin blockchain.
-				    // This is the reverse of shitIn.
-				    sendToken: RenJS.Tokens.BTC.Eth2Btc,
+				// const burn = this.sdk.burnAndRelease({
+				//     // Send BTC from the Ethereum blockchain to the Bitcoin blockchain.
+				//     // This is the reverse of shitIn.
+				//     sendToken: RenJS.Tokens.BTC.Eth2Btc,
 
-				    // The web3 provider to talk to Ethereum
-				    web3Provider: web3.currentProvider,
+				//     // The web3 provider to talk to Ethereum
+				//     web3Provider: web3.currentProvider,
 
-				    // The transaction hash of our contract call
-				    ethereumTxHash: '0x63d85ac854fb1100ed7d8c44531d39cbd13a116ff4d09888d7dac1f0f7a7caa8',
-				})
-				await burn.readFromEthereum()
-				//console.log(burn)
-				//console.log(await burn.queryTx())
-				let promiEvent = await burn.submit()
-				console.log(promiEvent, "PROMI EVENT")
+				//     // The transaction hash of our contract call
+				//     ethereumTxHash: '0x272e83c156c60cff7a87d1bbc365fee1f05269b0d08c2be0b041115cafbe16f0',
+				// })
+				// await burn.readFromEthereum()
+				// //console.log(burn)
+				// //console.log(await burn.queryTx())
+				// let promiEvent = await burn.submit()
+				// console.log(promiEvent, "PROMI EVENT")
 				////promiEvent.on('txHash', hash => console.log(hash)).on('status', status => console.log(status));
 
 
 			},
 
 			set_max_balance() {
-				if(this.from_currency == 1) {
+				if(this.from_currency == 0) {
 					this.fromInput = 0
 					return;
 				}
 				this.fromInput = BN(this.maxBalance).div(1e8).toFixed(8)
+				this.set_to_amount()
 			},
 
 			set_from_amount() {
 
 			},
 
+			getTxHashLink(transaction) {
+				let hash = transaction.type == 0 ? 
+					'https://blockchain.info/btc/tx/' + transaction.btcTxHash 
+					: 'https://etherscan.io/tx/' + transaction.ethTxHash;
+				return hash;
+			},
+
 			async set_to_amount() {
-				// console.log(+this.totalFee, "REN FEE")
-				// let amount = (BN(this.amount).minus(BN(this.totalFee))).times(1e8).toFixed(0, 1)
-				// console.log(i, j, amount, "I J AMOUNT")
+				this.highlight_input();
 				let i = this.from_currency
 				let j = this.to_currency
 				let dx = BN(this.fromInput).times(1e8).toFixed(0,1)
 				let original_dx = dx
 				dx = BN(this.fromInput).times(1e8).times(0.999).minus(this.minersFee).toFixed(0,1)
-				// if(this.from_currency == 0) {
-				// 	dx = BN(this.fromInput).times(1e8).times(0.999).minus(this.minersFee).toFixed(0,1)
-				// }
-				// if(this.from_currency == 1) {
-				// 	dx = BN(this.fromInput).times(1e8).times(0.999).minus(this.minersFee).toFixed(0,1)
-				// }
 
 				//case WBTC -> BTC
 					//swapping the entered WBTC amount and then from result subtract fees
@@ -408,7 +435,18 @@
 				}
 				else {
 					this.toInput = (result - this.minersFee)*0.999 / 1e8
+					this.toInput = result / 1e8
 					this.toInputOriginal = result / 1e8
+				}
+			},
+
+			highlight_input() {
+				if(this.from_currency == 0) return;
+				if(this.fromInput > this.maxBalance / 1e8) {
+					this.fromBgColor = 'red'
+				}
+				else {
+					this.fromBgColor = 'blue'
 				}
 			},
 
@@ -432,20 +470,15 @@
             },
 
 			async setMaxBalance() {
-				//console.log(this.address, "THE ADDRESS")
 				let balance = await this.wbtccontract.methods.balanceOf(this.default_account).call()
 				this.maxBalance = this.default_account ? balance : 0
 				//console.log(this.maxBalance)
 			},
 
 			async setAmount() {
-				// console.log(+this.totalFee, "REN FEE")
-				// let amount = (BN(this.amount).minus(BN(this.totalFee))).times(1e8).toFixed(0, 1)
-				// console.log(i, j, amount, "I J AMOUNT")
 				let i = this.from_currency
 				let j = this.to_currency
 				let get_dy = await this.swap.methods.get_dy(i, j, amount).call()
-				//console.log(get_dy, "THE DY")
 				this.toInput = BN(get_dy).div(1e8).toFixed(8);
 			},
 
@@ -501,8 +534,6 @@
 			},
 
 			async initMint(transaction) {
-				//console.log(BN(this.toInput).times(1e8).times(0.99).toFixed(0, 1), "MIN VALUE")
-				//console.log(BN(this.toInput).toFixed(0), "BN")
 				if(transaction) {
 					var { id, amount, nonce, address } = transaction
 				}
@@ -542,10 +573,10 @@
 				    // Web3 provider for submitting mint to Ethereum
 				    web3Provider: web3.currentProvider,
 				}
-				//console.log(transfer, "TRANSFER")
 				const mint = this.sdk.lockAndMint(transfer);
 				if(!id) {
 					transfer.id = helpers.generateID();
+					transfer.type = 0
 					transfer.amount = this.from_currency == 0 ? this.amountAfterBTC : this.fromInput;
 					transfer.address = this.address;
 					transfer.toInput = this.toInput;
@@ -659,7 +690,7 @@
 				let txhash = await new Promise((resolve, reject) => {
 					return this.adapterContract.methods.swapThenBurn(
 						RenJS.utils.BTC.addressToHex(this.address),
-						BN(this.fromInput).times(1e8),
+						BN(this.fromInput).times(1e8).toFixed(0, 1),
 						BN(this.toInputOriginal).times(0.97).toFixed(0, 1),
 					).send({
 						from: this.default_account,
@@ -668,6 +699,16 @@
 					.once('transactionHash', resolve)
 					.catch(err => reject(err))
 				})
+				let id = helpers.generateID();
+				this.transactions.unshift({
+					id: id,
+					type: 1,
+					gatewayAddress: this.address,
+					confirmations: 0,
+					state: 10,
+					ethTxHash: txhash,
+				})
+
 
 				const burn = await this.sdk.burnAndRelease({
 				    // Send BTC from the Ethereum blockchain to the Bitcoin blockchain.
@@ -680,8 +721,13 @@
 				    // The transaction hash of our contract call
 				    ethereumTxHash: txhash,
 				}).readFromEthereum();
-				//console.log(burn)
-				//console.log(await burn.queryTx())
+				console.log(burn)
+				console.log(await burn.queryTx())
+				setInterval(async () => {
+					let tx = this.transactions.find(t => t.id == id);
+					let res = await burn.queryTx()
+					tx.confirmations = res.txStatus
+				}, 1000)
 				let promiEvent = await burn.submit()
 				//console.log(promiEvent, "PROMI EVENT")
 				//promiEvent.on('txHash', hash => console.log(hash)).on('status', status => console.log(status));
@@ -711,7 +757,13 @@
 	#address {
 		width: 600px;
 	}
-	button {
+	.flexbreak {
+		width: 100%;
+		height: 0;
+	}
+	button.swap {
+		display: block;
+		margin: 0 auto;
 		margin-top: 1em;
 	}
 	.tui-table {
@@ -730,10 +782,32 @@
 	.exchange-rate {
 		text-align: left;
 	}
+	.exchange-rate {
+		margin-top: 0.5em;
+		margin-bottom: 0;
+	}
 	.input.address {
 		margin-bottom: 1em;
 	}
 	.infiniteapproval {
 		margin-top: 1em;
+	}
+	input[type=radio] + label[for]:before, input[type=checkbox] + label[for]:before {
+		width: auto;
+	}
+	.exchangefields input[type=radio] + label[for]:before {
+		margin-right: 0.5em;
+	}
+	.amount-after-fees {
+		margin-top: 0.5em;
+	}
+	.maxbalance {
+		cursor: pointer;
+	}
+	.maxbalance:hover {
+		text-decoration: underline;
+	}
+	.shifttype {
+		white-space: nowrap;
 	}
 </style>

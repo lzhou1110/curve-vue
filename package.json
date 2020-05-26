@@ -9,7 +9,7 @@
   "dependencies": {
     "3box": "^1.19.0",
     "@renproject/gateway": "^1.0.0-alpha.7",
-    "@renproject/ren": "^1.0.0-alpha.9",
+    "@renproject/ren": "^1.0.0-alpha.10",
     "@sentry/browser": "^5.15.0",
     "@sentry/integrations": "^5.15.0",
     "bignumber.js": "^9.0.0",
