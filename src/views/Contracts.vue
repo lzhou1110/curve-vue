@@ -87,8 +87,11 @@
 		                	</a>
 		            </fieldset>
 		            <fieldset v-for = '(addresses, i) in gaugeAddresses'>
-		            	<legend>{{allPools[i]}} gauge</legend>
-		                	<a :href = "'https://etherscan.io/address/' + addresses.address">
+		            	<legend>
+		            		{{allPools[i]}} gauge
+		            		<span v-show="allPools[i] == 'usdt'">(disabled)</span>
+		            	</legend>
+		                	<a :href = "'https://etherscan.io/address/' + addresses.address" :class="{'disabledGauge': allPools[i] == 'usdt'}">
 		                		<img class='icon' :src="getTokenUrl(i)"> <span class='text'>{{allPools[i]}} Gauge address</span>
 		                	</a>
 		            </fieldset>
@@ -162,16 +165,16 @@
 					    address: "0x69Fb7c45726cfE2baDeE8317005d3F94bE838840",
 					},
 					{
+						name: "susdv2",
+						address: "0xA90996896660DEcC6E997655E065b23788857849",
+					},
+					{
 					    name: "PAX",
 					    address: "0x64E3C23bfc40722d3B649844055F1D51c1ac041d",
 					},
 					{
 					    name: "RenBTC",
 					    address: "0xB1F2cdeC61db658F091671F5f199635aEF202CAC",
-					},
-					{
-						name: "susdv2",
-						address: "0xA90996896660DEcC6E997655E065b23788857849",
 					},
 					{
 						name: "sbtc",
@@ -230,5 +233,8 @@
 	}
 	.buttoncontracts {
 		margin-right: 1em;
+	}
+	.disabledGauge {
+		opacity: 0.5;
 	}
 </style>

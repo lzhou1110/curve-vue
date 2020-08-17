@@ -94,20 +94,20 @@
                     >
                         Deposit <span class='loading line' v-show='loadingAction == 1'></span>
                 </button>
-                <button 
+                <!-- <button 
                     id='add-liquidity-stake' 
                     v-show="['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool) && hasRewards" 
                     :disabled = 'slippage < -0.03 || depositingZeroWarning || isZeroSlippage'
                     @click = 'justDeposit = false; deposit_stake()'>
                     Deposit and stake <span class='loading line' v-show='loadingAction == 2'></span>
-                </button>
-                <button id='stakeunstaked' 
+                </button> -->
+                <!-- <button id='stakeunstaked' 
                     v-show="totalShare > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool) && hasRewards"
                     :disabled='stakePercentageInvalid' 
                     @click='stakeTokens()'
                     >
                     Stake unstaked <span class='loading line' v-show='loadingAction == 3'></span>
-                </button>
+                </button> -->
                 <p class='info-message gentle-message' v-show="lpCrvReceived > 0">
                     You'll receive minimum {{ lpCrvReceivedText }} Curve {{currentPool}} LP tokens <sub>{{ ((1 - getMaxSlippage) * 100).toFixed(2)}}% max slippage</sub>
                     

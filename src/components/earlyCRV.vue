@@ -19,7 +19,7 @@
 			<div class='datainfo'>
 				<a href='https://github.com/curvefi/early-user-distribution'>Calculation script</a>
 				<a href='https://github.com/curvefi/CRV-distribution-data'>Data subgraphs</a>
-				<a href='https://guides.curve.fi/everything-you-need-to-know-about-crv/'>Everything known about the CRV token article</a>
+				<a href='https://guides.curve.fi/crv-launches-curve-dao-and-crv/'>Curve launches Curve DAO and CRV</a>
 			</div>
 			<div class='info-message gentle-message'>
 				If you find inconsistencies, please contract us on 
