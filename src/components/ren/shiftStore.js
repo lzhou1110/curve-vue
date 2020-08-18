@@ -177,7 +177,7 @@ export async function loadTransactions() {
 	await checkForFailedStake(transactions.filter(t => t.stakeTxHash))
 	await resumeStakeTransactions(transactions)
 	//send all txs so case is handled when user goes to submit 
-	let mints = transactions.filter(t => [0,3].includes(t.type) && ![14,15].includes(t.state)).map(t=>sendMint(t))
+	let mints = transactions.filter(t => ([0,3].includes(t.type) && ![14,15].includes(t.state)) || t.state == 14 && (!t.ethTxHash || t.ethTxHash == '')).map(t=>sendMint(t))
 	console.log(mints, "MINTS")
 	let burns = transactions.filter(t => !t.btcTxHash && t.ethTxHash && t.state && t.state != 65 && t.type == 1)
 	console.log(burns, "BURNS")
