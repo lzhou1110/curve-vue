@@ -234,7 +234,7 @@
     		Slippage, GasPrice,
     	},
     	data: () => ({
-    		disabled: true,
+    		disabled: false,
     		disabledButtons: true,
     		sync_balances: false,
     		max_balances: true,
@@ -528,7 +528,6 @@
                     this.susdWaitingPeriodTime = +decoded[decoded.length - 1]
                 }
 			    if (this.max_balances) {
-			        this.disabled = true;
 			        for (let i = 0; i < currentContract.N_COINS; i++) {
 			        	let amount = this.wallet_balances[i] * currentContract.c_rates[i]
 			        	if(!this.depositc) amount = this.wallet_balances[i] / allabis[currentContract.currentContract].coin_precisions[i]
