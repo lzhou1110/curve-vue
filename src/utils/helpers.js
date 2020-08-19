@@ -194,9 +194,12 @@ export function formatNumber(number, dec = 2, dsep, tsep) {
 export async function getETHPrice() {
   let price = 260
   try {
-    let req = await fetch('https://pushservice.curve.fi/getETHprice');
+    let req = await Promise.race([fetch('https://pushservice.curve.fi/getETHprice'), fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')]);
     let res = await req.json()
-    price = res.price
+    if(res.price)
+      price = res.price
+    else
+      price = res.ethereum.usd
   }
   catch(err) {
     console.error(err)
