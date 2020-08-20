@@ -98,7 +98,6 @@
         methods: {
             async getGasPrice() {
                 try {
-                    throw new Error('test')
                     let gasPriceInfo = await retry(fetch('https://pushservice.curve.fi/gasprice'))
                     gasPriceInfo = await gasPriceInfo.json()
                     state.gasPriceInfo = gasPriceInfo
