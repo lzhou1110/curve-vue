@@ -98,17 +98,21 @@
         methods: {
             async getGasPrice() {
                 try {
-                    let gasPriceInfo = await retry(fetch('https://pushservice.curve.fi/gasprice'))
+                    let gasPriceInfo = await retry(fetch('https://gasprice.poa.network/'))
                     gasPriceInfo = await gasPriceInfo.json()
+                    state.gasPriceInfo.low = state.gasPriceInfo.slow
                     state.gasPriceInfo = gasPriceInfo
                     if(state.gasPriceInfo.fast > 1000) throw new Error('too high!')
                 }
                 catch(err) {
                     try {
-                        let gasPriceInfo = await retry(fetch('https://gasprice.poa.network/'))
+                        let gasPriceInfo = await retry(fetch('https://fees.upvest.co/estimate_eth_fees'))
                         gasPriceInfo = await gasPriceInfo.json()
-                        state.gasPriceInfo = gasPriceInfo
+                        state.gasPriceInfo = gasPriceInfo.estimates
                         state.gasPriceInfo.low = state.gasPriceInfo.slow
+                        state.gasPriceInfo.standard = state.gasPriceInfo.medium
+                        state.gasPriceInfo.fast = state.gasPriceInfo.fast
+                        state.gasPriceInfo.instant = state.gasPriceInfo.fastest
                         if(state.gasPriceInfo.fast > 1000) throw new Error('too high!')
                     }
                     catch(err) {
