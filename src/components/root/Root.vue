@@ -557,7 +557,7 @@
 			async fetchPrices() {
 				let requests  = await Promise.allSettled([
 					fetch('https://api.coingecko.com/api/v3/simple/price?ids=havven,republic-protocol,bitcoin,balancer,yearn-finance&vs_currencies=usd'),
-					fetch('https://pushservice.curve.fi/getBalancerTVL'),
+					fetch('https://pushservice.curve.fi/static/tvl.txt'),
 				])
 				let prices = await Promise.all(requests.map((request, i) => {
 					return request.status == 'fulfilled' && request.value.json()
@@ -566,7 +566,7 @@
 				let renPrice = prices[0] && prices[0]['republic-protocol'].usd
 				let btcPrice = prices[0] && prices[0]['bitcoin'].usd
 				let balPrice = prices[0] && prices[0].balancer.usd
-				let balancerTVL = prices[1].TVL
+				let balancerTVL = prices[1]
 				let yfiPrice = prices[0] && prices[0]['yearn-finance'].usd
 				if(requests[0].status == 'rejected') {
 					let requests = await Promise.allSettled([
