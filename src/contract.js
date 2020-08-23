@@ -90,6 +90,7 @@ export const poolMenu = {
 	tbtc: 'TBTC',
 	ren: 'renBTC',
 	sbtc: 'sBTC',
+	hbtc: 'HBTC',
 }
 
 export const gas = {
@@ -133,6 +134,10 @@ export const gas = {
 		sbtc: {
 			exchange: (i, j) => (i == 2 || j == 2) ? 1000000 : 300000,
 			exchange_underlying: (i, j) => (i == 2 || j == 2) ? 1000000 : 300000,
+		},
+		hbtc: {
+			exchange: (i, j) => 300000,
+			exchange_underlying: (i, j) => 300000,
 		},
 	},
 	deposit: {

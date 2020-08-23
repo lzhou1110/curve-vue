@@ -316,18 +316,18 @@
                 return allabis[currentContract.currentContract].coin_precisions
             },
             actualFromValue() {
-                if(!this.swapwrapped && !['ren','sbtc'].includes(this.currentPool)) return;
-                if(['ren', 'sbtc'].includes(this.currentPool)) return (this.fromInput * this.btcPrice).toFixed(2)
+                if(!this.swapwrapped && !['ren','sbtc', 'hbtc'].includes(this.currentPool)) return;
+                if(['ren', 'sbtc', 'hbtc'].includes(this.currentPool)) return (this.fromInput * this.btcPrice).toFixed(2)
                 return (this.fromInput * this.c_rates[this.from_currency] * this.toFixed(this.precisions[this.from_currency]))
             },
             actualToValue() {
-                if(!this.swapwrapped && !['ren', 'sbtc'].includes(this.currentPool)) return;
-                if(['ren', 'sbtc'].includes(this.currentPool)) return (this.toInput * this.btcPrice).toFixed(2)
+                if(!this.swapwrapped && !['ren', 'sbtc', 'hbtc'].includes(this.currentPool)) return;
+                if(['ren', 'sbtc', 'hbtc'].includes(this.currentPool)) return (this.toInput * this.btcPrice).toFixed(2)
                 return (this.toInput * this.c_rates[this.to_currency] * this.toFixed(this.precisions[this.to_currency]))
             },
             ...getters,
             minAmount() {
-                if(['tbtc', 'ren', 'sbtc'].includes(currentContract.currentContract)) return 1e-8
+                if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(currentContract.currentContract)) return 1e-8
                 return 0.01
             },
             selldisabled() {
@@ -365,7 +365,7 @@
         methods: { 
             async mounted() {
                 console.log(currentContract.default_account)
-                if(['ren', 'sbtc'].includes(currentContract.currentContract)) this.btcPrice = await priceStore.getBTCPrice()
+                if(['ren', 'sbtc', 'hbtc'].includes(currentContract.currentContract)) this.btcPrice = await priceStore.getBTCPrice()
                 if(['tbtc', 'ren', 'sbtc'].includes(currentContract.currentContract)) this.fromInput = '0.0001'
                 this.c_rates = currentContract.c_rates
                 this.coins = currentContract.underlying_coins
@@ -602,7 +602,7 @@
                 var { dismiss } = notifyNotification(this.waitingMessage)
                 min_dy = cBN(min_dy).toFixed(0);
                 let exchangeMethod = currentContract.swap.methods.exchange_underlying
-                if(this.swapwrapped || ['susdv2', 'tbtc', 'ren', 'sbtc'].includes(this.currentPool)) exchangeMethod = currentContract.swap.methods.exchange
+                if(this.swapwrapped || ['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc'].includes(this.currentPool)) exchangeMethod = currentContract.swap.methods.exchange
                 try {
                     await helpers.setTimeoutPromise(100)
                     await exchangeMethod(i, j, dx, BN(min_dy).toFixed(0,1))

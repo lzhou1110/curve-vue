@@ -182,7 +182,7 @@
 				        */
 			         	if (contract.tethered && contract.tethered[i] 
 			         		&& contract.use_lending && !contract.use_lending[i] 
-			         		|| key == 'susdv2' || (key == 'pax' && i == 3) || key == 'tbtc' || key == 'ren' || key == 'sbtc') {
+			         		|| key == 'susdv2' || (key == 'pax' && i == 3) || key == 'tbtc' || key == 'ren' || key == 'sbtc' || key == 'hbtc') {
 			            	this.all_c_rates[key].c_rates[i] = 1 / contract.coin_precisions[i]
 			         	}
 			         	else {
@@ -371,6 +371,17 @@
 						ind = 92
 					}
 					if(key == 'sbtc') {
+						let N_COINS = contracts[key].N_COINS
+						let start = 108
+						let slice = decoded.slice(start)
+						for(let i = 0; i < N_COINS; i++) {
+							let calcBalance = this.all_c_rates[key].c_rates[i] * (slice[i])
+							this.bal_infos[key].push(calcBalance)
+							total += calcBalance
+						}
+						ind = 103
+					}
+					if(key == 'hbtc') {
 						let N_COINS = contracts[key].N_COINS
 						let start = 108
 						let slice = decoded.slice(start)

@@ -11,6 +11,7 @@ import abis from '../../allabis'
 		tbtc: [],
 		ren: [],
 		sbtc: [],
+		hbtc: [],
 	})
 
 export const state = Vue.observable({

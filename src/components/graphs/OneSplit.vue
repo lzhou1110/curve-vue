@@ -142,6 +142,9 @@
 
                             <input id='sbtcpool' type='checkbox' value='sbtc' v-model='pools'/>
                             <label for='sbtcpool'>sBTC</label>
+
+                            <input id='hbtcpool' type='checkbox' value='hbtc' v-model='pools'/>
+                            <label for='hbtcpool'>HBTC</label>
                         </div>
                         <div v-show='fromInput > 0' id='max_slippage'><span>Max slippage:</span> 
                             <input id="slippage05" type="radio" name="slippage" value='0.005' @click='maxSlippage = 0.5; customSlippageDisabled = true'>
@@ -239,7 +242,7 @@
         },
 
         data: () => ({
-            pools: ['compound', 'y', 'busd', 'susdv2', 'pax', 'ren', 'sbtc'],
+            pools: ['compound', 'y', 'busd', 'susdv2', 'pax', 'ren', 'sbtc', 'hbtc'],
             maxBalance: -1,
             maxSynthBalance: -1,
             susdWaitingPeriod: false,
@@ -260,8 +263,8 @@
             customSlippageDisabled: true,
             inf_approval: false,
             distribution: null,
-            //DAI, USDC, USDT, TUSD, BUSD, sUSD, PAX, renBTC, wBTC, sBTC
-            coin_precisions: [1e18, 1e6, 1e6, 1e18, 1e18, 1e18, 1e18, 1e8, 1e8, 1e18],
+            //DAI, USDC, USDT, TUSD, BUSD, sUSD, PAX, renBTC, wBTC, sBTC, HBTC
+            coin_precisions: [1e18, 1e6, 1e6, 1e18, 1e18, 1e18, 1e18, 1e8, 1e8, 1e18, 1e18],
             swap: [],
             addresses: [],
             coins: [],
@@ -329,6 +332,7 @@
                         renbtc: 'renBTC',
                         wbtc: 'wBTC',
                         sbtc: 'sBTC',
+                        hbtc: 'HBTC',
                         // tbtc: 'tBTC',
                         // hbtc: 'hBTC',
                         // wbtc: 'wBTC',
@@ -369,7 +373,7 @@
                 // if((this.from_currency == 6 && [3,4,5].includes(this.to_currency)) 
                 //     || (this.to_currency == 6 && [3,4,5].includes(this.from_currency))) return 'Not Available'
                 if(this.bestPool === null) return 'Not available'
-                return ['compound', 'y', 'busd', 'susd', 'pax', 'ren', 'sbtc', '1split'][this.bestPool]
+                return ['compound', 'y', 'busd', 'susd', 'pax', 'ren', 'sbtc', 'hbtc', '1split'][this.bestPool]
             },
             selldisabled() {
                 if([7,8,9].includes(this.from_currency) && ![7,8,9].includes(this.to_currency) 
@@ -381,7 +385,7 @@
                 return false;
             },
             allPools() {
-                return ['compound', 'usdt', 'y', 'busd', 'susdv2', 'pax', 'ren', 'sbtc']
+                return ['compound', 'usdt', 'y', 'busd', 'susdv2', 'pax', 'ren', 'sbtc', 'hbtc']
             },
             warningNoPool() {
                 this.message = 'Please select '
@@ -441,7 +445,7 @@
             },
             distributionText() {
                 if(!this.decodeDistribution.length) return null;
-                let distPools = ['compound', 'usdt', 'y', 'busd', 'susdv2', 'pax', 'ren', 'sbtc']
+                let distPools = ['compound', 'usdt', 'y', 'busd', 'susdv2', 'pax', 'ren', 'sbtc', 'hbtc']
                 let text = '';
                 let multipaths = ['DAI', 'USDC', 'USDT']
 
@@ -705,7 +709,7 @@
                 }
                 else {
                     let exchangeMethod = bestContract.swap.methods.exchange_underlying
-                    if(this.swapwrapped || ['susd', 'ren', 'sbtc'].includes(this.bestPoolText)) 
+                    if(this.swapwrapped || ['susd', 'ren', 'sbtc', 'hbtc'].includes(this.bestPoolText)) 
                         exchangeMethod = bestContract.swap.methods.exchange
                     i = this.normalizeCurrency(i)
                     j = this.normalizeCurrency(j)
@@ -932,6 +936,19 @@
                         }
                         )
                     }
+                    else if([10].includes(this.from_currency) || [10].includes(this.to_currency) && this.pools.includes('hbtc')) {
+                        let from_currency = this.from_currency - 9
+                        let to_currency = this.to_currency - 9
+
+                        let dx = BN(this.fromInput).times(contractAbis.hbtc.coin_precisions[from_currency])
+
+                        calls = [
+                            [
+                                this.swap[8]._address,
+                                this.swap[8].methods.get_dy(from_currency, to_currency, dx.toFixed(0,1)).encodeABI()
+                            ]
+                        ]
+                    }
                     else {
                         //susd is already checked outside this function
                         //now coins are DAI, USDC, USDT, other cases are handled and they go through all pools
@@ -990,17 +1007,16 @@
                         this.toInput = '0.00';
                         return;
                     }
-                    /*if(this.from_currency == 5 || this.to_currency == 5) {
+                    if(this.from_currency == 10 || this.to_currency == 10) {
                         let dx = BN(this.fromInput * this.precisions(this.from_currency)).toFixed(0, 1)
                         let actualFromCurrency = this.normalizeCurrency(this.from_currency)
                         let actualToCurrency = this.normalizeCurrency(this.to_currency)
-                        let dy = await this.swap[2].methods.get_dy_underlying(actualFromCurrency, actualToCurrency, dx).call()
-                        this.bestPool = 4;
+                        let dy = await this.swap[8].methods.get_dy(actualFromCurrency, actualToCurrency, dx).call()
+                        this.bestPool = 8;
                         dy = +(BN(dy).div(this.precisions(this.to_currency)))
                         exchangeRate = dy / dx * this.precisions(this.from_currency)
                     }
-                    else*/
-                    if([3,4,5,6].includes(this.from_currency) && [3,4,5,6].includes(this.to_currency)) {
+                    else if([3,4,5,6].includes(this.from_currency) && [3,4,5,6].includes(this.to_currency)) {
                         exchangeRate = (await this.set_to_amount_onesplit())[1]
                         this.bestPool = 7
                         let [_, txPrice1split] = this.calculateGas('1split')
@@ -1118,6 +1134,10 @@
                 //sbtc
                 this.coins.push(new contract.web3.eth.Contract(synthERC20_abi, contractAbis.sbtc.coins[2]))
                 this.underlying_coins.push(new contract.web3.eth.Contract(synthERC20_abi, contractAbis.sbtc.coins[2]))
+
+                //hbtc
+                this.coins.push(new contract.web3.eth.Contract(ERC20_abi, contractAbis.hbtc.coins[1]))
+                this.underlying_coins.push(new contract.web3.eth.Contract(ERC20_abi, contractAbis.hbtc.coins[1]))
 
                 this.snxExchanger = new contract.web3.eth.Contract(synthetixExchanger_ABI, synthetixExchanger_address)
             }
