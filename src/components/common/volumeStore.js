@@ -51,14 +51,14 @@ export async function fetchVolumeData(pools, refresh = false, period = 5) {
 		return fetch(`${window.domain}/raw-stats/${p}-${period}m.json`)
 	})
 	//will work for 17 days on 5 minutes chart
-	if(pools.includes('tbtc') || pools.includes('ren') || pools.includes('sbtc'))
+	if(pools.includes('tbtc') || pools.includes('ren') || pools.includes('sbtc') || pools.includes('hbtc'))
 		requests.push(fetch(`
 			https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=1589587198&to=${(Date.now() / 1000) | 0}`
 			))
 	requests = await Promise.all(requests)
 	let jsons = await Promise.all(requests.map(r => r.json()))
 	let btcPrices = jsons[jsons.length-1]
-	if(pools.includes('tbtc') || pools.includes('ren')) jsons = jsons.slice(0, -1)
+	if(pools.includes('tbtc') || pools.includes('ren') || pools.includes('hbtc')) jsons = jsons.slice(0, -1)
 	for(let [i, data] of jsons.entries()) {
 		let pool = pools[i]
 		if(['tbtc', 'ren', 'sbtc'].includes(pool)) {

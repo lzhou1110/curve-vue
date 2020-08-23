@@ -112,7 +112,7 @@ export default {
         toFixed(num, precisions = 2, round = 4) {
             if(num == 0) return 0
             if(num == '' || num === null || num === undefined) return ''
-            if(precisions == 2 && ['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) precisions = 8
+            if(precisions == 2 && ['tbtc', 'ren', 'sbtc', 'hbtc'].includes(this.currentPool)) precisions = 8
             if(this.showinUSD == 1) precisions = 2
             let rounded = helpers.formatNumber(num, precisions)
             return rounded

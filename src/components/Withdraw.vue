@@ -29,8 +29,8 @@
                         <span v-show='withdrawc'>{{currencies[currency]}}
 	                    	<span v-show="!(currency == 'usdt' && currentPool == 'usdt') && currentPool != 'susdv2'">(in {{currency | capitalize}})</span>
                     	</span>
-                    	<span v-show="!withdrawc && !['susdv2', 'tbtc', 'ren'].includes(currentPool)">{{currency | capitalize}}</span>
-                        <span v-show="!withdrawc && ['susdv2', 'tbtc', 'ren'].includes(currentPool)">{{currencies[currency]}}</span>
+                    	<span v-show="!withdrawc && !['susdv2', 'tbtc', 'ren', 'hbtc'].includes(currentPool)">{{currency | capitalize}}</span>
+                        <span v-show="!withdrawc && ['susdv2', 'tbtc', 'ren', 'hbtc'].includes(currentPool)">{{currencies[currency]}}</span>
                     </label>
                     <input type="text" 
                     :id="'currency_'+i" 
@@ -42,7 +42,7 @@
                     @input='handle_change_amounts(i)'
                     @focus='handle_change_amounts(i)'>
                 </li>
-                <li v-show = "!['susd','susdv2','tbtc','ren','sbtc'].includes(currentPool)">
+                <li v-show = "!['susd','susdv2','tbtc','ren','sbtc','hbtc'].includes(currentPool)">
                     <input id="withdrawc" type="checkbox" name="withdrawc" v-model='withdrawc'>
                     <label for="withdrawc">Withdraw wrapped</label>
                 </li>
@@ -58,7 +58,7 @@
                 </span>
             </legend>
         	<ul>
-        		<li v-show = "!['susdv2','tbtc','ren'].includes(currentPool)">
+        		<li v-show = "!['susdv2','tbtc','ren','hbtc'].includes(currentPool)">
         			<input type='radio' id='to_cur_comb' name="to_cur" :value='10' :checked='to_currency === 10' @click='handleCheck(10)'>
         			<label for='to_cur_comb'>
                         Combination of all coins
@@ -84,7 +84,7 @@
 	            	<input type='checkbox' id='donate_dust' name='donate_dust' v-model='donate_dust'>
 	            	<label 
                         for='donate_dust' 
-                        v-show="!['tbtc', 'ren'].includes(currentPool)">
+                        v-show="!['tbtc', 'ren','hbtc'].includes(currentPool)">
                             Donate dust<span class='tooltip'>[?]<span class='tooltiptext'>(may use less gas)</span>
                         </span>
 	            	</label>
@@ -245,7 +245,7 @@
                 return (100 + maxSlippage)/100
             },
             minAmount() {
-            if(['tbtc', 'ren'].includes(currentContract.currentContract)) return 1e-8
+            if(['tbtc', 'ren', 'hbtc'].includes(currentContract.currentContract)) return 1e-8
                 return 0.01
             },
             calcFee() {
@@ -264,7 +264,7 @@
         },
         methods: {
             async mounted() {
-            	if(['susdv2', 'tbtc', 'ren'].includes(this.currentPool)) {
+            	if(['susdv2', 'tbtc', 'ren', 'hbtc'].includes(this.currentPool)) {
             		this.withdrawc = true;
             		this.to_currency = null
             	}
@@ -281,7 +281,7 @@
                 return helpers.getTokenIcon(token, this.withdrawc, this.currentPool)
             },
             toFixed(num, precisions = 2, round = 4) {
-                if(precisions == 2 && ['tbtc', 'ren'].includes(currentContract.currentContract)) precisions = 8
+                if(precisions == 2 && ['tbtc', 'ren', 'hbtc'].includes(currentContract.currentContract)) precisions = 8
                 let rounded = num.toFixed(precisions)
                 return isNaN(rounded) ? '0.00' : rounded
             },
@@ -487,7 +487,7 @@
                 this.estimateGas = 0;
                 this.show_loading = true;
                 let inOneCoin = currentContract.deposit_zap
-                if(['tbtc','ren'].includes(currentContract.currentContract)) inOneCoin = currentContract.swap
+                if(['tbtc','ren','hbtc'].includes(currentContract.currentContract)) inOneCoin = currentContract.swap
 
 				let min_amounts = []
 			    for (let i = 0; i < currentContract.N_COINS; i++) {
@@ -550,7 +550,7 @@
                         this.waitingMessage = `Please approve ${token_amount / 1e18} tokens for withdrawal`
                         try {
                             this.estimateGas = gas / (['compound', 'usdt'].includes(currentContract.currentContract) ? 1.5 : 2.5)
-                            if(!['tbtc','ren'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(token_amount)
+                            if(!['tbtc','ren','hbtc'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(token_amount)
                             this.waitingMessage = 'Please confirm withdrawal transaction'
     			        	await inOneCoin.methods.remove_liquidity_imbalance(amounts, token_amount).send({
     				        	from: currentContract.default_account, gas: gas
@@ -577,7 +577,7 @@
                     if(this.to_currency !== null && this.to_currency < 10) {
                         this.waitingMessage = `Please approve ${this.toFixed((amount / 1e18))} tokens for withdrawal`
                         this.estimateGas = contractGas.depositzap[this.currentPool].withdraw / 2
-                        if(!['tbtc','ren'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(amount)
+                        if(!['tbtc','ren','hbtc'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(amount)
                         let min_amount;
                         try {
                             min_amount = await inOneCoin.methods.calc_withdraw_one_coin(amount, this.to_currency).call();
@@ -590,7 +590,7 @@
                         }
                         this.waitingMessage = 'Please confirm withdrawal transaction'
                         let args = [amount, this.to_currency, BN(min_amount).times(BN(1).div(BN(this.getMaxSlippage))).toFixed(0, 1)]
-                        if(!['tbtc','ren'].includes(currentContract.currentContract)) args.push(this.donate_dust)
+                        if(!['tbtc','ren','hbtc'].includes(currentContract.currentContract)) args.push(this.donate_dust)
 			        	await inOneCoin.methods
 			        		.remove_liquidity_one_coin(...args)
 			        		.send({
@@ -602,7 +602,7 @@
                         this.waitingMessage = `Please approve ${this.toFixed(amount / 1e18)} tokens for withdrawal`
                         try {
                             this.estimateGas = contractGas.depositzap[this.currentPool].withdrawShare / 2
-                            if(!['tbtc','ren'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(amount)
+                            if(!['tbtc','ren','hbtc'].includes(currentContract.currentContract)) await common.ensure_allowance_zap_out(amount)
                             this.waitingMessage = 'Please confirm withdrawal transaction'
                             let min_amounts = await this.getMinAmounts();
     			        	await inOneCoin.methods.remove_liquidity(amount, min_amounts)
@@ -654,7 +654,7 @@
 			},
 			async handle_change_share() {
                 let inOneCoin = currentContract.deposit_zap
-                if(['tbtc','ren'].includes(currentContract.currentContract)) inOneCoin = currentContract.swap
+                if(['tbtc','ren','hbtc'].includes(currentContract.currentContract)) inOneCoin = currentContract.swap
 
                 this.warninglow = false;
                 this.showWithdrawSlippage = false

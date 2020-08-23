@@ -55,7 +55,7 @@ export default {
 				if(subdomain == 'susdv2') subdomain = 'susd'
 				if(subdomain == 'ren') subdomain = 'ren2'
 				if(subdomain == 'sbtc') subdomain = 'rens'
-				if(['ren', 'rens'].includes(subdomain)) {
+				if(['ren', 'rens', 'hbtc'].includes(subdomain)) {
 					await this.getBTCPrice()
 				}
 	        	let reqs = await Promise.all([
@@ -94,7 +94,7 @@ export default {
 	    	if(!this.$route.params.address) {
 	    		let totalShare = currentContract.totalShare
 	    		let usdShare = currentContract.usdShare
-	    		if(!['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) this.btcPrice = 1
+	    		if(!['tbtc', 'ren', 'sbtc', 'hbtc'].includes(this.currentPool)) this.btcPrice = 1
 	    		console.log(currentContract.curveStakedBalance, currentContract.virtual_price, this.btcPrice)
 	    		if(['y', 'iearn'].includes(this.currentPool)) {
 	    			let vault = '0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c'
@@ -149,7 +149,7 @@ export default {
 	    	let usdShare = tokenBalance * currentContract.virtual_price / 1e18
 	    	let usdStake = stakedBalance * currentContract.virtual_price / 1e18
 
-	    	if(['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) {
+	    	if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(this.currentPool)) {
 	    		usdShare *= this.btcPrice
 	    		usdStake *= this.btcPrice
 	    	}
@@ -297,7 +297,7 @@ export default {
 				point.rates = prev.rates.map((r, i) => interpolator(r, next.rates[i]))
 				point.supply = interpolator(prev.supply, next.supply);
 			}
-			if(['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) {
+			if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(this.currentPool)) {
 				point.btcPrice = this.btcPrice
 				// //instead of this better to make a request to coinpaprika but which API allows querying 
 				// try {
@@ -455,7 +455,7 @@ export default {
 		        fromBlock = '0x'+parseInt(block+1).toString(16)
 		        depositUsdSum += +localStorage.getItem(this.currentPool + 'lastDeposits')
 		        this.depositsUSD = allDepositsUSD = +localStorage.getItem(this.currentPool + 'lastDepositsUSD')
-		        if(['ren', 'sbtc'].includes(this.currentPool)) {
+		        if(['ren', 'sbtc', 'hbtc'].includes(this.currentPool)) {
 		        	this.depositsBTC = this.depositsUSD
 		        	this.depositsUSD = this.depositsUSD * this.btcPrice
 		        }
@@ -504,7 +504,7 @@ export default {
 	             ].includes(transfer[0].topics[1])) continue;
 	            let depositsUSD = transferTokens * poolInfoPoint.virtual_price / 1e36
 	        	allDepositsUSD += depositsUSD
-	            if(['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) {
+	            if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(this.currentPool)) {
 	            	this.depositsUSD += depositsUSD * poolInfoPoint.btcPrice
 	            	this.depositsBTC += depositsUSD
 	            }
@@ -553,7 +553,7 @@ export default {
 			        fromBlock = '0x'+parseInt(block+1).toString(16)
 			        withdrawals += +localStorage.getItem(this.currentPool + 'lastWithdrawals')
 			        this.withdrawalsUSD = allWithdrawalsUSD = +localStorage.getItem(this.currentPool + 'lastWithdrawalsUSD')
-			        if(['ren', 'sbtc'].includes(this.currentPool)) {
+			        if(['ren', 'sbtc', 'hbtc'].includes(this.currentPool)) {
 			        	this.withdrawalsBTC = this.withdrawalsUSD
 			        	this.withdrawalsUSD = this.withdrawalsUSD * this.btcPrice
 			        }

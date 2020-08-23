@@ -433,7 +433,7 @@
 			let data = volumeStore.state.volumeData[1440]
 			let btcPrices = await helpers.retry(fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=1589587198&to=${(Date.now() / 1000) | 0}`))
 			btcPrices = await btcPrices.json()
-			for(let btcPool of ['ren', 'sbtc']) {
+			for(let btcPool of ['ren', 'sbtc', 'hbtc']) {
 				data[btcPool] = data[btcPool].map(d => {
 					d.balances = d.balances.map(bal => bal * volumeStore.findClosestPrice(d.timestamp, btcPrices.prices))
 					return d;
@@ -473,7 +473,7 @@
 				}, false, false)
 			}
 
-			let coins = ['DAI', 'USDC', 'USDT', 'TUSD', 'BUSD', 'SUSD', 'PAX', 'renBTC', 'WBTC', 'sBTC']
+			let coins = ['DAI', 'USDC', 'USDT', 'TUSD', 'BUSD', 'SUSD', 'PAX', 'renBTC', 'WBTC', 'sBTC', 'hBTC']
 			let coinbalances = coins.reduce((a,b)=> (a[b]=[],a),{});
 
 
@@ -488,7 +488,7 @@
 						if(pool == 'busd' && i == 3) i = 4
 						if(pool == 'susd' && i == 3) i = 5
 						if(pool == 'pax' && i == 3) i = 6
-						if(['ren', 'sbtc'].includes(pool)) i += 7
+						if(['ren', 'sbtc', 'hbtc'].includes(pool)) i += 7
 						let hasPoint = coinbalances[coins[i]].find(p => p[0] == point.timestamp*1000)
 						if(hasPoint !== undefined) {
 							hasPoint[1] += balance
@@ -598,7 +598,7 @@
 
 		methods: {
 			async showBalances() {
-				let pools = ['compound','usdt','y','busd','susdv2','pax','ren', 'sbtc']
+				let pools = ['compound','usdt','y','busd','susdv2','pax','ren', 'sbtc', 'hbtc']
 				if(!contract.default_account) return;
 				contract.contracts.compound = contract;
 				let calls = pools.flatMap(k => {
@@ -618,7 +618,7 @@
 				helpers.chunkArr(decoded, 2).slice(0,pools.length).map((v, i) => {
 					let key = pools[i]
 					Vue.set(this.balances, key, +v[0] * (+v[1]) / 1e36);
-					if(['tbtc', 'ren', 'sbtc'].includes(key)) Vue.set(this.balances, key, this.balances[key] * btcPrice)
+					if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(key)) Vue.set(this.balances, key, this.balances[key] * btcPrice)
 				})
 				let len = decoded.length
 				Vue.set(this.balances, 'susdv2', this.balances.susdv2 + (+decoded[len-3] * decoded[9]) / 1e36)

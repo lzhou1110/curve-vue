@@ -39,7 +39,7 @@
                                 <p class='actualvalue' v-show='swapwrapped'>
                                     ≈ {{toFixed(actualFromValue)}} {{Object.keys(currencies)[this.from_currency] | capitalize}}
                                 </p>
-                                <p class='actualvalue' v-show="['sbtc', 'ren'].includes(currentPool)">
+                                <p class='actualvalue' v-show="['sbtc', 'ren', 'hbtc'].includes(currentPool)">
                                     ≈ {{ actualFromValue }}$
                                 </p>
                             </li>
@@ -49,8 +49,8 @@
                                     <img 
                                         :class="{'token-icon': true, [currency+'-icon']: true, 'y': swapwrapped}" 
                                         :src='getTokenIcon(currency)'>
-                                    <span v-show="!swapwrapped && !['tbtc', 'ren', 'sbtc'].includes(currentPool)">{{currency | capitalize}}</span>
-                                    <span v-show="swapwrapped || ['tbtc', 'ren', 'sbtc'].includes(currentPool)">{{currencies[currency]}}</span>
+                                    <span v-show="!swapwrapped && !['tbtc', 'ren', 'sbtc', 'hbtc'].includes(currentPool)">{{currency | capitalize}}</span>
+                                    <span v-show="swapwrapped || ['tbtc', 'ren', 'sbtc', 'hbtc'].includes(currentPool)">{{currencies[currency]}}</span>
                                 </label>
                             </label>
                             </li>
@@ -74,7 +74,7 @@
                                 <p class='actualvalue' v-show='swapwrapped'>
                                     ≈ {{toFixed(actualToValue)}} {{Object.keys(currencies)[this.to_currency] | capitalize}}
                                 </p>
-                                <p class='actualvalue' v-show="['ren', 'sbtc'].includes(currentPool)">
+                                <p class='actualvalue' v-show="['ren', 'sbtc', 'hbtc'].includes(currentPool)">
                                     ≈ {{ actualToValue }}$
                                 </p>
                             </li>
@@ -84,8 +84,8 @@
                                     <img 
                                         :class="{'token-icon': true, [currency+'-icon']: true, 'y': swapwrapped}" 
                                         :src='getTokenIcon(currency)'>
-                                    <span v-show="!swapwrapped && !['tbtc', 'ren'].includes(currentPool)">{{currency | capitalize}}</span>
-                                    <span v-show="swapwrapped || ['tbtc', 'ren'].includes(currentPool)">{{currencies[currency]}}</span>
+                                    <span v-show="!swapwrapped && !['tbtc', 'ren', 'hbtc'].includes(currentPool)">{{currency | capitalize}}</span>
+                                    <span v-show="swapwrapped || ['tbtc', 'ren', 'hbtc'].includes(currentPool)">{{currencies[currency]}}</span>
                                 </label>
                             </label>
                             </li>

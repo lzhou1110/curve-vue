@@ -29,6 +29,9 @@
 				<input id='sbtcpool' type='checkbox' value='sbtc' v-model='piepools'/>
 				<label for='sbtcpool'>sBTC</label>
 
+				<input id='hbtcpool' type='checkbox' value='hbtc' v-model='piepools'/>
+				<label for='hbtcpool'>sBTC</label>
+
 				<button @click='selectPools'>Select</button>
 			</div>
 
@@ -200,7 +203,7 @@
 			    	enabled: true,
 			    }
 			},
-			piepools: ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren', 'sbtc'],
+			piepools: ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren', 'sbtc', 'hbtc'],
 			currencies: ['DAI', 'USDC', 'USDT', 'TUSD', 'BUSD', 'sUSD', 'PAX', 'TBTC', 'WBTC', 'HBTC', 'renBTC', 'sBTC'],
 			volumes: [],
 			period: 'week',

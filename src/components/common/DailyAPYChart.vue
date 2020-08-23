@@ -7,7 +7,7 @@
     		<span :class="{'loading line': !volume}">
     			<span v-show='volume && volume[0] != -1'> {{ (volume && volume[0] || 0) | formatNumber(0) }}$</span>	
     		</span>
-    		<div v-show="['tbtc', 'ren', 'sbtc'].includes(pool)">
+    		<div v-show="['tbtc', 'ren', 'sbtc', 'hbtc'].includes(pool)">
 	    		<span>Daily ₿ trading volume:</span>
 	    		<span>
 	    			<span v-show='volume && volume[1] != -1'> {{ (volume && volume[1] || 0) | formatNumber(8) }} ₿ </span>
@@ -160,7 +160,7 @@
 		                	if(this.series.name == 'Lending APY') return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${value}</b><br/>`
 		                	if(this.series.name === 'Trading Volume') {
 		                		let val = this.y.toFixed(2)
-		                		if(['tbtc', 'ren', 'sbtc'].includes(self.pool)) val = this.y.toFixed(8)
+		                		if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(self.pool)) val = this.y.toFixed(8)
 		                		return `<span style="color:${this.color}">●</span> ${this.series.name} : <b>${val}</b><br/>`
 		                	}
 		                }
@@ -175,7 +175,7 @@
 		},
 		computed: {
 			volumeData() {
-				if(['tbtc', 'ren', 'sbtc'].includes(this.pool)) return helpers.formatNumber(this.volume, 8)
+				if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(this.pool)) return helpers.formatNumber(this.volume, 8)
 				return helpers.formatNumber(this.volume, 0)
 			}
 		},
@@ -398,7 +398,7 @@
 
 		        let lendingrates;
 		        let lendingAxis = 'apyAxis'
-		        if(!['susdv2', 'tbtc', 'ren', 'sbtc'].includes(this.pool))    	
+		        if(!['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc'].includes(this.pool))    	
 	    			lendingrates = await volumeStore.getLendingAPY(this.pool, false, 1440)
 		        else {
 		        	lendingrates = volumeSeries.map(data => [data[0], 0])
@@ -438,7 +438,7 @@
 	    			color: '#7bb5ec',
 	    		})
 
-		        if(!['susdv2', 'tbtc', 'ren', 'sbtc', 'y', 'iearn'].includes(this.pool)) {
+		        if(!['susdv2', 'tbtc', 'ren', 'sbtc', 'y', 'iearn', 'hbtc'].includes(this.pool)) {
 		        	let totalAPYs = chartData.map(([timestamp, apy], i) => [timestamp, apy + lendingrates[i][1]])
 
 		        	this.chart.addSeries({

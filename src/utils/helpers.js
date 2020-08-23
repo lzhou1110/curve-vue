@@ -39,7 +39,7 @@ export function getTokenIcon(token, wrapped, pool) {
     }
     let publicPath = process.env.BASE_URL
     let asset
-    let pngs = ['dai', 'busd', 'pax', '_ydai', '_yusdc', '_yusdt', '_ytusd', '_ybusd']
+    let pngs = ['dai', 'busd', 'pax', '_ydai', '_yusdc', '_yusdt', '_ytusd', '_ybusd', 'hbtc']
     if(pngs.includes(token)) {
         asset = publicPath + 'tokens/' + token + '.png'
     }

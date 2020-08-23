@@ -11,7 +11,7 @@
                 <label for="showinUSD">Show in USD [Virtual profit]</label>
 
                 <input id="showinBTC" type="radio" name="showinUSD" value='2' v-model='showinUSD'>
-                <label for="showinBTC" v-show="['ren', 'sbtc'].includes(currentPool)">Show in BTC</label>
+                <label for="showinBTC" v-show="['ren', 'sbtc', 'hbtc'].includes(currentPool)">Show in BTC</label>
 
                 <input id="showintokens" type="radio" name="showintokens" value='3' v-model='showinUSD'>
                 <label for="showintokens">Show in tokens [Impermanent profit]</label>

@@ -12,7 +12,7 @@
                                     :src='getTokenIcon(currency)'>
                                 <span v-show='depositc'>{{currencies[currency]}}
     	                        	<span v-show="!(currency == 'usdt' && currentPool == 'usdt' || currency == 'pax') 
-    	                        					&& !['susdv2', 'tbtc', 'ren', 'sbtc'].includes(currentPool)"> 
+    	                        					&& !['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc'].includes(currentPool)"> 
     	                        		(in {{currency | capitalize}}) 
     	                        	</span>
     	                        </span>
@@ -79,7 +79,7 @@
                     	</span>
                     </label>
                 </li>
-                <li v-show = "!['susd','susdv2','tbtc','ren','sbtc'].includes(currentPool)">
+                <li v-show = "!['susd','susdv2','tbtc','ren','sbtc','hbtc'].includes(currentPool)">
                     <input id="depositc" type="checkbox" name="inf-approval" checked v-model='depositc'>
                     <label for="depositc">Deposit wrapped</label>
                 </li>
@@ -113,7 +113,7 @@
                     
                     <span class='curvelpusd'> 
                         1 Curve {{currentPool}} LP token = {{ (1 * virtual_price).toFixed(6) }} 
-                        {{ !['ren', 'sbtc'].includes(currentPool) ? 'USD' : 'BTC' }} 
+                        {{ !['ren', 'sbtc', 'hbtc'].includes(currentPool) ? 'USD' : 'BTC' }} 
                     </span>
                 </p>
                 <div>
@@ -304,7 +304,7 @@
         computed: {
           ...getters,
           minAmount() {
-          	if(['tbtc', 'ren', 'sbtc'].includes(currentContract.currentContract)) return 1e-8
+          	if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(currentContract.currentContract)) return 1e-8
           	return 0.01
           },
           calcFee() {
@@ -327,7 +327,7 @@
             return this.inputs.filter(v=>+v==0).length == this.N_COINS && !this.disabledButtons
           },
           isPlain() {
-            return ['susdv2', 'tbtc', 'ren', 'sbtc'].includes(this.currentPool)
+            return ['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc'].includes(this.currentPool)
           },
           transferableBalanceText() {
             return this.toFixed((this.transferableBalance / 1e18))
@@ -407,7 +407,7 @@
 
             async mounted(oldContract) {
 
-            	if(['susd', 'susdv2', 'tbtc', 'ren', 'sbtc'].includes(currentContract.currentContract)) this.depositc = true;
+            	if(['susd', 'susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc'].includes(currentContract.currentContract)) this.depositc = true;
                 else this.depositc = false;
             	this.changeSwapInfo(this.depositc)
             	currentContract.showSlippage = false;
@@ -433,8 +433,8 @@
                 return helpers.getTokenIcon(token, this.depositc, this.currentPool)
             },
             toFixed(num, precisions = 2, round = 4) {
-                if(+num == 0 && ['ren', 'sbtc'].includes(currentContract.currentContract)) return '0.00'
-                if(precisions == 2 && ['tbtc', 'ren', 'sbtc'].includes(currentContract.currentContract)) precisions = 8
+                if(+num == 0 && ['ren', 'sbtc', 'hbtc'].includes(currentContract.currentContract)) return '0.00'
+                if(precisions == 2 && ['tbtc', 'ren', 'sbtc', 'hbtc'].includes(currentContract.currentContract)) precisions = 8
                 let rounded = (+num).toFixed(precisions)
                 return isNaN(rounded) ? '0.00' : rounded
             },
