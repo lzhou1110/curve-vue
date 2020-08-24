@@ -292,11 +292,9 @@
             			//comparing prices against USDC
 	            		let key = "1-"+i;
 	                	if(i == 0) key = "0-1"
-	                	let price = point.prices[key] && point.prices[key][3]
+	                	let price = point.prices[key] && point.prices[key][0]
 	                	if(i > 0) price = 1 / price
 	                	price = price || 1
-
-	                	price = Math.min(price, 1.01)
 
 	            		let real_amount = balance * point.rates[i] / abis[subdomain == 'susd' ? 'susdv2' : subdomain == 'ren2' ? 'ren' : subdomain == 'rens' ? 'sbtc' : subdomain].coin_precisions[i];
 	            		return real_amount / S * (point.virtual_price / this.virtual_price_0) * price
