@@ -346,7 +346,6 @@
 		        		let timestamp = this.data[i].timestamp
 		        		let total_supply = this.data[i].supply
 		        		let virtual_price = this.data[i].virtual_price
-		        		console.log(SNXprices, "SNX PRICES")
 		        		let SNXprice = this.findClosestPrice(this.data[i].timestamp, SNXprices)
 		        		let reward = decoded[0] * decoded[1] / 1e18
 		        		if(+decoded[2] < timestamp)

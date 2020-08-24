@@ -296,6 +296,8 @@
 	                	if(i > 0) price = 1 / price
 	                	price = price || 1
 
+	                	price = Math.min(price, 1.01)
+
 	            		let real_amount = balance * point.rates[i] / abis[subdomain == 'susd' ? 'susdv2' : subdomain == 'ren2' ? 'ren' : subdomain == 'rens' ? 'sbtc' : subdomain].coin_precisions[i];
 	            		return real_amount / S * (point.virtual_price / this.virtual_price_0) * price
 	            	})
