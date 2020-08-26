@@ -7,6 +7,7 @@ import BurnerConnectProvider from "@burner-wallet/burner-connect-provider";
 */
 import Onboard from 'bnc-onboard'
 //import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
+import TransportU2F from "@ledgerhq/hw-transport-u2f";
 
 import Notify from "bnc-notify"
 
@@ -81,7 +82,7 @@ let wallets = [
     walletName: "ledger",
     rpcUrl:
       "https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b",
-    //LedgerTransport: TransportWebUSB,
+    LedgerTransport: TransportU2F,
   },
   { walletName: "dapper" },
   { walletName: "coinbase" },
@@ -114,6 +115,8 @@ let wallets = [
   { walletName: "unilogin" },
   { walletName: "imToken", rpcUrl: "https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b" },
   { walletName: "meetone" },
+  { walletName: "mykey", rpcUrl: 'https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b' },
+  { walletName: "huobiwallet", rpcUrl: 'https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b' },
 ]
 
 let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);

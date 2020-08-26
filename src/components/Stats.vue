@@ -292,7 +292,7 @@
             			//comparing prices against USDC
 	            		let key = "1-"+i;
 	                	if(i == 0) key = "0-1"
-	                	let price = point.prices[key] && point.prices[key][3]
+	                	let price = point.prices[key] && point.prices[key][0]
 	                	if(i > 0) price = 1 / price
 	                	price = price || 1
 
