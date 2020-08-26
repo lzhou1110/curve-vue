@@ -42,6 +42,7 @@
                     @input='handle_change_amounts(i)'
                     @focus='handle_change_amounts(i)'>
                 </li>
+                {{ currentPool }}
                 <li v-show = "!['susd','susdv2','tbtc','ren','sbtc','hbtc'].includes(currentPool)">
                     <input id="withdrawc" type="checkbox" name="withdrawc" v-model='withdrawc'>
                     <label for="withdrawc">Withdraw wrapped</label>

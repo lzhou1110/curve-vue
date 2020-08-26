@@ -953,7 +953,7 @@
                         //susd is already checked outside this function
                         //now coins are DAI, USDC, USDT, other cases are handled and they go through all pools
                         dx = BN(this.fromInput).times(contractAbis.usdt.coin_precisions[this.from_currency])
-                        let poolidx = this.pools.filter(pool => !['tbtc', 'ren', 'sbtc'].includes(pool)).map(pool => this.allPools.indexOf(pool))
+                        let poolidx = this.pools.filter(pool => !['tbtc', 'ren', 'sbtc', 'hbtc'].includes(pool)).map(pool => this.allPools.indexOf(pool))
                         if(this.from_currency == 2 || this.to_currency == 2) poolidx =  poolidx.filter(id => id != 0)
                         calls = poolidx.map(i =>
                             [

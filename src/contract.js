@@ -183,6 +183,9 @@ export const gas = {
 		sbtc: {
 			imbalance: x => 800000,
 		},
+		hbtc: {
+			imbalance: x => 600000,
+		},
 	},
 	depositzap: {
 		compound: {
@@ -242,6 +245,12 @@ export const gas = {
 			withdraw: 350000,
 			withdrawShare: 350000,
 			withdrawImbalance: x => 800000,
+		},
+		hbtc: {
+			deposit: x => 300000,
+			withdraw: 250000,
+			withdrawShare: 250000,
+			withdrawImbalance: x => 600000,
 		},
 	},
 	adapter: {

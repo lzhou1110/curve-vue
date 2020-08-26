@@ -96,7 +96,7 @@
                     Exchange rate
                     <span @click='swapExchangeRate' class='clickable underline'>
                         {{getPair(swaprate)}}
-                        <img src='@/assets/sync-solid.svg' class='swaprates-icon'>
+                        <img :src="publicPath + 'sync-solid.svg'" class='swaprates-icon'>
                     </span> (including fees): 
                     <span id="exchange-rate" @click='swapExchangeRate' class='clickable'>
                         {{exchangeRateSwapped}}
@@ -115,7 +115,7 @@
                     </li>
                     <li>
                         <input id='swapw' type='checkbox' name='swapw' v-model = 'swapwrapped'>
-                        <label for='swapw' v-show = "!['susdv2', 'tbtc', 'ren', 'sbtc'].includes(currentPool)">Swap wrapped</label>
+                        <label for='swapw' v-show = "!['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc'].includes(currentPool)">Swap wrapped</label>
                     </li>
                 </ul>
                 <div>
@@ -390,7 +390,7 @@
             toFixed(num) {
                 if(num == '' || num == undefined || +num == 0) return '0.00'
                 if(!BigNumber.isBigNumber(num)) num = +num
-                if(['tbtc', 'ren', 'sbtc'].includes(currentContract.currentContract)) return num.toFixed(8)
+                if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(currentContract.currentContract)) return num.toFixed(8)
                 return num.toFixed(2)
             },
             getCurrency(i) {
