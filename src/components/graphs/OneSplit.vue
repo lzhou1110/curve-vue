@@ -376,8 +376,9 @@
                 return ['compound', 'y', 'busd', 'susd', 'pax', 'ren', 'sbtc', 'hbtc', '1split'][this.bestPool]
             },
             selldisabled() {
-                if([7,8,9].includes(this.from_currency) && ![7,8,9].includes(this.to_currency) 
-                    || [7,8,9].includes(this.to_currency) && ![7,8,9].includes(this.from_currency)) return true
+                if((this.from_currency == 10 && this.to_currency != 8) || (this.to_currency == 8 && this.from_currency != 10)) return true
+                // if([7,8,9].includes(this.from_currency) && ![7,8,9].includes(this.to_currency) 
+                //     || [7,8,9].includes(this.to_currency) && ![7,8,9].includes(this.from_currency)) return true
                 // if(this.from_currency == 5 && ![0,1,2].includes(this.to_currency) || this.to_currency == 5 && ![0,1,2].includes(this.from_currency))
                 //     return true
                 // if((this.from_currency == 6 && [3,4,5].includes(this.to_currency)) || (this.to_currency == 6 && [3,4,5].includes(this.from_currency)))
@@ -569,7 +570,7 @@
             toFixed(num) {
                 if(num == '' || num == undefined || num == 0) return '0.00'
                 if(!BN.isBigNumber(num)) num = +num
-                if([7, 8, 9].includes(this.from_currency)) return num.toFixed(8)
+                if([7, 8, 9, 10].includes(this.from_currency)) return num.toFixed(8)
                 return num.toFixed(2)
             },
             handleError(err) {
@@ -597,6 +598,7 @@
             },
             normalizeCurrency(i) {
                 if([7, 8, 9].includes(i)) return i - 7;
+                if(i == 10) i = 0
                 if(i > 3) return 3
                 return i;
             },
@@ -944,8 +946,8 @@
 
                         calls = [
                             [
-                                this.swap[8]._address,
-                                this.swap[8].methods.get_dy(from_currency, to_currency, dx.toFixed(0,1)).encodeABI()
+                                this.swap[9]._address,
+                                this.swap[9].methods.get_dy(from_currency, to_currency, dx.toFixed(0,1)).encodeABI()
                             ]
                         ]
                     }
@@ -1011,7 +1013,8 @@
                         let dx = BN(this.fromInput * this.precisions(this.from_currency)).toFixed(0, 1)
                         let actualFromCurrency = this.normalizeCurrency(this.from_currency)
                         let actualToCurrency = this.normalizeCurrency(this.to_currency)
-                        let dy = await this.swap[8].methods.get_dy(actualFromCurrency, actualToCurrency, dx).call()
+                        console.log(this.swap[9])
+                        let dy = await this.swap[9].methods.get_dy(actualFromCurrency, actualToCurrency, dx).call()
                         this.bestPool = 8;
                         dy = +(BN(dy).div(this.precisions(this.to_currency)))
                         exchangeRate = dy / dx * this.precisions(this.from_currency)

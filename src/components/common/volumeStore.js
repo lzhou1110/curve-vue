@@ -82,7 +82,7 @@ export async function getVolumes(pools, refresh = false) {
     for(let [pool, volume] of Object.entries(state.volumes)) {
     	if(volume[0] == -1) {
     		let volume = pool == 'ren' ? stats.volume.ren2 : pool == 'sbtc' ? stats.volume.rens : stats.volume[pool]
-    		if(['tbtc', 'ren', 'sbtc'].includes(pool)) volume *= btcPrice
+    		if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(pool)) volume *= btcPrice
     		Vue.set(state.volumes[pool], 0, volume || 0)
     		Vue.set(state.volumes[pool], 1, pool == 'ren' ? stats.volume.ren2 : pool == 'sbtc' ? stats.volume.rens : stats.volume[pool])
     	}

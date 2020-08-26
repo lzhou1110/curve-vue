@@ -57,11 +57,11 @@ const currencies = {
 		usdt: 'ycUSDT',
 		pax: 'PAX',
 	},
-	tbtc: {
-		tbtc: 'TBTC',
-		wbtc: 'wBTC',
-		hbtc: 'hBTC',
-	},
+	// tbtc: {
+	// 	tbtc: 'TBTC',
+	// 	wbtc: 'wBTC',
+	// 	hbtc: 'hBTC',
+	// },
 	ren: {
 		renbtc: 'renBTC',
 		wbtc: 'wBTC',
@@ -341,7 +341,7 @@ const state = Vue.observable({
 
 			...initState(),
 		},
-		sbtc: {
+		hbtc: {
 			currentContract: 'hbtc',
 
 			...initState(),

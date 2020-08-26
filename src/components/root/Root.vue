@@ -391,6 +391,42 @@
                	 		</span>
 	                </router-link>
 	            </div>
+	            <div :class="{selected: activePoolLink == 5}">
+	                <router-link to = '/hbtc'>
+	                	<span class='index'>5.</span>  
+	                    <span class='pooltext'>hbtc</span>
+	                    <span class='pools'>[hBTC, wBTC]</span>  
+	                    <span class='apr'>
+	                    	<span class='tooltip'>APY:
+	                    		<span class='tooltiptext long'>
+		                    		<div>Pool APY + Lending APY (annualized)</div>
+		                    		<div>Daily APY: {{daily_apy[8]}}%</div>
+		                    		<div>Weekly APY: {{weekly_apy[8]}}%</div>
+		                    		<div>Monthly APY: {{monthly_apy[8]}}%</div>
+		                    		<div>Total APY: {{apy[8]}}%</div>
+		                    	</span>
+	                    	</span> 
+	                    	<span :class="{'loading line': !daily_apy[8]}">{{daily_apy[8]}}</span>%
+	                    	<!-- <div :class="{'incentive-apr': true}">(+{{CRVAPYs.hbtc | toFixed2}}%
+	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
+	                                <span class='tooltiptext'>
+	                                    CRV LP reward annualized
+	                                </span>
+	                            </span>)
+	                		</div> -->
+	                    </span>
+	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.hbtc && volumes.hbtc[0] < 0}">
+	                    	<span v-show='volumes.hbtc && volumes.hbtc[0] >= 0'>${{(volumes.hbtc && volumes.hbtc[0] | 0) | formatNumber(0)}}</span>
+               	 		</span></span>
+               	 		<span class='balance'>
+           	 				<span class='showmobile' v-show='balances.hbtc > 0'>Balance: ${{balances.hbtc && balances.hbtc.toFixed(2)}} </span>
+               	 			<span class='tooltip' v-show='balances.hbtc > 0'>
+               	 				<img :src="publicPath + 'dollar-sign-solid.svg'">
+               	 				<span class='tooltiptext'>Balance: ${{balances.hbtc && balances.hbtc.toFixed(2)}}</span>
+               	 			</span>
+               	 		</span>
+	                </router-link>
+	            </div>
 	        </fieldset>
 	    </div>
 
@@ -636,7 +672,7 @@
 	            }
 			},
 			async getAPY() {
-				let pools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc','ren2','rens']
+				let pools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc','ren2','rens','hbtc']
 	            let requests = await Promise.all([fetch(`${window.domain}/raw-stats/apys.json`), helpers.retry(fetch(`https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd`), 300)])
 	            let res = await Promise.all(requests.map(request => request.json()))
 	            let stats = res[0]
@@ -646,7 +682,7 @@
                 	if(volumeStore.state.volumes[key] && volumeStore.state.volumes[key][0] == -1) {
                 		let volume = key == 'ren' ? stats.volume.ren2 : key == 'sbtc' ? stats.volume.rens : stats.volume[key]
                 		Vue.set(volumeStore.state.volumes[key], 0, volume || 0)
-                		if(['tbtc', 'ren', 'sbtc'].includes(key)) {
+                		if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(key)) {
                 			Vue.set(volumeStore.state.volumes[key], 0, volume * this.btcPrice || 0)
                 			Vue.set(volumeStore.state.volumes[key], 1, volume || 0)
                 		}
