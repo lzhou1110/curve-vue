@@ -31,10 +31,10 @@
 		                    </span>
                     	<span :class="{'loading line': !daily_apy[0]}">{{daily_apy[0]}}</span>%
                     	<br>
-                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.compound | toFixed2}}%
+                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.compound && (CRVAPYs.compound[0]).toFixed(2)}}% <br> to {{CRVAPYs.compound && (CRVAPYs.compound[1]). toFixed(2)}}%
                 			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
-                                <span class='tooltiptext'>
-                                    CRV LP reward annualized
+                                <span class='tooltiptext long'>
+                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.compound &&  CRVAPYs.compound[2].toFixed(2)}})
                                 </span>
                             </span>)
                 		</div>
@@ -114,10 +114,10 @@
 		                    	</span>
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[5]}">{{daily_apy[5]}}</span>%
-	                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.pax | toFixed2}}%
+	                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.pax && (CRVAPYs.pax[0]).toFixed(2)}}% <br> to {{CRVAPYs.pax && (CRVAPYs.pax[1]).toFixed(2)}}%
 	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
-	                                <span class='tooltiptext'>
-	                                    CRV LP reward annualized
+	                                <span class='tooltiptext long'>
+	                                    CRV LP reward annualized(max APY can be reached with max boost of {{CRVAPYs.pax &&  CRVAPYs.pax[2].toFixed(2)}})
 	                                </span>
 	                            </span>)
 	                		</div>
@@ -158,10 +158,10 @@
 	                                </span>
 	                            </span>)
                     		</div>
-                    		<div :class="{'incentive-apr': true}">(+{{CRVAPYs.y | toFixed2}}%
+                    		<div :class="{'incentive-apr': true}">(+{{CRVAPYs.y && CRVAPYs.y[0].toFixed(2)}}% <br> to {{ CRVAPYs.y && (CRVAPYs.y[1].toFixed(2))}}
 	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
-	                                <span class='tooltiptext'>
-	                                    CRV LP reward annualized
+	                                <span class='tooltiptext long'>
+	                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.y && CRVAPYs.y[2].toFixed(2) }})
 	                                </span>
 	                            </span>)
 	                		</div>
@@ -195,10 +195,10 @@
 		                    	</span>
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[3]}">{{daily_apy[3]}}</span>%
-	                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.busd | toFixed2}}%
+	                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.busd && (CRVAPYs.busd[0]).toFixed(2)}}% <br> to {{CRVAPYs.busd && (CRVAPYs.busd[1]).toFixed(2)}}%
 	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
-	                                <span class='tooltiptext'>
-	                                    CRV LP reward annualized
+	                                <span class='tooltiptext long'>
+	                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.busd && CRVAPYs.busd[2].toFixed(2) }})
 	                                </span>
 	                            </span>)
 	                		</div>
@@ -252,10 +252,10 @@
 		                                </span>
 		                            </span>)
 	                    		</div>
-	                    		<div :class="{'incentive-apr': true}">(+{{CRVAPYs.susdv2 | toFixed2}}%
+	                    		<div :class="{'incentive-apr': true}">(+{{CRVAPYs.susdv2 && (CRVAPYs.susdv2[0]).toFixed(2)}}% <br> to {{CRVAPYs.susdv2 && (CRVAPYs.susdv2[1]).toFixed(2)}}%
 		                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
-		                                <span class='tooltiptext'>
-		                                    CRV LP reward annualized
+		                                <span class='tooltiptext long'>
+		                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.susdv2 && CRVAPYs.susdv2[2].toFixed(2) }})
 		                                </span>
 		                            </span>)
 		                		</div>
@@ -319,10 +319,10 @@
 		                    	</span>
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[7]}">{{daily_apy[7]}}</span>%
-	                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.ren | toFixed2}}%
+	                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.ren && (CRVAPYs.ren[0]).toFixed(2)}}% <br> to {{CRVAPYs.ren && (CRVAPYs.ren[1]).toFixed(2)}}%
 	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
-	                                <span class='tooltiptext'>
-	                                    CRV LP reward annualized
+	                                <span class='tooltiptext long'>
+	                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.ren && CRVAPYs.ren[2].toFixed(2) }})
 	                                </span>
 	                            </span>)
 	                		</div>
@@ -370,10 +370,10 @@
 		                                </span>
 		                            </span>)
 	                    		</div>
-	                    		<div :class="{'incentive-apr': true}">(+{{CRVAPYs.sbtc | toFixed2}}%
+	                    		<div :class="{'incentive-apr': true}">(+{{CRVAPYs.sbtc && (CRVAPYs.sbtc[0]).toFixed(2)}}% <br> to {{CRVAPYs.sbtc && (CRVAPYs.sbtc[1]).toFixed(2)}}%
 		                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
-		                                <span class='tooltiptext'>
-		                                    CRV LP reward annualized
+		                                <span class='tooltiptext long'>
+		                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.sbtc && CRVAPYs.sbtc[2].toFixed(2) }})
 		                                </span>
 		                            </span>)
 		                		</div>
@@ -391,7 +391,7 @@
                	 		</span>
 	                </router-link>
 	            </div>
-	            <div :class="{selected: activePoolLink == 5}">
+	            <!-- <div :class="{selected: activePoolLink == 5}">
 	                <router-link to = '/hbtc'>
 	                	<span class='index'>5.</span>  
 	                    <span class='pooltext'>hbtc</span>
@@ -407,13 +407,13 @@
 		                    	</span>
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[8]}">{{daily_apy[8]}}</span>%
-	                    	<!-- <div :class="{'incentive-apr': true}">(+{{CRVAPYs.hbtc | toFixed2}}%
+	                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.hbtc && (CRVAPYs.hbtc[0]).toFixed(2)}}% <br> to {{CRVAPYs.hbtc && (CRVAPYs.hbtc[1]).toFixed(2)}}%
 	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
-	                                <span class='tooltiptext'>
-	                                    CRV LP reward annualized
+	                                <span class='tooltiptext long'>
+	                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.hbtc && CRVAPYs.hbtc[2].toFixed(2) }})
 	                                </span>
 	                            </span>)
-	                		</div> -->
+	                		</div>
 	                    </span>
 	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.hbtc && volumes.hbtc[0] < 0}">
 	                    	<span v-show='volumes.hbtc && volumes.hbtc[0] >= 0'>${{(volumes.hbtc && volumes.hbtc[0] | 0) | formatNumber(0)}}</span>
@@ -426,7 +426,7 @@
                	 			</span>
                	 		</span>
 	                </router-link>
-	            </div>
+	            </div> -->
 	        </fieldset>
 	    </div>
 
@@ -490,6 +490,8 @@
 			btcPrice: null,
 
 			CRVAPYs: {},
+
+			CRVboosts: {},
 		}),
 		async created() {
 			var start = new Date();
@@ -785,12 +787,14 @@
 				let ratesCalls = decodedGauges.map(gauge => [
 					[gauge, "0x180692d0"],
 					[gauge, "0x17e28089"],
+					[gauge, "0x18160ddd"],
 				])
 
 				let aggRates = await contract.multicall.methods.aggregate(ratesCalls.flat()).call()
 				let decodedRate = aggRates[1].map(hex => web3.eth.abi.decodeParameter('uint256', hex))
-				let gaugeRates = decodedRate.filter((_, i) => i % 2 == 0).map(v => v / 1e18)
-				let workingSupplies = decodedRate.filter((_, i) => i % 2 == 1).map(v => v / 1e18)
+				let gaugeRates = decodedRate.filter((_, i) => i % 3 == 0).map(v => v / 1e18)
+				let workingSupplies = decodedRate.filter((_, i) => i % 3 == 1).map(v => v / 1e18)
+				let totalSupplies = decodedRate.filter((_, i) => i % 3 == 2).map(v => v / 1e18)
 
 				let virtualPriceCalls = Object.values(poolInfo).map(v => [v.swap, "0xbb7b8b80"])
 				let aggVirtualPrices = await contract.multicall.methods.aggregate(virtualPriceCalls).call()
@@ -801,16 +805,23 @@
 					let swap_address = poolInfo[pool].swap
 					let virtual_price = decodedVirtualPrices.find(v => v[0].toLowerCase() == swap_address.toLowerCase())[1]
 					let _working_supply = workingSupplies[i]
-					if(['ren', 'sbtc'].includes(pool))
+					let totalSupply = totalSupplies[i]
+					if(['ren', 'sbtc'].includes(pool)) {
 						_working_supply *= btcPrice
+						totalSupply *= btcPrice
+					}
 					let rate = (gaugeRates[i] * w[1] * 31536000 / _working_supply * 0.4) / virtual_price
 					let apy = rate * CRVprice * 100
 					if(isNaN(apy))
 						apy = 0
 					Object.values(poolInfo).find(v => v.name == pool).gauge_relative_weight = w[1]
 					console.log(pool, apy, "POOL CRV APY")
-					Vue.set(this.CRVAPYs, pool, apy)
+					//boost = (totalSupply / _working_supply)
+					Vue.set(this.CRVAPYs, pool, [apy, apy * 2.5, 2.5])
+					Vue.set(this.CRVboosts, pool, 2.5)
 				})
+
+				console.log(this.CRVboosts, "CRV boosts")
 
 			}
 		}

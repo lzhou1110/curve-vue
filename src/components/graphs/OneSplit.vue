@@ -332,7 +332,7 @@
                         renbtc: 'renBTC',
                         wbtc: 'wBTC',
                         sbtc: 'sBTC',
-                        hbtc: 'HBTC',
+                        //hbtc: 'HBTC',
                         // tbtc: 'tBTC',
                         // hbtc: 'hBTC',
                         // wbtc: 'wBTC',
@@ -1026,7 +1026,7 @@
                         this.estimateGas = txPrice1split
                     }
                     else {
-                        let pools = ['compound', 'iearn', 'busd', 'susdv2', 'pax', 'ren', 'sbtc', '1split']
+                        let pools = ['compound', 'iearn', 'busd', 'susdv2', 'pax', 'ren', 'sbtc', 'hbtc', '1split']
                         this.swapPromise.cancel()
                         let promises = [this.realComparePools()]
                         if(this.fromInput > 100 || [7,8].includes(this.from_currency) && [7,8].includes(this.to_currency)) {

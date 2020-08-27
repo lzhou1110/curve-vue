@@ -21,7 +21,7 @@
             <router-link :to="'/susdv2/' + ($route.path.split('/')[2] || '') " :class="{selected: currentPool == 'susdv2'}">sUSD</router-link>
             <router-link :to="'/ren/' + ($route.path.split('/')[2] || '')">renBTC</router-link>
             <router-link :to="'/sbtc/' + ($route.path.split('/')[2] || '')">sBTC</router-link>
-            <router-link :to="'/hbtc/' + ($route.path.split('/')[2] || '')">HBTC</router-link>
+            <!-- <router-link :to="'/hbtc/' + ($route.path.split('/')[2] || '')">HBTC</router-link> -->
             <!-- <a href="https://iearn.finance/pool">sUSD</a> -->
             <p>____________</p>
             <router-link to='/'>Home</router-link>

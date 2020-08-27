@@ -114,6 +114,7 @@
           	let pools = {...contracts};
           	delete pools.y
           	delete pools.tbtc
+          	delete pools.hbtc
           	return pools;
           },
           error() {
@@ -121,7 +122,7 @@
           },
           filteredCurrencies() {
           	return Object.fromEntries(Object.entries(this.allCurrencies).filter(
-			      ([key, val])=>!['tbtc'].includes(key)
+			      ([key, val])=>!['tbtc', 'hbtc'].includes(key)
 			   ))
           }
         },
