@@ -49,7 +49,7 @@
 			</div>
 		</div>
 
-		<div id='modalinit' class='modal' v-show='showModal1' v-if='lastTransaction && [0,3].includes(lastTransaction.type)' @click.self='removeTx(lastTransaction)'>
+		<div id='modalinit' class='modal' v-show='showModal1' v-if='lastTransaction && [0,3].includes(lastTransaction.type)'>
 			<div class='modal-content window white'>
 				<fieldset>
 					<div class='legend2 hoverpointer' @click='removeTx(lastTransaction)'>
@@ -547,6 +547,7 @@
 			proceedTx() {
 				if(this.confirmCheckbox)
 					this.showModal1 =false
+				this.confirmCheckbox = false
 			},
 
 			copy(transaction) {
@@ -590,6 +591,7 @@
         	removeTx(transaction) {
         		store.removeTx(transaction)
         		this.showModal1 = false
+        		this.confirmCheckbox = false
 			},
 
 			mintThenSwap(transaction) {
@@ -793,7 +795,7 @@
 	}
 	.buttoncancel {
 		margin-left: 1em;
-		background: gray;
+		background: darkred;
 		box-shadow: none;
 		border: none;
 	}

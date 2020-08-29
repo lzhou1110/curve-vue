@@ -377,6 +377,7 @@
             },
             selldisabled() {
                 if((this.from_currency == 10 && this.to_currency != 8) || (this.to_currency == 8 && this.from_currency != 10)) return true
+                if(this.from_currency <= 6 && this.to_currency >= 7 || this.to_currency <= 6 && this.from_currency >= 7) return true
                 // if([7,8,9].includes(this.from_currency) && ![7,8,9].includes(this.to_currency) 
                 //     || [7,8,9].includes(this.to_currency) && ![7,8,9].includes(this.from_currency)) return true
                 // if(this.from_currency == 5 && ![0,1,2].includes(this.to_currency) || this.to_currency == 5 && ![0,1,2].includes(this.from_currency))
@@ -1021,7 +1022,7 @@
                     }
                     else if([3,4,5,6].includes(this.from_currency) && [3,4,5,6].includes(this.to_currency)) {
                         exchangeRate = (await this.set_to_amount_onesplit())[1]
-                        this.bestPool = 7
+                        this.bestPool = 8
                         let [_, txPrice1split] = this.calculateGas('1split')
                         this.estimateGas = txPrice1split
                     }

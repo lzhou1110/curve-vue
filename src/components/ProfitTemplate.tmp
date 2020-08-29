@@ -163,16 +163,16 @@
                     </b> 
                     <span :class="{'loading line': available == -1}"> 
                         <span v-show='available != -1'>
-                            {{ toFixed(+showProfit + +showEarnedYFIUSD + +showRewardsYFIUSD) }} {{showinUSD ? 'USD' : '' }}
+                            {{ toFixed(+showProfit) }} {{showinUSD ? 'USD' : '' }}
                         </span>
                     </span>
                 </li>
 
                 <br>
 
-                <li class='profitprices'>
+                <!-- <li class='profitprices'>
                     <b>YFI price: </b><span :class="{'loading line': yfiPrice === null}"></span><span>{{yfiPrice && yfiPrice.toFixed(2)}} USD</span>
-                </li>
+                </li> -->
             </ul>
         </ul>
     </fieldset>

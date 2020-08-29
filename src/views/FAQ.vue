@@ -21,9 +21,14 @@
                 <router-link to='/integrations'>Integrations</router-link>
             </div>
 
-            <div>
-                <a href='https://guides.curve.fi' rel='noopener noreferrer'>Guides</a>
-            </div>
+            <p>
+                <div>
+                    <a href='https://guides.curve.fi' rel='noopener noreferrer'>Guides</a>
+                </div>
+                <div>
+                    <a href='https://resources.curve.fi' rel='noopener noreferrer'>Resources</a>
+                </div>
+            </p>
 
             <p>
                 <a href='https://medium.com/@crypto.tutorials/curve-fi-how-does-it-work-b673a8fe16cc' rel='noopener noreferrer'>Getting started tutorial</a>

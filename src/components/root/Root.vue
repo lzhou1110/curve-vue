@@ -31,7 +31,9 @@
 		                    </span>
                     	<span :class="{'loading line': !daily_apy[0]}">{{daily_apy[0]}}</span>%
                     	<br>
-                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.compound && (CRVAPYs.compound[0]).toFixed(2)}}% <br> to {{CRVAPYs.compound && (CRVAPYs.compound[1]). toFixed(2)}}%
+                    	<div :class="{'incentive-apr': true}">
+                    		(+{{CRVAPYs.compound && (CRVAPYs.compound[0]).toFixed(2)}}% <br> to {{CRVAPYs.compound && (CRVAPYs.compound[1]). toFixed(2)}}%
+                    		<span v-show='CRVAPYs.compound && CRVAPYs.compound[3]'><br>my: {{CRVAPYs.compound && CRVAPYs.compound[3] > 0 && CRVAPYs.compound[3].toFixed(2)}}%&nbsp;</span>
                 			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
                                 <span class='tooltiptext long'>
                                     CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.compound &&  CRVAPYs.compound[2].toFixed(2)}})
@@ -115,6 +117,7 @@
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[5]}">{{daily_apy[5]}}</span>%
 	                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.pax && (CRVAPYs.pax[0]).toFixed(2)}}% <br> to {{CRVAPYs.pax && (CRVAPYs.pax[1]).toFixed(2)}}%
+	                    		<span v-show='CRVAPYs.pax && CRVAPYs.pax[3]'><br>my: {{CRVAPYs.pax && CRVAPYs.pax[3] > 0 && CRVAPYs.pax[3].toFixed(2)}}%&nbsp;</span>
 	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
 	                                <span class='tooltiptext long'>
 	                                    CRV LP reward annualized(max APY can be reached with max boost of {{CRVAPYs.pax &&  CRVAPYs.pax[2].toFixed(2)}})
@@ -151,14 +154,15 @@
 		                    	</span>
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[2]}">{{daily_apy[2]}}</span>%
-	                    	<div :class="{'loading line': yfiRewards === null, 'incentive-apr': true}">(+{{yfiRewards | toFixed2}}%
+	                    	<!-- <div :class="{'loading line': yfiRewards === null, 'incentive-apr': true}">(+{{yfiRewards | toFixed2}}%
                     			<span class='tooltip'>YFI
 	                                <span class='tooltiptext'>
 	                                    YFI LP reward annualized
 	                                </span>
 	                            </span>)
-                    		</div>
-                    		<div :class="{'incentive-apr': true}">(+{{CRVAPYs.y && CRVAPYs.y[0].toFixed(2)}}% <br> to {{ CRVAPYs.y && (CRVAPYs.y[1].toFixed(2))}}
+                    		</div> -->
+                    		<div :class="{'incentive-apr': true}">(+{{CRVAPYs.y && CRVAPYs.y[0].toFixed(2)}}% <br> to {{ CRVAPYs.y && (CRVAPYs.y[1].toFixed(2))}}%
+                    			<span v-show='CRVAPYs.y && CRVAPYs.y[3]'><br>my: {{CRVAPYs.y && CRVAPYs.y[3] > 0 && CRVAPYs.y[3].toFixed(2)}}%&nbsp;</span>
 	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
 	                                <span class='tooltiptext long'>
 	                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.y && CRVAPYs.y[2].toFixed(2) }})
@@ -196,6 +200,7 @@
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[3]}">{{daily_apy[3]}}</span>%
 	                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.busd && (CRVAPYs.busd[0]).toFixed(2)}}% <br> to {{CRVAPYs.busd && (CRVAPYs.busd[1]).toFixed(2)}}%
+                    			<span v-show='CRVAPYs.busd && CRVAPYs.busd[3]'><br>my: {{CRVAPYs.busd && CRVAPYs.busd[3] > 0 && CRVAPYs.busd[3].toFixed(2)}}%&nbsp;</span>
 	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
 	                                <span class='tooltiptext long'>
 	                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.busd && CRVAPYs.busd[2].toFixed(2) }})
@@ -253,6 +258,7 @@
 		                            </span>)
 	                    		</div>
 	                    		<div :class="{'incentive-apr': true}">(+{{CRVAPYs.susdv2 && (CRVAPYs.susdv2[0]).toFixed(2)}}% <br> to {{CRVAPYs.susdv2 && (CRVAPYs.susdv2[1]).toFixed(2)}}%
+                    				<span v-show='CRVAPYs.susdv2 && CRVAPYs.susdv2[3]'><br>my: {{CRVAPYs.susdv2 && CRVAPYs.susdv2[3] > 0 && CRVAPYs.susdv2[3].toFixed(2)}}%&nbsp;</span>
 		                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
 		                                <span class='tooltiptext long'>
 		                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.susdv2 && CRVAPYs.susdv2[2].toFixed(2) }})
@@ -320,6 +326,7 @@
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[7]}">{{daily_apy[7]}}</span>%
 	                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.ren && (CRVAPYs.ren[0]).toFixed(2)}}% <br> to {{CRVAPYs.ren && (CRVAPYs.ren[1]).toFixed(2)}}%
+                    			<span v-show='CRVAPYs.ren && CRVAPYs.ren[3]'><br>my: {{CRVAPYs.ren && CRVAPYs.ren[3] > 0 && CRVAPYs.ren[3].toFixed(2)}}%&nbsp;</span>
 	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
 	                                <span class='tooltiptext long'>
 	                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.ren && CRVAPYs.ren[2].toFixed(2) }})
@@ -356,21 +363,22 @@
 			                    	</span>
 	                    		</span> 
 	                    		<span :class="{'loading line': !daily_apy[8]}">{{daily_apy[8]}}%</span>
-	                    		<div :class="{'loading line': sbtcRewards === null, 'incentive-apr': true}">(+{{sbtcRewards | toFixed2}}%
+	                    		<!-- <div :class="{'loading line': sbtcRewards === null, 'incentive-apr': true}">(+{{sbtcRewards | toFixed2}}%
 	                    			<span class='tooltip'>SNX/REN
 		                                <span class='tooltiptext'>
 		                                    SNX/REN LP reward annualized
 		                                </span>
 		                            </span>)
 	                    		</div>
-	                    		<div :class="{'loading line': balRewards === null, 'incentive-apr': true}">(+{{balRewards | toFixed2}}%
+	                    		<div :class="{'loading line': balRewards === null, 'incentive-apr': true}">(+0.00%
 	                    			<span class='tooltip'>BAL
 		                                <span class='tooltiptext'>
 		                                    BAL reward annualized
 		                                </span>
 		                            </span>)
-	                    		</div>
+	                    		</div> -->
 	                    		<div :class="{'incentive-apr': true}">(+{{CRVAPYs.sbtc && (CRVAPYs.sbtc[0]).toFixed(2)}}% <br> to {{CRVAPYs.sbtc && (CRVAPYs.sbtc[1]).toFixed(2)}}%
+                					<span v-show='CRVAPYs.sbtc && CRVAPYs.sbtc[3]'><br>my: {{CRVAPYs.sbtc && CRVAPYs.sbtc[3] > 0 && CRVAPYs.sbtc[3].toFixed(2)}}%&nbsp;</span>
 		                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
 		                                <span class='tooltiptext long'>
 		                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.sbtc && CRVAPYs.sbtc[2].toFixed(2) }})
@@ -447,6 +455,8 @@
 
 	import { contract } from '../../contract'
 
+	import { GraphQLClient, gql } from 'graphql-request'
+
 	export default {
 		components: {
 			TotalBalances,
@@ -492,6 +502,8 @@
 			CRVAPYs: {},
 
 			CRVboosts: {},
+
+			boosts: {},
 		}),
 		async created() {
 			var start = new Date();
@@ -705,8 +717,6 @@
 
 			async getCRVAPY() {
 
-				console.log("GET CRV APY")
-
 				let poolInfo = {
 					compound: {
 						swap: '0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56',
@@ -821,6 +831,34 @@
 					Vue.set(this.CRVboosts, pool, 2.5)
 				})
 
+				let wrapper = new GraphQLClient('https://api.thegraph.com/subgraphs/name/pengiundev/curve-gauges-mainnet')
+
+				let QUERY = gql`
+					{
+					  gauges(where: { user: "${contract.default_account.toLowerCase()}"}) {
+					    id
+					    user
+					    gauge
+					    originalBalance
+					    originalSupply
+					    workingBalance
+					    workingSupply
+					  }
+					}
+				`
+
+				let results = await wrapper.request(QUERY, {})
+				console.log(results, "THE RESULTS")
+				results = results.gauges
+
+				for(let gaugeBoost of results) {
+					let pool = Object.values(poolInfo).find(pool => pool.gauge.toLowerCase() == gaugeBoost.gauge.toLowerCase())
+					console.log(pool.name, "THE POOL")
+					pool.previousWorkingBalance = gaugeBoost.workingBalance
+					Vue.set(this.boosts, pool.name, gaugeBoost.workingBalance / (0.4 * gaugeBoost.originalBalance))
+					this.CRVAPYs[pool.name].push(this.CRVAPYs[pool.name][0] * this.boosts[pool.name])
+				}
+
 				console.log(this.CRVboosts, "CRV boosts")
 
 			}
@@ -884,7 +922,7 @@
 		flex: 1.6;
 	}
 	.apr {
-		flex: 0.8;
+		flex: 0.88;
 	}
 	.volume {
 		flex: 0.8;

@@ -533,17 +533,17 @@
 				data: line,
 			})
 
-			this.allPools = Object.fromEntries(Object.entries(volumes).filter(([p, v]) => p != 'tbtc')
+			this.allPools = Object.fromEntries(Object.entries(volumes).filter(([p, v]) => !['tbtc', 'hbtc'].includes(p))
 									.map(([p, v]) => [p, volumes[p][volumes[p].length-1][1]]))
 
-			let latestDeposits = Object.keys(volumes).filter(p => p != 'tbtc').map(p => volumes[p][volumes[p].length-1][1])
+			let latestDeposits = Object.keys(volumes).filter(p => !['tbtc', 'hbtc'].includes(p)).map(p => volumes[p][volumes[p].length-1][1])
 
 			let poolHoldings = latestDeposits.reduce((a, b) => a + b, 0)
 
 			let poolPercentages = latestDeposits.map(poolDeposits => (poolDeposits / poolHoldings) * 100)
 
 			poolPercentages = poolPercentages.map((percentage, i) => ({
-				name: Object.keys(volumes).filter(p => p != 'tbtc')[i],
+				name: Object.keys(volumes).filter(p => !['tbtc', 'hbtc'].includes(p))[i],
 				y: poolPercentages[i],
 			}))
 
@@ -559,8 +559,10 @@
 
 			this.piechart.hideLoading()
 
-			this.allCoins = Object.fromEntries(Object.entries(coinbalances).filter(([p, v]) => p != 'tbtc')
-									.map(([p, v]) => [p, coinbalances[p][coinbalances[p].length-1][1]]))
+			this.allCoins = Object.fromEntries(Object.entries(coinbalances).filter(([p, v]) => !['tbtc', 'hBTC'].includes(p))
+									.map(([p, v]) => {
+										return [p, coinbalances[p][coinbalances[p].length-1][1]]
+									}))
 
 			latestDeposits = Object.keys(coinbalances).filter(p => !['tbtc','hbtc'].includes(p.toLowerCase())).map(p => coinbalances[p][coinbalances[p].length-1][1])
 

@@ -121,12 +121,12 @@
 		}),
 		computed: {
 			contractAddresses() {
-				return Object.keys(allabis).filter(pool => !['y', 'susd', 'tbtc'].includes(pool)).map(pool => 
+				return Object.keys(allabis).filter(pool => !['y', 'susd', 'tbtc', 'hbtc'].includes(pool)).map(pool => 
 					({swap: allabis[pool].swap_address, token: allabis[pool].token_address})
 				)
 			},
 			depositZaps() {
-				return Object.keys(allabis).filter(pool => !['y', 'susd', 'tbtc'].includes(pool)).map(pool => 
+				return Object.keys(allabis).filter(pool => !['y', 'susd', 'tbtc', 'hbtc'].includes(pool)).map(pool => 
 					({deposit: allabis[pool].deposit_address, token: allabis[pool].token_address})
 				)
 			},
@@ -186,6 +186,7 @@
 		methods: {
 			getTokenUrl(i) {
 				let publicPath = process.env.BASE_URL
+				console.log(i, "GET TOKEN URL")
 				return publicPath + 'curveIcons/' + this.tokenNames[i].ticker + '.png'
 			},
 		},

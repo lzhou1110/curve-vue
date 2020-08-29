@@ -242,6 +242,10 @@ input[type=checkbox]:checked + label[for]:before {
   cursor: pointer;
 }
 
+input[type=checkbox] + label, input[type=radio] + label {
+  cursor: pointer;
+}
+
 .window > textarea {
   width: 100%;
   border: none;

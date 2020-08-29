@@ -756,8 +756,8 @@ export async function recoverRedeposit(transfer, newtxhash, newvout) {
 	transaction.signature = signature.signature
 	transaction.utxoAmount = transaction.renResponse.autogen.amount
 	upsertTx(transaction)
-	if(transaction.type == 0) mintThenSwap(transaction)
-	if(transaction.type == 3) mintThenDeposit(transaction)
+	if(transaction.type == 0) mintThenSwap(transaction, false, true)
+	if(transaction.type == 3) mintThenDeposit(transaction, false, true)
 
 }
 
@@ -1389,7 +1389,7 @@ export async function burn(burn, address, renBTCAmount, burnType, data) {
 }
 
 async function checkForFailed(transactions) {
-	transactions = transactions.filter(t => t.ethTxHash && ![14, 15, 17, 65].includes(t.state))
+	transactions = transactions.filter(t => t.ethTxHash && ![65].includes(t.state))
 	let receipts = await Promise.all(transactions.map(t => contract.web3.eth.getTransactionReceipt(t.ethTxHash)))
 	receipts = receipts.filter(receipt => receipt && receipt.blockNumber !== null)
 	for(let receipt of receipts) {

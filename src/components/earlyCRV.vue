@@ -22,7 +22,7 @@
 				<a href='https://guides.curve.fi/crv-launches-curve-dao-and-crv/'>Curve launches Curve DAO and CRV</a>
 			</div>
 			<div class='info-message gentle-message'>
-				If you find inconsistencies, please contract us on 
+				If you find inconsistencies, please contact us on 
 				<a href="https://twitter.com/CurveFinance" rel='noopener noreferrer'>#Twitter</a>,
       			<a href="https://t.me/curvefi" rel='noopener noreferrer'>@Telegram</a>,
 				<a href="https://discord.gg/9uEHakc" rel='noopener noreferrer'>@Discord</a>
