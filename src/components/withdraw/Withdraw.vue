@@ -141,7 +141,7 @@
             </button>
             <button 
                 id='remove-liquidity-unstake'
-                v-show = "['susdv2', 'sbtc','y','iearn'].includes(currentPool) && staked_balance > 0 "
+                v-show = "staked_balance > 0 "
                 :disabled = 'slippage < -0.03'
                 @click='handle_remove_liquidity(true, false, true)'>
                 Withdraw & claim <span class='loading line' v-show='loadingAction == 2'></span>
@@ -153,11 +153,22 @@
                 Claim {{(pendingSNXRewards / 1e18).toFixed(2)}} {{ ['y','iearn'].includes(currentPool) ? 'YFI' : 'SNX' }}
                 <span v-show="currentPool == 'sbtc'"> + {{(pendingRENRewards / 1e18).toFixed(2)}} REN</span>
             </button>
+            <button id='claim-snx-gauge'
+                @click='claim_SNX_Gauge()'
+                v-show="+claimableSNXGauge > 0"
+            >
+                Claim {{ claimableSNXGaugeFormat }} {{ currentPool == 'susdv2' ? 'SNX' : 'BPT'}}
+            </button>
             <button id='claim-bpt'
                 @click='claim_SNX(true)'
                 v-show="['sbtc'].includes(currentPool) && pendingBALRewards > 0"
             >
                 Claim {{(pendingBALRewards / 1e18).toFixed(6)}} BPT
+            </button>
+            <button id='claim-CRV'
+                @click='claim_CRV()'
+                v-show='claimableCRV > 0'>
+                Claim {{ (claimableCRV / 1e18).toFixed(2) }} CRV       
             </button>
             <button id='claim-snxbpt' 
                 @click='claim_SNX(true, false)'
@@ -178,7 +189,7 @@
             </button> -->
             <button id='unstake-snx'
                 @click='handle_remove_liquidity(true, true)'
-                v-show="['susdv2', 'sbtc','y','iearn'].includes(currentPool) && staked_balance > 0"
+                v-show="staked_balance > 0"
             >
                 Unstake
             </button>
@@ -204,7 +215,7 @@
             <Slippage v-bind="{show_nobalance, show_nobalance_i}"/>
         </div>
 
-        <div v-show="staked_balance > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)">
+        <div v-show="staked_balance > 0">
             <button class='simplebutton advancedoptions' @click='showadvancedoptions = !showadvancedoptions'>
                 Advanced unstaking options
                 <span v-show='!showadvancedoptions'>▼</span>
@@ -221,7 +232,7 @@
                             <label for='unstakepercentage'>Unstake:</label>
                             <input id='unstakepercentage' v-model='unstakepercentage' :class="{'invalid': unstakePercentageInvalid}">
                             <button id='unstakestaked' 
-                                v-show="staked_balance > 0 && ['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)"
+                                v-show="staked_balance > 0"
                                 :disabled='unstakePercentageInvalid' 
                                 @click='unstakeStaked()'
                             >
@@ -241,7 +252,7 @@
     import { notify, notifyHandler, notifyNotification } from '../../init'
     import * as common from '../../utils/common.js'
     import { getters, contract as currentContract, gas as contractGas, init } from '../../contract'
-    import allabis, { balancer_ABI, balancer_address, ERC20_abi } from '../../allabis'
+    import allabis, { balancer_ABI, balancer_address, ERC20_abi, minter_ABI, minter_address } from '../../allabis'
     const compound = allabis.compound
     import * as helpers from '../../utils/helpers'
 
@@ -310,6 +321,13 @@
             showModal: false,
     		slippagePromise: helpers.makeCancelable(Promise.resolve()),
             inf_approval: true,
+
+            claimableCRV: 0,
+
+            claimableSNX: 0,
+            claimedSNX: 0,
+
+            minter: null,
     	}),
         async created() {
 
@@ -385,11 +403,15 @@
                     return true
                 }
             },
+            claimableSNXGauge() {
+                return +this.claimableSNX - +this.claimedSNX
+            },
+            claimableSNXGaugeFormat() {
+                return this.toFixed(this.claimableSNXGauge / 1e18)
+            },
         },
         mounted() {
-        	if(['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool)) {
-        		this.showstaked = true
-        	}
+    		this.showstaked = true
         	this.$watch(() => this.showstaked, this.handle_change_share)
         	if(currentContract.currentContract == 'susd') this.withdrawc = true;
         	this.setInputStyles(true)
@@ -412,6 +434,18 @@
                     if(allowance.lte(currentContract.max_allowance.div(BN(2))))
                         this.inf_approval = false
                 }
+                let gaugeCalls = [
+                    [currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimable_tokens(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()],
+                    [currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimable_reward(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()],
+                    [currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimed_rewards_for(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()],
+                ]
+                let aggGaugeCalls = await currentContract.multicall.methods.aggregate(gaugeCalls).call()
+                let decodedGaugeCalls = aggGaugeCalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
+                console.log(decodedGaugeCalls, "DECODED GAUGE CALLS")
+                this.claimableCRV = decodedGaugeCalls[0]
+                this.claimableSNX = decodedGaugeCalls[1]
+                this.claimedSNX = decodedGaugeCalls[2]
+
                 if(['susdv2', 'y', 'iearn'].includes(this.currentPool)) {
                     this.pendingSNXRewards = await curveRewards.methods.earned(this.default_account).call()
                     console.log(this.pendingSNXRewards, "PENDING SNX REWARDS")
@@ -518,7 +552,7 @@
 			    for (let i = 0; i < currentContract.N_COINS; i++) {
 			    	calls.push([currentContract.swap._address ,currentContract.swap.methods.balances(i).encodeABI()])
 			    }
-		    	if(['susdv2', 'sbtc','y','iearn'].includes(this.currentPool)) calls.push([currentContract.curveRewards._address, currentContract.curveRewards.methods.balanceOf(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()])
+		    	calls.push([currentContract.gaugeContract._address, currentContract.gaugeContract.methods.balanceOf(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()])
 				calls.push([currentContract.swap_token._address ,currentContract.swap_token.methods.totalSupply().encodeABI()])
 				let aggcalls = await currentContract.multicall.methods.aggregate(calls).call()
 				let decoded = aggcalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
@@ -534,8 +568,7 @@
 			        if(!currentContract.default_account) Vue.set(this.balances, i, 0)
 				})
                 console.log(decoded[decoded.length-2])
-                if(['susdv2', 'sbtc','y','iearn'].includes(this.currentPool)) this.staked_balance = BN(decoded[decoded.length-2])
-                else this.staked_balance = BN(0)
+                this.staked_balance = BN(decoded[decoded.length-2])
                 this.unstakepercentage = this.toFixed(this.staked_balance.div(1e18))
 				this.token_supply = +decoded[decoded.length-1]
 			},
@@ -674,6 +707,40 @@
                 this.show_loading = false
 
             },
+            async claim_SNX_Gauge() {
+                let gas = await currentContract.gaugeContract.methods.claim_rewards(currentContract.default_account).estimateGas()
+                // if(['susdv2', 'sbtc'].includes(this.gauge.name))
+                //  gas = 1000000
+
+                var { dismiss } = notifyNotification(`Please confirm claiming ${this.currentPool == 'susdv2' ? 'SNX' : 'BPT'}`)
+
+                await currentContract.gaugeContract.methods.claim_rewards(currentContract.default_account).send({
+                    from: currentContract.default_account,
+                    gasPrice: this.gasPriceWei,
+                    gas: 500000,
+                })
+                .once('transactionHash', hash => {
+                    dismiss()
+                    notifyHandler(hash)
+                })
+            },
+            async claim_CRV() {
+                let gas = await currentContract.minter.methods.mint(currentContract.gaugeContract._address).estimateGas()
+                if(['susdv2', 'sbtc'].includes(currentContract.currentContract))
+                    gas = 1000000
+
+                var { dismiss } = notifyNotification(`Please confirm claiming CRV from ${currentContract.currentContract} gauge`)
+
+                await currentContract.minter.methods.mint(currentContract.gaugeContract._address).send({
+                    from: currentContract.default_account,
+                    gasPrice: this.gasPriceWei,
+                    gas: gas * 1.5 | 0,
+                })
+                .once('transactionHash', hash => {
+                    dismiss()
+                    notifyHandler(hash)
+                })
+            },
             // async claimYFIaDAI() {
             //     this.estimateGas = 50000
 
@@ -729,18 +796,18 @@
                 
                 var { dismiss } = notifyNotification(this.waitingMessage)
 
-                let stakedAmount = BN(await currentContract.curveRewards.methods.balanceOf(currentContract.default_account).call())
+                let stakedAmount = BN(await currentContract.gaugeContract.methods.balanceOf(currentContract.default_account).call())
 
                 if(stakedAmount.lt(amount))
                     amount = stakedAmount
 
                 try {
     				await new Promise((resolve, reject) => {
-    					currentContract.curveRewards.methods.withdraw(amount.toFixed(0,1))
+    					currentContract.gaugeContract.methods.withdraw(amount.toFixed(0,1))
     						.send({
     							from: currentContract.default_account,
     							gasPrice: this.gasPriceWei,
-                                gas: 125000,
+                                gas: 1000000,
     						})
     						.once('transactionHash', hash => {
                                 this.waitingMessage = 'Waiting for unstake transaction to confirm'
@@ -758,11 +825,11 @@
                                 reject(err)
                             })
     				})
-                    if(exit) {
-        				this.claim_SNX()
-                        //if(['y', 'iearn'].includes(this.currentPool))
-                            //this.showModal = true
-                    }
+            //         if(exit) {
+        				// this.claim_SNX()
+            //             //if(['y', 'iearn'].includes(this.currentPool))
+            //                 //this.showModal = true
+            //         }
                 }
                 catch(err) {
                     console.log(err)
@@ -839,7 +906,7 @@
 			        }
                     token_amount = BN(token_amount).times(BN(1).plus(this.calcFee))
 			        token_amount = BN(Math.floor(token_amount * this.getMaxSlippage).toString()).toFixed(0,1)
-                    if((this.token_balance.lt(BN(token_amount)) || unstake) && ['susdv2', 'sbtc','y','iearn'].includes(this.currentPool)) {
+                    if((this.token_balance.lt(BN(token_amount)) || unstake)) {
                         let unstakeAmount = BN(token_amount).minus(BN(this.token_balance))
                         if(unstake) unstakeAmount = BN(token_amount) 
                         await this.unstake(unstakeAmount, unstake && !unstake_only, unstake_only)
@@ -928,7 +995,7 @@
                     if(this.showstaked) balance = balance.plus(this.staked_balance)
                     var amount = BN(this.share).div(BN(100)).times(balance)
 
-                    if((this.token_balance.lt(amount) || unstake) && ['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool)) {
+                    if((this.token_balance.lt(amount) || unstake)) {
                         let unstakeAmount = BN(amount).minus(BN(this.token_balance))
                         if(unstake) unstakeAmount = BN(amount)
                         await this.unstake(unstakeAmount, unstake && !unstake_only, unstake_only)
@@ -1182,7 +1249,7 @@
 </script>
 
 <style>
-	#remove-liquidity, #remove-liquidity-unstake, #claim-snx, #claim-bpt, #claim-snxbpt, #claim-adai {
+	#remove-liquidity, #remove-liquidity-unstake, #claim-snx, #claim-bpt, #claim-snxbpt, #claim-adai, #claim-CRV, #claim-snx-gauge {
 		margin-right: 1em;
 	}
 	#withdrawold {

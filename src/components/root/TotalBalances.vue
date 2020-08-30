@@ -8,6 +8,7 @@
 				<div :class="{'loading line': volume < 0}" >
 					Daily volume: <span v-show='volume >= 0'>{{(volume | 0) | formatNumber(0)}}$</span>
 				</div>
+				<slot></slot>
         </fieldset>
     </div>
 </template>
@@ -92,7 +93,7 @@
 	fieldset div {
 		display: block;
 	}
-	fieldset div:nth-of-type(2) {
+	fieldset div:nth-of-type(n+2), fieldset div:nth-of-type(3) {
 		margin-top: 1em;
 	}
 </style>

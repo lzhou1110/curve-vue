@@ -19,6 +19,14 @@ export default {
 		stakedTokens: -1,
 
 		dailyAPY: null,
+
+		mintedCRV: null,
+		earnedCRV: null,
+		claimableSNX: null,
+		claimedSNX: null,
+
+		SNXprice: null,
+		CRVprice: null,
 	}),
 	computed: {
 		fromBlock() {
@@ -38,7 +46,39 @@ export default {
 		},
 		decodeParametersWithdrawalOne() {
 			return [`uint256`, `uint256`]
-		}
+		},
+		stakeAddresses() {
+			let rewardsContracts = [
+            	"0x000000000000000000000000dcb6a51ea3ca5d3fd898fd6564757c7aaec3ca92",
+             	"0x00000000000000000000000013c1542a468319688b89e323fe9a3be3a90ebb27",
+             	"0x0000000000000000000000000001fb050fe7312791bf6475b96569d83f695c9f",
+             	"0x0000000000000000000000005dbcf33d8c2e976c6b560249878e6f1491bca25c",
+         	]
+			rewardsContracts.push(...Object.values(allabis).filter(pool => pool.gauge_address).map(pool => "0x000000000000000000000000" + pool.gauge_address.slice(2)))
+			return rewardsContracts.map(address => address.toLowerCase())
+		},
+		showEarnedCRV() {
+			if(this.showinUSD == 1) return (+this.earnedCRV / 1e18 * this.CRVprice).toFixed(2)
+			return (+this.earnedCRV / 1e18).toFixed(2)
+		},
+		showRewardsCRV() {
+			if(this.showinUSD == 1) return (+this.mintedCRV / 1e18 * this.CRVprice).toFixed(2)
+			return (+this.mintedCRV / 1e18).toFixed(2)
+		},
+		showEarnedSNXGauge() {
+			if(this.showinUSD == 1) return (+this.claimableSNX / 1e18 * this.SNXprice).toFixed(2)
+			return (+this.claimableSNX / 1e18).toFixed(2)
+		},
+		showRewardsSNXGauge() {
+			if(this.showinUSD == 1) return (+this.claimedSNX / 1e18 * this.SNXprice).toFixed(2)
+			return (+this.claimedSNX / 1e18).toFixed(2)
+		},
+		showEarnedCRVUSD() {
+			return (+this.earnedCRV / 1e18 * this.CRVprice).toFixed(2)
+		},
+		showRewardsCRVUSD() {
+			return (+this.mintedCRV / 1e18).toFixed(2)
+		},
 	},
 	methods: {
 		async mounted() {
@@ -76,6 +116,40 @@ export default {
 			    	this.getStakedBalanceUSD = stakedBalanceUSD
 			    	this.stakedTokens = currentContract.curveStakedBalance
 			    }
+
+			 //    let decodedGauges = [
+				//   "0x7ca5b0a2910B33e9759DC7dDB0413949071D7575",
+				//   "0xBC89cd85491d81C6AD2954E6d0362Ee29fCa8F53",
+				//   "0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1",
+				//   "0x69Fb7c45726cfE2baDeE8317005d3F94bE838840",
+				//   "0x64E3C23bfc40722d3B649844055F1D51c1ac041d",
+				//   "0xB1F2cdeC61db658F091671F5f199635aEF202CAC",
+				//   "0xA90996896660DEcC6E997655E065b23788857849",
+				//   "0x705350c4BcD35c9441419DdD5d2f097d7a55410F"
+				// ]
+
+				// let calls = decodedGauges.map(gauge => [currentContract.minter._address, currentContract.minter.methods.minted(currentContract.default_account, gauge).encodeABI()])
+			    let calls =[
+		   	 		[currentContract.minter._address, currentContract.minter.methods.minted(currentContract.default_account, currentContract.gaugeContract._address).encodeABI()],
+					[currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimable_tokens(currentContract.default_account).encodeABI()],
+					[currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimable_reward(currentContract.default_account).encodeABI()],
+					[currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimed_rewards_for(currentContract.default_account).encodeABI()],
+				]
+				let aggcalls = await currentContract.multicall.methods.aggregate(calls).call()
+				let decoded = aggcalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
+
+				console.log(decoded, "THE DECODED")
+
+				this.mintedCRV = +decoded[0]
+				this.earnedCRV = +decoded[1]
+				this.claimableSNX = +decoded[2] - +decoded[3]
+				this.claimedSNX = +decoded[3]
+
+				let CRVprice = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=havven,curve-dao-token&vs_currencies=usd`)
+				CRVprice = await CRVprice.json()
+				this.SNXprice = CRVprice.havven.usd
+				this.CRVprice = CRVprice['curve-dao-token'].usd
+
 			    this.deposits = await this.getDeposits();
 			    this.withdrawals = await this.getWithdrawals();
 			    //this.available = await this.getAvailableBalance()
@@ -496,12 +570,7 @@ export default {
 				if(!transfer.length) continue
 	            let transferTokens = +transfer[0].data
 	            console.log(transferTokens / 1e18, poolInfoPoint.virtual_price, transferTokens * poolInfoPoint.virtual_price / 1e36)
-	            if(addliquidity.length == 0 && [
-	            	"0x000000000000000000000000dcb6a51ea3ca5d3fd898fd6564757c7aaec3ca92",
-	             	"0x00000000000000000000000013c1542a468319688b89e323fe9a3be3a90ebb27",
-	             	"0x0000000000000000000000000001fb050fe7312791bf6475b96569d83f695c9f",
-	             	"0x0000000000000000000000005dbcf33d8c2e976c6b560249878e6f1491bca25c",
-	             ].includes(transfer[0].topics[1])) continue;
+	            if(addliquidity.length == 0 && this.stakeAddresses.includes(transfer[0].topics[1])) continue;
 	            let depositsUSD = transferTokens * poolInfoPoint.virtual_price / 1e36
 	        	allDepositsUSD += depositsUSD
 	            if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(this.currentPool)) {
@@ -594,15 +663,14 @@ export default {
 	            console.log(transferTokens / 1e18, poolInfoPoint.virtual_price, transferTokens * poolInfoPoint.virtual_price / 1e36)
 	            console.log(transfer)
 	            console.log("WITHDRAWALS")
+	            console.log(removeliquidity.length == 0, 
+            		removeliquidityImbalance.length == 0, 
+            		removeliquidityOne.length == 0, 
+            		this.stakeAddresses.includes(transfer[0].topics[2]))
             	if(removeliquidity.length == 0 && 
             		removeliquidityImbalance.length == 0 && 
             		removeliquidityOne.length == 0 && 
-            		[
-            			"0x000000000000000000000000dcb6a51ea3ca5d3fd898fd6564757c7aaec3ca92", 
-            			"0x00000000000000000000000013c1542a468319688b89e323fe9a3be3a90ebb27",
-            			"0x0000000000000000000000000001fb050fe7312791bf6475b96569d83f695c9f",
-            			"0x0000000000000000000000005dbcf33d8c2e976c6b560249878e6f1491bca25c",
-        			].includes(transfer[0].topics[2])) continue;
+            		this.stakeAddresses.includes(transfer[0].topics[2])) continue;
             	let withdrawalsUSD = transferTokens * poolInfoPoint.virtual_price / 1e36
             	allWithdrawalsUSD += withdrawalsUSD
             	if(['tbtc', 'ren', 'sbtc'].includes(this.currentPool)) {

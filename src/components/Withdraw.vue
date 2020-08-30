@@ -255,9 +255,7 @@
             },
         },
         mounted() {
-        	if(this.currentPool == 'susdv2') {
-        		this.showstaked = true
-        	}
+    		this.showstaked = true
         	this.$watch(() => this.showstaked, this.handle_change_share)
         	if(currentContract.currentContract == 'susd') this.withdrawc = true;
         	this.setInputStyles(true)
@@ -348,7 +346,7 @@
 			    for (let i = 0; i < currentContract.N_COINS; i++) {
 			    	calls.push([currentContract.swap._address ,currentContract.swap.methods.balances(i).encodeABI()])
 			    }
-		    	if(this.currentPool == 'susdv2') calls.push([currentContract.curveRewards_address, currentContract.curveRewards.methods.balanceOf(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()])
+		    	calls.push([currentContract.curveGauge._address, currentContract.curveGauge.methods.balanceOf(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()])
 				calls.push([currentContract.swap_token._address ,currentContract.swap_token.methods.totalSupply().encodeABI()])
 				let aggcalls = await currentContract.multicall.methods.aggregate(calls).call()
 				let decoded = aggcalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
@@ -363,8 +361,8 @@
 					Vue.set(this.balances, i, +v)
 			        if(!currentContract.default_account) Vue.set(this.balances, i, 0)
 				})
-				if(this.currentPool == 'susdv2') this.staked_balance = BN(decoded[decoded.length-2])
-                else this.staked_balance = BN(0)
+				this.staked_balance = BN(decoded[decoded.length-2])
+                this.staked_balance = BN(0)
 				this.token_supply = +decoded[decoded.length-1]
 			},
 			async handle_change_amounts(i, event) {

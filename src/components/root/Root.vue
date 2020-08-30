@@ -46,10 +46,10 @@
 	                    	<span v-show='!volumes.compound && volumes.compound[0]'>$0</span>
                	 		</span></span>
                	 		<span class='balance'>
-           	 				<span class='showmobile' v-show='balances.compound > 0'>Balance: ${{balances.compound && balances.compound.toFixed(2)}} </span>
+           	 				<span class='showmobile' v-show='balances.compound > 0'>Balance: ${{(balances.compound && balances.compound.toFixed(2)) | formatNumber(0)}} </span>
                	 			<span class='tooltip' v-show='balances.compound > 0'>
                	 				<img :src="publicPath + 'dollar-sign-solid.svg'">
-               	 				<span class='tooltiptext'>Balance: ${{balances.compound && balances.compound.toFixed(2)}}</span>
+               	 				<span class='tooltiptext'>Balance: ${{(balances.compound && balances.compound.toFixed(2)) | formatNumber(0)}}</span>
                	 			</span>
                	 		</span>
 	                </router-link>
@@ -130,10 +130,10 @@
 	                    	<span v-show='!volumes.pax && volumes.pax[0]'>$0</span>
                	 		</span></span>
                	 		<span class='balance'>
-           	 				<span class='showmobile' v-show='balances.pax > 0'>Balance: ${{balances.pax && balances.pax.toFixed(2)}} </span>
+           	 				<span class='showmobile' v-show='balances.pax > 0'>Balance: ${{(balances.pax && balances.pax.toFixed(2)) | formatNumber(0)}} </span>
                	 			<span class='tooltip' v-show='balances.pax > 0'>
                	 				<img :src="publicPath + 'dollar-sign-solid.svg'">
-               	 				<span class='tooltiptext'>Balance: ${{balances.pax && balances.pax.toFixed(2)}}</span>
+               	 				<span class='tooltiptext'>Balance: ${{(balances.pax && balances.pax.toFixed(2)) | formatNumber(0)}}</span>
                	 			</span>
                	 		</span>
 	                </router-link>
@@ -175,10 +175,10 @@
 	                    	<span v-show='!volumes.y && volumes.y[0]'>$0</span>
                	 		</span></span>
                	 		<span class='balance'>
-           	 				<span class='showmobile' v-show='balances.y > 0'>Balance: ${{balances.y && balances.y.toFixed(2)}} </span>
+           	 				<span class='showmobile' v-show='balances.y > 0'>Balance: ${{(balances.y && balances.y.toFixed(2)) | formatNumber(0)}} </span>
                	 			<span class='tooltip' v-show='balances.y > 0'>
                	 				<img :src="publicPath + 'dollar-sign-solid.svg'">
-               	 				<span class='tooltiptext'>Balance: ${{balances.y && balances.y.toFixed(2)}}</span>
+               	 				<span class='tooltiptext'>Balance: ${{(balances.y && balances.y.toFixed(2)) | formatNumber(0)}}</span>
                	 			</span>
                	 		</span>
 	                </router-link>
@@ -213,10 +213,10 @@
 	                    	<span v-show='!volumes.busd && volumes.busd[0]'>$0</span>
                	 		</span></span>
                	 		<span class='balance'>
-           	 				<span class='showmobile' v-show='balances.busd > 0'>Balance: ${{balances.busd && balances.busd.toFixed(2)}} </span>
+           	 				<span class='showmobile' v-show='balances.busd > 0'>Balance: ${{(balances.busd && balances.busd.toFixed(2)) | formatNumber(0)}} </span>
                	 			<span class='tooltip' v-show='balances.busd > 0'>
                	 				<img :src="publicPath + 'dollar-sign-solid.svg'">
-               	 				<span class='tooltiptext'>Balance: ${{balances.busd && balances.busd.toFixed(2)}}</span>
+               	 				<span class='tooltiptext'>Balance: ${{(balances.busd && balances.busd.toFixed(2)) | formatNumber(0)}}</span>
                	 			</span>
                	 		</span>
 	                </router-link>
@@ -272,10 +272,10 @@
 	                    	<span v-show='!volumes.susd && volumes.susd[0]'>$0</span>
                	 		</span></span>
                	 		<span class='balance'>
-           	 				<span class='showmobile' v-show='balances.susdv2 > 0'>Balance: ${{balances.susdv2 && balances.susdv2.toFixed(2)}} </span>
+           	 				<span class='showmobile' v-show='balances.susdv2 > 0'>Balance: ${{(balances.susdv2 && balances.susdv2.toFixed(2)) | formatNumber(0)}} </span>
                	 			<span class='tooltip' v-show='balances.susdv2 > 0'>
                	 				<img :src="publicPath + 'dollar-sign-solid.svg'">
-               	 				<span class='tooltiptext'>Balance: ${{balances.susdv2 && balances.susdv2.toFixed(2)}}</span>
+               	 				<span class='tooltiptext'>Balance: ${{(balances.susdv2 && balances.susdv2.toFixed(2)) | formatNumber(0)}}</span>
                	 			</span>
                	 		</span>
 	                </router-link>
@@ -338,10 +338,10 @@
 	                    	<span v-show='volumes.ren && volumes.ren[0] >= 0'>${{(volumes.ren && volumes.ren[0] | 0) | formatNumber(0)}}</span>
                	 		</span></span>
                	 		<span class='balance'>
-           	 				<span class='showmobile' v-show='balances.ren > 0'>Balance: ${{balances.ren && balances.ren.toFixed(2)}} </span>
+           	 				<span class='showmobile' v-show='balances.ren > 0'>Balance: ${{(balances.ren && balances.ren.toFixed(2)) | formatNumber(0)}} </span>
                	 			<span class='tooltip' v-show='balances.ren > 0'>
                	 				<img :src="publicPath + 'dollar-sign-solid.svg'">
-               	 				<span class='tooltiptext'>Balance: ${{balances.ren && balances.ren.toFixed(2)}}</span>
+               	 				<span class='tooltiptext'>Balance: ${{(balances.ren && balances.ren.toFixed(2)) | formatNumber(0)}}</span>
                	 			</span>
                	 		</span>
 	                </router-link>
@@ -391,10 +391,10 @@
 	                    	<span v-show='volumes.sbtc && volumes.sbtc[0] >= 0'>${{(volumes.sbtc && volumes.sbtc[0] | 0) | formatNumber(0)}}</span>
                	 		</span></span>
                	 		<span class='balance'>
-           	 				<span class='showmobile' v-show='balances.sbtc > 0'>Balance: ${{balances.sbtc && balances.sbtc.toFixed(2)}} </span>
+           	 				<span class='showmobile' v-show='balances.sbtc > 0'>Balance: ${{(balances.sbtc && balances.sbtc.toFixed(2)) | formatNumber(0)}} </span>
                	 			<span class='tooltip' v-show='balances.sbtc > 0'>
                	 				<img :src="publicPath + 'dollar-sign-solid.svg'">
-               	 				<span class='tooltiptext'>Balance: ${{balances.sbtc && balances.sbtc.toFixed(2)}}</span>
+               	 				<span class='tooltiptext'>Balance: ${{(balances.sbtc && balances.sbtc.toFixed(2)) | formatNumber(0)}}</span>
                	 			</span>
                	 		</span>
 	                </router-link>
@@ -438,7 +438,11 @@
 	        </fieldset>
 	    </div>
 
-	    <total-balances :total-volume='totalVolume'/>
+	    <total-balances :total-volume='totalVolume'>
+	    	<div>
+	    		My deposits: {{ +sumBalances.toFixed(2) | formatNumber(0) }}$
+	    	</div>
+	    </total-balances>
 
 	</div>
 </template>
@@ -464,7 +468,7 @@
 		},
 		data: () => ({
 			activePoolLink: -1,
-			pools: ['compound','usdt','y','busd','susdv2','pax','ren', 'sbtc'],
+			pools: ['compound','usdt','y','busd','susdv2','pax','ren', 'sbtc', 'hbtc'],
 			daily_apy: [],
 			weekly_apy: [],
 			monthly_apy: [],
@@ -537,6 +541,70 @@
             },
 			sumBalances() {
 				return Object.values(this.balances).filter(balance => balance > 0).reduce((a, b) => a + b, 0)
+			},
+			decodedGauges() {
+				return [
+				  "0x7ca5b0a2910B33e9759DC7dDB0413949071D7575",
+				  "0xBC89cd85491d81C6AD2954E6d0362Ee29fCa8F53",
+				  "0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1",
+				  "0x69Fb7c45726cfE2baDeE8317005d3F94bE838840",
+				  "0x64E3C23bfc40722d3B649844055F1D51c1ac041d",
+				  "0xB1F2cdeC61db658F091671F5f199635aEF202CAC",
+				  "0xA90996896660DEcC6E997655E065b23788857849",
+				  "0x705350c4BcD35c9441419DdD5d2f097d7a55410F",
+				]
+			},
+			poolInfo() {
+				return {
+					compound: {
+						swap: '0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56',
+						swap_token: '0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2',
+						name: 'compound',
+						gauge: '0x7ca5b0a2910B33e9759DC7dDB0413949071D7575',
+					},
+					usdt: {
+						swap: '0x52EA46506B9CC5Ef470C5bf89f17Dc28bB35D85C',
+						swap_token: '0x9fC689CCaDa600B6DF723D9E47D84d76664a1F23',
+						name: 'usdt',
+						gauge: '0xBC89cd85491d81C6AD2954E6d0362Ee29fCa8F53',
+					},
+					y: {
+						swap: '0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51',
+						swap_token: '0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8',
+						name: 'y',
+						gauge: '0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1',
+					},
+					busd: {
+						swap: '0x79a8C46DeA5aDa233ABaFFD40F3A0A2B1e5A4F27',
+						swap_token: '0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B',
+						name: 'busd',
+						gauge: '0x69Fb7c45726cfE2baDeE8317005d3F94bE838840',
+					},
+					susdv2: {
+						swap: '0xA5407eAE9Ba41422680e2e00537571bcC53efBfD',
+						swap_token: '0xC25a3A3b969415c80451098fa907EC722572917F',
+						name: 'susdv2',
+						gauge: '0xA90996896660DEcC6E997655E065b23788857849',
+					},
+					pax: {
+						swap: '0x06364f10B501e868329afBc005b3492902d6C763',
+						swap_token: '0xD905e2eaeBe188fc92179b6350807D8bd91Db0D8',
+						name: 'pax',
+						gauge: '0x64E3C23bfc40722d3B649844055F1D51c1ac041d',
+					},
+					ren: {
+						swap: '0x93054188d876f558f4a66B2EF1d97d16eDf0895B',
+						swap_token: '0x49849C98ae39Fff122806C06791Fa73784FB3675',
+						name: 'ren',
+						gauge: '0xB1F2cdeC61db658F091671F5f199635aEF202CAC',
+					},
+					sbtc: {
+						swap: '0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714',
+						swap_token: '0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3',
+						name: 'sbtc',
+						gauge: '0x705350c4BcD35c9441419DdD5d2f097d7a55410F',
+					},
+				}
 			},
 		},
 		methods: {
@@ -637,6 +705,7 @@
 			async getBalances() {
 				if(!contract.default_account) return;
 				contract.contracts.compound = contract;
+				console.log(this.pools, "THE POOLS")
 				let calls = this.pools.flatMap(k => {
 					return [
 						//balanceOf(address)
@@ -647,19 +716,29 @@
 				calls.push([allabis.susdv2.sCurveRewards_address, '0x70a08231000000000000000000000000' + contract.default_account.slice(2)])
 				calls.push([allabis.sbtc.sCurveRewards_address, '0x70a08231000000000000000000000000' + contract.default_account.slice(2)])
 				calls.push([allabis.iearn.sCurveRewards_address, '0x70a08231000000000000000000000000' + contract.default_account.slice(2)])
+				let callslen = calls.length
+				calls.push(...this.decodedGauges.map(gauge => [gauge, '0x70a08231000000000000000000000000' + contract.default_account.slice(2)]))
 				let aggcalls = await contract.multicall.methods.aggregate(calls).call()
 				let decoded = aggcalls[1].map(hex => web3.eth.abi.decodeParameter('uint256', hex))
-				console.log(decoded, "THE DECODED")
+				console.log(decoded, "THE DECODED GET BALANCES")
 				//this.balances = []
+				let decodedGaugeBalances = decoded.slice(callslen)
+				decoded = decoded.slice(0, callslen)
 				helpers.chunkArr(decoded, 2).slice(0,this.pools.length).map((v, i) => {
 					let key = this.pools[i]
 					Vue.set(this.balances, key, +v[0] * (+v[1]) / 1e36);
-					if(['tbtc', 'ren', 'sbtc'].includes(key)) Vue.set(this.balances, key, this.balances[key] * this.btcPrice)
+					if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(key)) Vue.set(this.balances, key, this.balances[key] * this.btcPrice)
 				})
 				let len = decoded.length
 				Vue.set(this.balances, 'susdv2', this.balances.susdv2 + (+decoded[len-3] * decoded[9]) / 1e36)
 				Vue.set(this.balances, 'sbtc', this.balances.sbtc + ((+decoded[len-2] * decoded[15]) / 1e36) * this.btcPrice)
 				Vue.set(this.balances, 'y', this.balances.y + (+decoded[len-1] * decoded[5]) / 1e36)
+
+				for(let pool of Object.values(this.poolInfo)) {
+					let callsGauges = calls.slice(callslen)
+					Vue.set(this.balances, pool.name, this.balances[pool.name] + +decodedGaugeBalances[callsGauges.findIndex(callGauge => callGauge[0] == pool.gauge)] / 1e18)
+				}
+
 			},
 			handle_pool_change(e) {
 				if(document.querySelector('#from_currency') == document.activeElement 
@@ -717,67 +796,9 @@
 
 			async getCRVAPY() {
 
-				let poolInfo = {
-					compound: {
-						swap: '0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56',
-						swap_token: '0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2',
-						name: 'compound',
-						gauge: '0x7ca5b0a2910B33e9759DC7dDB0413949071D7575',
-					},
-					usdt: {
-						swap: '0x52EA46506B9CC5Ef470C5bf89f17Dc28bB35D85C',
-						swap_token: '0x9fC689CCaDa600B6DF723D9E47D84d76664a1F23',
-						name: 'usdt',
-						gauge: '0xBC89cd85491d81C6AD2954E6d0362Ee29fCa8F53',
-					},
-					y: {
-						swap: '0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51',
-						swap_token: '0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8',
-						name: 'y',
-						gauge: '0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1',
-					},
-					busd: {
-						swap: '0x79a8C46DeA5aDa233ABaFFD40F3A0A2B1e5A4F27',
-						swap_token: '0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B',
-						name: 'busd',
-						gauge: '0x69Fb7c45726cfE2baDeE8317005d3F94bE838840',
-					},
-					susdv2: {
-						swap: '0xA5407eAE9Ba41422680e2e00537571bcC53efBfD',
-						swap_token: '0xC25a3A3b969415c80451098fa907EC722572917F',
-						name: 'susdv2',
-						gauge: '0xA90996896660DEcC6E997655E065b23788857849',
-					},
-					pax: {
-						swap: '0x06364f10B501e868329afBc005b3492902d6C763',
-						swap_token: '0xD905e2eaeBe188fc92179b6350807D8bd91Db0D8',
-						name: 'pax',
-						gauge: '0x64E3C23bfc40722d3B649844055F1D51c1ac041d',
-					},
-					ren: {
-						swap: '0x93054188d876f558f4a66B2EF1d97d16eDf0895B',
-						swap_token: '0x49849C98ae39Fff122806C06791Fa73784FB3675',
-						name: 'ren',
-						gauge: '0xB1F2cdeC61db658F091671F5f199635aEF202CAC',
-					},
-					sbtc: {
-						swap: '0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714',
-						swap_token: '0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3',
-						name: 'sbtc',
-						gauge: '0x705350c4BcD35c9441419DdD5d2f097d7a55410F',
-					},
-				}
+				
 
-				let decodedGauges = [
-				  "0x7ca5b0a2910B33e9759DC7dDB0413949071D7575",
-				  "0xBC89cd85491d81C6AD2954E6d0362Ee29fCa8F53",
-				  "0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1",
-				  "0x69Fb7c45726cfE2baDeE8317005d3F94bE838840",
-				  "0x64E3C23bfc40722d3B649844055F1D51c1ac041d",
-				  "0xB1F2cdeC61db658F091671F5f199635aEF202CAC",
-				  "0xA90996896660DEcC6E997655E065b23788857849",
-				  "0x705350c4BcD35c9441419DdD5d2f097d7a55410F"
-				]
+				
 
 				let gaugeController_address = '0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB'
 				let gauge_relative_weight = '0x6207d866000000000000000000000000'
@@ -789,12 +810,12 @@
 				let btcPrice = prices.bitcoin.usd
 				let CRVprice = prices['curve-dao-token'].usd
 
-				let weightCalls = decodedGauges.map(gauge => [gaugeController_address, gauge_relative_weight + gauge.slice(2)])
+				let weightCalls = this.decodedGauges.map(gauge => [gaugeController_address, gauge_relative_weight + gauge.slice(2)])
 
 				let aggCallsWeights = await contract.multicall.methods.aggregate(weightCalls).call()
 				let decodedWeights = aggCallsWeights[1].map((hex, i) => [weightCalls[i][0], web3.eth.abi.decodeParameter('uint256', hex) / 1e18])
 
-				let ratesCalls = decodedGauges.map(gauge => [
+				let ratesCalls = this.decodedGauges.map(gauge => [
 					[gauge, "0x180692d0"],
 					[gauge, "0x17e28089"],
 					[gauge, "0x18160ddd"],
@@ -806,13 +827,13 @@
 				let workingSupplies = decodedRate.filter((_, i) => i % 3 == 1).map(v => v / 1e18)
 				let totalSupplies = decodedRate.filter((_, i) => i % 3 == 2).map(v => v / 1e18)
 
-				let virtualPriceCalls = Object.values(poolInfo).map(v => [v.swap, "0xbb7b8b80"])
+				let virtualPriceCalls = Object.values(this.poolInfo).map(v => [v.swap, "0xbb7b8b80"])
 				let aggVirtualPrices = await contract.multicall.methods.aggregate(virtualPriceCalls).call()
 				let decodedVirtualPrices = aggVirtualPrices[1].map((hex, i) => [virtualPriceCalls[i][0], web3.eth.abi.decodeParameter('uint256', hex) / 1e18])
 
 				let weightData = decodedWeights.map((w, i) => {
-					let pool = Object.values(poolInfo).find(v => v.gauge.toLowerCase() == '0x' + weightCalls[i][1].slice(34).toLowerCase()).name
-					let swap_address = poolInfo[pool].swap
+					let pool = Object.values(this.poolInfo).find(v => v.gauge.toLowerCase() == '0x' + weightCalls[i][1].slice(34).toLowerCase()).name
+					let swap_address = this.poolInfo[pool].swap
 					let virtual_price = decodedVirtualPrices.find(v => v[0].toLowerCase() == swap_address.toLowerCase())[1]
 					let _working_supply = workingSupplies[i]
 					let totalSupply = totalSupplies[i]
@@ -824,7 +845,7 @@
 					let apy = rate * CRVprice * 100
 					if(isNaN(apy))
 						apy = 0
-					Object.values(poolInfo).find(v => v.name == pool).gauge_relative_weight = w[1]
+					Object.values(this.poolInfo).find(v => v.name == pool).gauge_relative_weight = w[1]
 					console.log(pool, apy, "POOL CRV APY")
 					//boost = (totalSupply / _working_supply)
 					Vue.set(this.CRVAPYs, pool, [apy, apy * 2.5, 2.5])
@@ -852,7 +873,7 @@
 				results = results.gauges
 
 				for(let gaugeBoost of results) {
-					let pool = Object.values(poolInfo).find(pool => pool.gauge.toLowerCase() == gaugeBoost.gauge.toLowerCase())
+					let pool = Object.values(this.poolInfo).find(pool => pool.gauge.toLowerCase() == gaugeBoost.gauge.toLowerCase())
 					console.log(pool.name, "THE POOL")
 					pool.previousWorkingBalance = gaugeBoost.workingBalance
 					Vue.set(this.boosts, pool.name, gaugeBoost.workingBalance / (0.4 * gaugeBoost.originalBalance))

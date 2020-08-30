@@ -82,7 +82,7 @@
                 </a>
 
                 <li :class="{'loading line': earnedSNX === null}">
-                    <b>Pending SNX LP rewards:</b> <span v-show='earnedSNX !== null'> {{showEarnedSNX}} {{+showinUSD == 1 ? 'USD' : 'SNX'}}</span>
+                    <b>Pending SNX LP rewards:</b> <span v-show='earnedSNX !== null || claimableSNX !== null '> {{+showEarnedSNX + +showEarnedSNXGauge}} {{+showinUSD == 1 ? 'USD' : 'SNX'}}</span>
                 </li>
                 <li v-show="currentPool == 'sbtc'" :class="{'loading line': earnedREN === null}">
                     <b>Pending REN LP rewards:</b> <span v-show='earnedREN !== null'> {{showEarnedREN}} {{+showinUSD == 1 ? 'USD' : 'REN'}}</span>
@@ -102,6 +102,17 @@
                     <b>Estimated weekly BPT LP rewards:</b> <span v-show='weeklyEstimateBPT !== null'> {{showWeeklyBPT}} {{+showinUSD == 1 ? 'USD' : 'BPT'}}</span>
                 </li>
 
+                <br>
+
+                <li :class="{'loading line': earnedCRV === null}">
+                    <b>Pending <img class='icon small' :src="publicPath + 'logo.png'"> CRV:</b> <span v-show='earnedCRV !== null'> {{ showEarnedCRV }} {{ +showinUSD == 1 ? 'USD' : 'CRV' }} </span>
+                </li>
+                <li :class="{'loading line': mintedCRV === null}">
+                    <b>Minted <img class='icon small' :src="publicPath + 'logo.png'"> CRV:</b> <span v-show='mintedCRV !== null'> {{ showRewardsCRV }} {{ +showinUSD == 1 ? 'USD' : 'CRV' }} </span>
+                </li>
+
+                <br>
+
                 <li>
                     <b>Total profit
                         <span class='tooltip'>[?]
@@ -112,7 +123,7 @@
                     :</b> 
                     <span :class="{'loading line': available == -1}"> 
                         <span v-show='available != -1'>
-                            {{ toFixed(+showProfit + +showEarnedSNXUSD + +showEarnedRENUSD + +showRewardsSNXUSD + +showRewardsRENUSD) }} {{+showinUSD == 1 ? 'USD' : '' }}
+                            {{ toFixed(+showProfit + +showEarnedSNXUSD + +showEarnedRENUSD + +showRewardsSNXUSD + +showRewardsRENUSD + +showEarnedCRVUSD + +showRewardsCRVUSD) }} {{+showinUSD == 1 ? 'USD' : '' }}
                         </span>
                     </span>
                 </li>
@@ -127,6 +138,12 @@
                 </li>
                 <li v-if="currentPool == 'sbtc'">
                     <b>BPT price: </b><span :class="{'loading line': BPTPrice === null}"></span><span>{{BPTPrice && BPTPrice.toFixed(2)}} USD</span>
+                </li>
+                
+                <br>
+
+                <li>
+                    <b><img class='icon small' :src="publicPath + 'logo.png'"> CRV price: </b><span :class="{'loading line': CRVprice === null}"></span><span>{{ CRVprice && CRVprice.toFixed(2) }} USD</span>
                 </li>
             </ul>
             <ul v-if="['y', 'iearn'].includes(currentPool)" class='snxrewards'>
