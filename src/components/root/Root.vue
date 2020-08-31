@@ -7,10 +7,10 @@
 	        <fieldset class='poolsdialog'>
 	            <legend>
 	            	Curve pools
-	            	<span class='tooltip'>
+	            	<span class='tooltip' v-show='+sumBalances > 0'>
 	            		$
 	            		<span class='tooltiptext'>
-	            			Your total balances: ${{ +sumBalances.toFixed(2) }} 
+	            			Your total balances: ${{ +sumBalances.toFixed(2) | formatNumber(0) }} 
 	            		</span>
 	            	</span>
 	            </legend>
@@ -439,7 +439,7 @@
 	    </div>
 
 	    <total-balances :total-volume='totalVolume'>
-	    	<div>
+	    	<div v-show='+sumBalances > 0'>
 	    		My deposits: {{ +sumBalances.toFixed(2) | formatNumber(0) }}$
 	    	</div>
 	    </total-balances>
@@ -736,7 +736,10 @@
 
 				for(let pool of Object.values(this.poolInfo)) {
 					let callsGauges = calls.slice(callslen)
-					Vue.set(this.balances, pool.name, this.balances[pool.name] + +decodedGaugeBalances[callsGauges.findIndex(callGauge => callGauge[0] == pool.gauge)] / 1e18)
+					let balance = +decodedGaugeBalances[callsGauges.findIndex(callGauge => callGauge[0] == pool.gauge)]
+					if(['ren', 'sbtc'].includes(pool.name))
+						balance *= this.btcPrice
+					Vue.set(this.balances, pool.name, this.balances[pool.name] + balance / 1e18)
 				}
 
 			},

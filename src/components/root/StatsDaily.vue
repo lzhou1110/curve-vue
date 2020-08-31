@@ -243,7 +243,14 @@
 		async mounted() {
 			let allPools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren', 'sbtc']
 			let allVolume = volumeStore.state.allVolume
-			this.$watch(()=>Object.keys(allVolume).every(pool => allVolume[pool].length > 0), val => {
+			console.log(Object.keys(allVolume).filter(pool => !['tbtc', 'hbtc'].includes(pool)), "HERERE")
+			console.log(allVolume)
+			this.$watch(()=>Object.keys(allVolume).filter(pool => !['tbtc', 'hbtc'].includes(pool)).every(pool => {
+				console.log(allVolume[pool].length, "LENGTH")
+				return allVolume[pool].length > 0
+			}), val => {
+
+				console.log("I AM HERE")
 				if(val) {
 					let volumeSeries = []
 					let data = volumeStore.state.allVolume

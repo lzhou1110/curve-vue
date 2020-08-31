@@ -77,7 +77,7 @@ export default {
 			return (+this.earnedCRV / 1e18 * this.CRVprice).toFixed(2)
 		},
 		showRewardsCRVUSD() {
-			return (+this.mintedCRV / 1e18).toFixed(2)
+			return (+this.mintedCRV / 1e18 * this.CRVprice).toFixed(2)
 		},
 	},
 	methods: {
@@ -111,11 +111,9 @@ export default {
 	        		this.ADDRESSES[symbol] = allabis[this.currentPool].coins[i]
 	        	}
 			    let [available, availableUSD, stakedBalanceUSD, stakedBalance] = await this.getAvailableAmount()
-			    if(['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool)) {
-			    	this.getStakedBalance = stakedBalance
-			    	this.getStakedBalanceUSD = stakedBalanceUSD
-			    	this.stakedTokens = currentContract.curveStakedBalance
-			    }
+		    	this.getStakedBalance = stakedBalance
+		    	this.getStakedBalanceUSD = stakedBalanceUSD
+		    	this.stakedTokens = currentContract.curveStakedBalance
 
 			 //    let decodedGauges = [
 				//   "0x7ca5b0a2910B33e9759DC7dDB0413949071D7575",
@@ -132,9 +130,13 @@ export default {
 			    let calls =[
 		   	 		[currentContract.minter._address, currentContract.minter.methods.minted(currentContract.default_account, currentContract.gaugeContract._address).encodeABI()],
 					[currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimable_tokens(currentContract.default_account).encodeABI()],
-					[currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimable_reward(currentContract.default_account).encodeABI()],
-					[currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimed_rewards_for(currentContract.default_account).encodeABI()],
 				]
+				if(['susdv2', 'sbtc'].includes(this.currentPool)) {
+					calls.push(...[
+						[currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimable_reward(currentContract.default_account).encodeABI()],
+						[currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimed_rewards_for(currentContract.default_account).encodeABI()],
+					])
+				}
 				let aggcalls = await currentContract.multicall.methods.aggregate(calls).call()
 				let decoded = aggcalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
 
@@ -142,8 +144,10 @@ export default {
 
 				this.mintedCRV = +decoded[0]
 				this.earnedCRV = +decoded[1]
-				this.claimableSNX = +decoded[2] - +decoded[3]
-				this.claimedSNX = +decoded[3]
+				if(['susdv2', 'sbtc'].includes(this.currentPool)) {
+					this.claimableSNX = +decoded[2] - +decoded[3]
+					this.claimedSNX = +decoded[3]
+				}
 
 				let CRVprice = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=havven,curve-dao-token&vs_currencies=usd`)
 				CRVprice = await CRVprice.json()
@@ -156,6 +160,7 @@ export default {
 			    this.available = available
 			    this.availableUSD = availableUSD;
 			    this.profit = (available + this.getStakedBalance) + this.withdrawals - this.deposits
+			    console.log(available, this.getStakedBalance, this.withdrawals, this.deposits, "THE PROFIT")
 			    this.profitUSD = availableUSD + this.withdrawalsUSD - this.depositsUSD;
 			}
 			catch(err) {
@@ -168,8 +173,9 @@ export default {
 	    	if(!this.$route.params.address) {
 	    		let totalShare = currentContract.totalShare
 	    		let usdShare = currentContract.usdShare
+	    		let stakedBalance = +currentContract.curveStakedBalance
 	    		if(!['tbtc', 'ren', 'sbtc', 'hbtc'].includes(this.currentPool)) this.btcPrice = 1
-	    		console.log(currentContract.curveStakedBalance, currentContract.virtual_price, this.btcPrice)
+	    		console.log(stakedBalance, currentContract.virtual_price, this.btcPrice)
 	    		if(['y', 'iearn'].includes(this.currentPool)) {
 	    			let vault = '0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c'
 	    			let vaultContract = new currentContract.web3.eth.Contract(yERC20_abi, '0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c')
@@ -186,8 +192,12 @@ export default {
 	    			totalShare += this.getAvailableTransfer(+balanceOf * +rate, this.priceData[this.priceData.length - 1]) / 1e18
 	    			usdShare += (+balanceOf * +rate / 1e36) * currentContract.virtual_price
 	    		}
+	    		if(['susdv2', 'sbtc', 'y'].includes(this.currentPool)) {
+	    			let oldStakedRewards = await currentContract.curveRewards.methods.balanceOf(currentContract.default_account).call()
+	    			stakedBalance += +oldStakedRewards
+	    		}
 	    		return [totalShare * 100, usdShare * this.btcPrice || 0,
-    				currentContract.curveStakedBalance * currentContract.virtual_price * this.btcPrice / 1e18, currentContract.totalStake * 100]
+    				stakedBalance * currentContract.virtual_price * this.btcPrice / 1e18, currentContract.totalStake * 100]
 	    	}
 	    	return this.calcAvailable();
 	    },

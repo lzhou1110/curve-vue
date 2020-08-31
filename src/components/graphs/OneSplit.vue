@@ -376,7 +376,7 @@
                 return ['compound', 'y', 'busd', 'susd', 'pax', 'ren', 'sbtc', 'hbtc', '1split'][this.bestPool]
             },
             selldisabled() {
-                if((this.from_currency == 10 && this.to_currency != 8) || (this.to_currency == 8 && this.from_currency != 10)) return true
+                //if((this.from_currency == 10 && this.to_currency != 8) || (this.to_currency == 8 && this.from_currency != 10)) return true
                 if(this.from_currency <= 6 && this.to_currency >= 7 || this.to_currency <= 6 && this.from_currency >= 7) return true
                 // if([7,8,9].includes(this.from_currency) && ![7,8,9].includes(this.to_currency) 
                 //     || [7,8,9].includes(this.to_currency) && ![7,8,9].includes(this.from_currency)) return true

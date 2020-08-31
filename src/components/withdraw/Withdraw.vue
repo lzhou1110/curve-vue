@@ -127,13 +127,21 @@
             <label for='inf_approval'>Infinite approval - trust zap contract forever</label>
         </p>
 
+        <fieldset class='info-message gentle-message' v-show = "['susdv2', 'sbtc', 'y'].includes(currentPool) && oldRewardsBalance > 0">
+            <p>
+                You have {{ oldRewardsBalanceFormat }} {{ currentPool }} LP tokens in old rewards contract.
+                Please withdraw from old staking contract an stake again
+            </p>
+            <button @click='withdrawOldStaking'>Withdraw from old</button>
+        </fieldset>
+
         <div id='withdraw_buttons' class='buttons'>
             <div class='info-message gentle-message' id='amount-warning' v-show = 'nobalance'>
-	        	You don't have any available amount to withdraw
-	        	<!-- <div v-show="currentPool == 'susdv2'">
-	        		(You have {{(staked_balance / 1e18) | toFixed2}} staked)
-	        	</div> -->
-	      	</div>
+                You don't have any available amount to withdraw
+                <!-- <div v-show="currentPool == 'susdv2'">
+                    (You have {{(staked_balance / 1e18) | toFixed2}} staked)
+                </div> -->
+            </div>
             <button id="remove-liquidity"
                 :disabled="['susdv2', 'sbtc'].includes(currentPool) && slippage < -0.03 && !warninglow || show_nobalance == true"
                 @click='handle_remove_liquidity()' v-show="currentPool != 'susd'">
@@ -191,7 +199,7 @@
                 @click='handle_remove_liquidity(true, true)'
                 v-show="staked_balance > 0"
             >
-                Unstake
+                Unstake from gauge
             </button>
             <router-link v-show="['susdv2'].includes(currentPool) && oldBalance > 0" class='button' to='/susd/withdraw' id='withdrawold'>Withdraw old</router-link>
             <button @click='migrateUSDT' v-show="currentPool == 'usdt'">Migrate to PAX</button>
@@ -243,6 +251,7 @@
                 </fieldset>
             </div>
         </div>
+
 
     </div>
 </template>
@@ -300,6 +309,7 @@
             withdrawSNXPool: 0,
             withdrawRENPool: 0,
             withdrawADAI: 0,
+            oldRewardsBalance: null,
             show_loading: false,
             waitingMessage: '',
             showWithdrawSlippage: false,
@@ -409,6 +419,9 @@
             claimableSNXGaugeFormat() {
                 return this.toFixed(this.claimableSNXGauge / 1e18)
             },
+            oldRewardsBalanceFormat() {
+                return this.oldRewardsBalance && this.toFixed(this.oldRewardsBalance / 1e18)
+            },
         },
         mounted() {
     		this.showstaked = true
@@ -436,15 +449,25 @@
                 }
                 let gaugeCalls = [
                     [currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimable_tokens(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()],
-                    [currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimable_reward(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()],
-                    [currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimed_rewards_for(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()],
                 ]
+                if(['susdv2', 'sbtc'].includes(this.currentPool)) {
+                    gaugeCalls.push(...[
+                        [currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimable_reward(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()],
+                        [currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimed_rewards_for(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()],
+                    ])
+                }
+                console.log(gaugeCalls, "GAUGE CALLS")
                 let aggGaugeCalls = await currentContract.multicall.methods.aggregate(gaugeCalls).call()
                 let decodedGaugeCalls = aggGaugeCalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
                 console.log(decodedGaugeCalls, "DECODED GAUGE CALLS")
                 this.claimableCRV = decodedGaugeCalls[0]
-                this.claimableSNX = decodedGaugeCalls[1]
-                this.claimedSNX = decodedGaugeCalls[2]
+                if(['susdv2', 'sbtc', 'y'].includes(this.currentPool)) {
+                    this.oldRewardsBalance = +(await currentContract.curveRewards.methods.balanceOf(currentContract.default_account || '0x0000000000000000000000000000000000000000').call())
+                }
+                if(['susdv2', 'sbtc'].includes(this.currentPool)) {
+                    this.claimableSNX = decodedGaugeCalls[1]
+                    this.claimedSNX = decodedGaugeCalls[2]
+                }
 
                 if(['susdv2', 'y', 'iearn'].includes(this.currentPool)) {
                     this.pendingSNXRewards = await curveRewards.methods.earned(this.default_account).call()
@@ -825,11 +848,11 @@
                                 reject(err)
                             })
     				})
-            //         if(exit) {
-        				// this.claim_SNX()
-            //             //if(['y', 'iearn'].includes(this.currentPool))
-            //                 //this.showModal = true
-            //         }
+                    if(exit) {
+        				this.claim_CRV()
+                        //if(['y', 'iearn'].includes(this.currentPool))
+                            //this.showModal = true
+                    }
                 }
                 catch(err) {
                     console.log(err)
@@ -1242,7 +1265,40 @@
                     console.error(err)
                     errorStore.handleError(err)
                 }
-            }
+            },
+            async withdrawOldStaking() {
+
+                let amount = BN(await currentContract.curveRewards.methods.balanceOf(currentContract.default_account).call())
+
+                var { dismiss } = notifyNotification(`Withdraw from old staking contract`)
+
+                try {
+                    await new Promise((resolve, reject) => {
+                        currentContract.curveRewards.methods.withdraw(amount.toFixed(0,1))
+                            .send({
+                                from: currentContract.default_account,
+                                gasPrice: this.gasPriceWei,
+                                gas: 125000,
+                            })
+                            .once('transactionHash', hash => {
+                                this.waitingMessage = 'Waiting for unstake transaction to confirm'
+                                dismiss()
+                                notifyHandler(hash)
+                                resolve()
+                            })
+                            .catch(err => {
+                                dismiss()
+                                reject(err)
+                            })
+                    })
+                }
+                catch(err) {
+                    console.log(err)
+                    errorStore.handleError(err)
+                    this.waitingMessage = ''
+                    this.show_loading = false;
+                }
+            },
         },
 
     }

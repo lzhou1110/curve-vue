@@ -12,6 +12,14 @@
 		</div>
 
 		<div class='window white'>
+			<highcharts :constructor-type="'stockChart'" :options='volumeperpooldata' ref='volumeperpoolcharts'></highcharts>
+		</div>
+
+		<div class='window white'>
+			<highcharts :constructor-type="'stockChart'" :options='liquidityutilizationdata' ref='liquidityutilizationcharts'></highcharts>
+		</div>
+
+		<div class='window white'>
 			<highcharts :constructor-type="'stockChart'" :options='coinchartdata' ref='coincharts'></highcharts>
 		</div>
 
@@ -123,6 +131,196 @@
 	            	opposite: false,
 	            	title: {
 	            		text: 'Total deposits',
+	            		style: {
+	            			color: 'black'
+	            		},
+	            	},
+            		stackLabels: {
+			            enabled: false,
+			            style: {
+			                fontWeight: 'bold',
+			                color: ( // theme
+			                    Highcharts.defaultOptions.title.style &&
+			                    Highcharts.defaultOptions.title.style.color
+			                ) || 'gray'
+			            }
+			        },
+	            	tickPixelInterval: 10,
+	            },
+	            xAxis: {
+	            	labels: {	
+		            	style: {
+		            		color: 'black'
+		            	}
+	            	},
+	            },
+		        series: [],
+		        tooltip: {
+	                valueDecimals: 5,
+	                pointFormatter() {
+	                	return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${this.y.toFixed(2)}</b><br/>`
+	                },
+	            },
+	            legend: {
+	            	enabled: true,
+	            },
+			},
+			liquidityutilizationdata: {
+				chart: {
+					panning: true,
+					zoomType: 'x',
+			        panKey: 'ctrl',
+			        type: 'column',
+			        height: 600,
+				},
+		        title: {
+		        	text: 'Liquidity utilization %', 
+		        },
+                rangeSelector: {
+		            selected: 1
+		        },
+		        plotOptions: {
+					series: {
+						dataGrouping: {
+						  forced: true,
+						  units: [
+						    ['day', [1]]
+						  ]
+						},
+						point: {
+							events: {
+								click: (function(self) {
+									return function() {
+										let index = this.dataGroup ? this.dataGroup.start : this.index
+										console.log(this, index, "INDEX")
+									}
+								})(this)
+							}
+						},
+					},
+					column: {
+						stacking: 'normal',
+						dataLabels: {
+							enabled: false
+						}
+					},
+				},
+		        exporting: {
+					buttons: {
+						contextButton: {
+							menuItems: ["printChart",
+					                    "separator",
+					                    "downloadPNG",
+					                    "downloadJPEG",
+					                    "downloadPDF",
+					                    "downloadSVG",
+					                    "separator",
+					                    "downloadCSV",
+					                    "downloadXLS",
+					                    //"viewData",
+					                    "openInCloud"]
+						}
+					}
+				},
+	            yAxis: {
+	            	opposite: false,
+	            	title: {
+	            		text: 'Liquidity utilization %',
+	            		style: {
+	            			color: 'black'
+	            		},
+	            	},
+            		stackLabels: {
+			            enabled: false,
+			            style: {
+			                fontWeight: 'bold',
+			                color: ( // theme
+			                    Highcharts.defaultOptions.title.style &&
+			                    Highcharts.defaultOptions.title.style.color
+			                ) || 'gray'
+			            }
+			        },
+	            	tickPixelInterval: 10,
+	            },
+	            xAxis: {
+	            	labels: {	
+		            	style: {
+		            		color: 'black'
+		            	}
+	            	},
+	            },
+		        series: [],
+		        tooltip: {
+	                valueDecimals: 5,
+	                pointFormatter() {
+	                	return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${this.y.toFixed(2)}%</b><br/>`
+	                },
+	            },
+	            legend: {
+	            	enabled: true,
+	            },
+			},
+			volumeperpooldata: {
+				chart: {
+					panning: true,
+					zoomType: 'x',
+			        panKey: 'ctrl',
+			        type: 'column',
+			        height: 600,
+				},
+		        title: {
+		        	text: 'Total volume per pool in USD', 
+		        },
+                rangeSelector: {
+		            selected: 1
+		        },
+		        plotOptions: {
+					series: {
+						dataGrouping: {
+						  forced: true,
+						  units: [
+						    ['day', [1]]
+						  ]
+						},
+						point: {
+							events: {
+								click: (function(self) {
+									return function() {
+										let index = this.dataGroup ? this.dataGroup.start : this.index
+										console.log(this, index, "INDEX")
+									}
+								})(this)
+							}
+						},
+					},
+					column: {
+						stacking: 'normal',
+						dataLabels: {
+							enabled: false
+						}
+					},
+				},
+		        exporting: {
+					buttons: {
+						contextButton: {
+							menuItems: ["printChart",
+					                    "separator",
+					                    "downloadPNG",
+					                    "downloadJPEG",
+					                    "downloadPDF",
+					                    "downloadSVG",
+					                    "separator",
+					                    "downloadCSV",
+					                    "downloadXLS",
+					                    //"viewData",
+					                    "openInCloud"]
+						}
+					}
+				},
+	            yAxis: {
+	            	opposite: false,
+	            	title: {
+	            		text: 'Total volume per pool in USD',
 	            		style: {
 	            			color: 'black'
 	            		},
@@ -423,12 +621,15 @@
 			this.piecoinschart = this.$refs.piecoinscharts.chart;
 			this.mypiechart = this.$refs.mypiecharts.chart;
 			this.coinchart = this.$refs.coincharts.chart;
-			this
+			this.liquidityutilizationchart = this.$refs.liquidityutilizationcharts.chart
+			this.volumeperpoolchart = this.$refs.volumeperpoolcharts.chart
 			this.chart.showLoading()
 			this.piechart.showLoading()
 			this.mypiechart.showLoading()
 			this.coinchart.showLoading()
-			let pools = Object.keys(allabis).filter(pool => pool != 'susd' && pool != 'y' && pool != 'tbtc')
+			this.liquidityutilizationchart.showLoading()
+			this.volumeperpoolchart.showLoading()
+			let pools = Object.keys(allabis).filter(pool => pool != 'susd' && pool != 'y' && pool != 'tbtc' && pool != 'hbtc')
 			await volumeStore.fetchVolumeData(pools, true, 1440)
 			let data = volumeStore.state.volumeData[1440]
 			let btcPrices = await helpers.retry(fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=1589587198&to=${(Date.now() / 1000) | 0}`))
@@ -436,6 +637,10 @@
 			for(let btcPool of ['ren', 'sbtc', 'hbtc']) {
 				data[btcPool] = data[btcPool].map(d => {
 					d.balances = d.balances.map(bal => bal * volumeStore.findClosestPrice(d.timestamp, btcPrices.prices))
+					// d.volume = Object.fromEntries(Object.entries(d.volume).map(([k, vol]) => {
+					// 	console.log(vol, "THE VOL")
+					// 	return [k, vol.map(v => v * volumeStore.findClosestPrice(d.timestamp, btcPrices.prices))]}
+					// ))
 					return d;
 				})
 			}
@@ -446,18 +651,35 @@
 			console.log(data, "THE DATA")
 
 			let volumes = {}
+			let liquidityUtilizations = {}
+			let volumeperpool = {}
 
 
 			for(let [pool, points] of Object.entries(data)) {
 				volumes[pool] = []
+				liquidityUtilizations[pool] = []
+				volumeperpool[pool] = []
 				for(let point of points) {
 					if(!point.timestamp) continue
 					let coinBalances = point.balances.map((bal, i) => {
 						return bal * point.rates[i] / 1e18 / allabis[pool == 'susd' ? 'susdv2' : pool].coin_precisions[i]
 					})
+					let volumeBalances = Object.entries(point.volume).map(([k, vol]) => {
+						return vol[0] / allabis[pool == 'susd' ? 'susdv2' : pool].coin_precisions[k.split('-')[0]]
+					})
+					let totalBalances = coinBalances.reduce((a, b) => a + b, 0)
+					let totalVolume = volumeBalances.reduce((a, b) => a + b, 0)
 					volumes[pool].push([
 						point.timestamp * 1000,
-						coinBalances.reduce((a, b) => a + b, 0)
+						totalBalances,
+					])
+					volumeperpool[pool].push([
+						point.timestamp * 1000,
+						totalVolume,
+					])
+					liquidityUtilizations[pool].push([
+						point.timestamp * 1000,
+						totalVolume * 100 / totalBalances,
 					])
 				}
 			}
@@ -465,13 +687,35 @@
 
 
 			for(let [pool, volume] of Object.entries(volumes)) {
-				if(pool == 'tbtc') continue
+				if(['tbtc', 'hbtc'].includes(pool)) continue
 				this.chart.addSeries({
 					type: 'column',
 					name: pool,
 					data: volume,
 				}, false, false)
 			}
+
+			for(let [pool, liquidityUtilization] of Object.entries(liquidityUtilizations)) {
+				if(['tbtc', 'hbtc'].includes(pool)) continue
+				this.liquidityutilizationchart.addSeries({
+					type: 'column',
+					name: pool,
+					data: liquidityUtilization,
+				}, true, false)
+			}
+
+			for(let [pool, volume] of Object.entries(volumeperpool)) {
+				if(['tbtc', 'hbtc'].includes(pool)) continue
+				this.volumeperpoolchart.addSeries({
+					type: 'column',
+					name: pool,
+					data: volume,
+				}, true, false)
+			}
+
+			this.liquidityutilizationchart.hideLoading()
+
+			this.volumeperpoolchart.hideLoading()
 
 			let coins = ['DAI', 'USDC', 'USDT', 'TUSD', 'BUSD', 'SUSD', 'PAX', 'renBTC', 'WBTC', 'sBTC', 'hBTC']
 			let coinbalances = coins.reduce((a,b)=> (a[b]=[],a),{});

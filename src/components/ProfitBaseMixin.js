@@ -85,7 +85,6 @@ export default {
         return (this.available / 100)
       },
       showStakedBalance() {
-        if(!['susdv2', 'sbtc', 'y', 'iearn'].includes(this.currentPool)) return 0
         if(this.showinUSD == 1) return this.getStakedBalanceUSD;
         return (this.getStakedBalance / 100); 
       },
@@ -103,6 +102,11 @@ export default {
       },
       publicPath() {
         return process.env.BASE_URL
+      },
+      totalProfit() {
+        let profits = [+this.showProfit, +this.showEarnedSNXUSD, +this.showEarnedRENUSD, +this.showRewardsSNXUSD, +this.showRewardsRENUSD, +this.showEarnedCRVUSD, +this.showRewardsCRVUSD, ]
+        profits = profits.filter(profit => !isNaN(profit))
+        return profits.reduce((a, b) => +a + +b, 0)
       },
     },
     beforeDestroy() {
