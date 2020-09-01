@@ -127,13 +127,17 @@
             <label for='inf_approval'>Infinite approval - trust zap contract forever</label>
         </p>
 
-        <fieldset class='info-message gentle-message' v-show = "['susdv2', 'sbtc', 'y'].includes(currentPool) && oldRewardsBalance > 0">
+        <fieldset class='info-message gentle-message' v-show = "['susdv2', 'sbtc', 'iearn', 'y'].includes(currentPool) && oldRewardsBalance > 0">
             <p>
                 You have {{ oldRewardsBalanceFormat }} {{ currentPool }} LP tokens in old rewards contract.
                 Please withdraw from old staking contract an stake again
             </p>
-            <button @click='withdrawOldStaking'>Withdraw from old</button>
+            <button @click='withdrawOldStaking'>Unstake from old contract</button>
         </fieldset>
+
+        <!-- <p class='simple-error synthsDisabled' v-show="['susdv2', 'sbtc'].includes(currentPool)">
+            Withdrawals are <b>temporarily</b> disabled due to <a href='https://blog.synthetix.io/the-pollux-release/' rel='noopener noreferrer'>Syntetix contract upgrades</a>. Will be enabled back shortly.
+        </p> -->
 
         <div id='withdraw_buttons' class='buttons'>
             <div class='info-message gentle-message' id='amount-warning' v-show = 'nobalance'>
@@ -461,8 +465,9 @@
                 let decodedGaugeCalls = aggGaugeCalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
                 console.log(decodedGaugeCalls, "DECODED GAUGE CALLS")
                 this.claimableCRV = decodedGaugeCalls[0]
-                if(['susdv2', 'sbtc', 'y'].includes(this.currentPool)) {
+                if(['susdv2', 'sbtc', 'iearn', 'y'].includes(this.currentPool)) {
                     this.oldRewardsBalance = +(await currentContract.curveRewards.methods.balanceOf(currentContract.default_account || '0x0000000000000000000000000000000000000000').call())
+                    console.log(this.oldRewardsBalance, "OLD REWARDS BALANCE", currentContract.curveRewards._address)
                 }
                 if(['susdv2', 'sbtc'].includes(this.currentPool)) {
                     this.claimableSNX = decodedGaugeCalls[1]

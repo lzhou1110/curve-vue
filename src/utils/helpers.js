@@ -105,7 +105,7 @@ export function setTimeoutPromise(delay) {
 }
 
 export function generateID() {
-  return '_' + Math.random().toString(36).substr(2, 9);
+  return '_' + Math.random().toString(36).substr(2, 9) + new Date().valueOf();
 }
 
 export async function retry(fn, retryDelay = 100, numRetries = 3) {

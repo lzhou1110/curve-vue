@@ -809,3 +809,28 @@ label[for='showinUSD'], label[for='showintokens'], label[for='showinBTC'] {
 .clear-cache-icon:hover {
   transform: rotateZ(45deg);
 }
+
+.synthsDisabled a {
+  border-bottom: 1px dashed white;
+}
+
+@-moz-document url-prefix() {
+  .modal fieldset {
+    margin-top: 0.4em;
+    position: relative;
+  }
+  .modal .modal-content.modal-content {
+    padding-top: 0.06em;
+  }
+  .modal fieldset > legend {
+    position: absolute;
+    left: 50%;
+    top: -12px; /* depends on font size and border */
+    background: silver; /* depends on background */
+    transform: translate(-50%, 0);
+  }
+  .modal fieldset .legend2 {
+    top: -12px;
+    left: 1.4em;
+  }
+}

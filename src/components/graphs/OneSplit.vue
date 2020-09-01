@@ -180,6 +180,9 @@
             <div class='simple-error pulse' v-show="susdWaitingPeriod">
                 Cannot transfer {{ from_currency == 5 ? 'sUSD' : 'sBTC' }} during waiting period {{ (susdWaitingPeriodTime).toFixed(0) }} secs left
             </div>
+            <!-- <p class='simple-error synthsDisabled' v-show="[5,9].includes(from_currency) || [5,9].includes(to_currency)">
+                Synths transfers are <b>temporarily</b> disabled due to <a href='https://blog.synthetix.io/the-pollux-release/' rel='noopener noreferrer'>Syntetix contract upgrades</a>. Will be enabled back shortly.
+            </p> -->
             <p class='trade-buttons'>
                 <button id="trade" @click='handle_trade' :disabled='selldisabled'>
                     Sell <span class='loading line' v-show='loadingAction'></span>

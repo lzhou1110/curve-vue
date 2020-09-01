@@ -164,6 +164,9 @@
                 <!-- <p class='simple-error' id='no-balance-synth' v-show='notEnoughBalanceSynth'>
                     Max balance you can use is {{ (+maxSynthBalance).toFixed(2) }}
                 </p> -->
+                <!-- <p class='simple-error synthsDisabled' v-show="['susdv2', 'sbtc'].includes(currentPool) && from_currency == Object.keys(currencies).length-1 || to_currency == Object.keys(currencies).length-1">
+                    {{ currentPool == 'susdv2' ? 'sUSD' : 'sBTC' }} transfers are <b>temporarily</b> disabled due to <a href='https://blog.synthetix.io/the-pollux-release/' rel='noopener noreferrer'>Syntetix contract upgrades</a>. Will be enabled back shortly.
+                </p> -->
                 <p class='trade-buttons'>
                     <button id="trade" @click='handle_trade'>
                         Sell <span class='loading line' v-show='loadingAction'></span>

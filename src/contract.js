@@ -204,13 +204,13 @@ export const gas = {
 		iearn: {
 			deposit: x => (225377*x + 522674)*2 | 0,
 			withdraw: 3500000 / 1.4,
-			withdrawShare: 3000000,
+			withdrawShare: 3500000,
 			withdrawImbalance: x => (276069*x + 516861)*2.5 | 0,
 		},
 		busd: {
 			deposit: x => (225377*x + 522674)*2 | 0,
 			withdraw: 3500000 / 1.4,
-			withdrawShare: 3000000,
+			withdrawShare: 3500000,
 			withdrawImbalance: x => (276069*x + 516861)*2.5 | 0,
 		},
 		susdv2: {
@@ -222,7 +222,7 @@ export const gas = {
 		pax: {
 			deposit: x => (225377*x + 522674)*2 | 0,
 			withdraw: 3500000 / 1.4,
-			withdrawShare: 3000000,
+			withdrawShare: 3500000,
 			withdrawImbalance: x => (276069*x + 516861)*2.5 | 0,
 		},
 		//no deposit zap
@@ -246,6 +246,7 @@ export const gas = {
 			withdrawShare: 350000,
 			withdrawImbalance: x => 800000,
 		},
+		//no deposit zap
 		hbtc: {
 			deposit: x => 300000,
 			withdraw: 250000,

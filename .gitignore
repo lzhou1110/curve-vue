@@ -25,3 +25,4 @@ src/jsons
 src/json
 
 .git-old/
+.vercel

@@ -59,9 +59,10 @@
 					<div class='content'>
 						<div>
 							<b>BTC deposit address: </b>
-							<span :class="{'loading line': !lastTransaction.gatewayAddress }"></span>
-							<span id='btcaddress'>{{ lastTransaction.gatewayAddress}}</span>
-							<div>
+							<!-- <span :class="{'loading line': !lastTransaction.gatewayAddress }"></span>
+							<span id='btcaddress'>{{ lastTransaction.gatewayAddress}}</span> -->
+							<span id='btcaddress'>Will be shown in table after you confirm initiating transaction</span>
+							<!-- <div>
 								<span class='hoverpointer' v-show='[0,3].includes(lastTransaction.type)' @click='copy(lastTransaction)'>
 									<span class='tooltip'>
 										<img class='icon small' :src="publicPath + 'copy-solid.svg'">
@@ -75,7 +76,7 @@
 										Show QR code
 									</span>
 								</span>
-							</div>
+							</div> -->
 							<div v-show='showQRinside' class='showQRinside'>
 								<vue-qrcode :value="qrValue" :options="qrOptions"></vue-qrcode>
 							</div>

@@ -87,6 +87,9 @@
             <div class='simple-error pulse' v-show="susdWaitingPeriod">
                 Cannot transfer {{ currentPool == 'susdv2' ? 'sUSD' : 'sBTC' }} during waiting period. {{ (susdWaitingPeriodTime).toFixed(0) }} secs left.
             </div>
+            <!-- <p class='simple-error synthsDisabled' v-show="['susdv2', 'sbtc'].includes(currentPool)">
+                Deposits are <b>temporarily</b> disabled due to <a href='https://blog.synthetix.io/the-pollux-release/' rel='noopener noreferrer'>Syntetix contract upgrades</a>. Will be enabled back shortly.
+            </p> -->
             <p style="text-align: center" class='buttons'>
                 <button id="add-liquidity" 
                     :disabled="currentPool == 'susdv2' && slippage < -0.03 || depositingZeroWarning || isZeroSlippage"
