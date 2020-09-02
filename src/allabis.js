@@ -9559,6 +9559,7 @@ var hbtc = {
 	is_plain: [true, true],
 	swap_address: '0x4CA9b3063Ec5866A4B82E437059D2C43d1be596F',
 	token_address: '0xb19059ebb43466C323583928285a49f558E572Fd',
+	gauge_address: '0x4c18E409Dc8619bFb6a1cB56D114C3f592E0aE79',
 	infura_url: 'https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b',
 	underlying_coins: [
 		'0x0316EB71485b0Ab14103307bf65a021042c6d380',
