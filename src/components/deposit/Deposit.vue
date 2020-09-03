@@ -92,13 +92,14 @@
             </p> -->
             <p style="text-align: center" class='buttons'>
                 <button id="add-liquidity" 
-                    :disabled="currentPool == 'susdv2' && slippage < -0.03 || depositingZeroWarning || isZeroSlippage"
+                    :disabled="currentPool == 'susdv2' && slippage < -0.03 || depositingZeroWarning || isZeroSlippage || slippage < -0.1"
                     @click='justDeposit = true; handle_add_liquidity()' 
                     >
                         Deposit <span class='loading line' v-show='loadingAction == 1'></span>
                 </button>
                 <button 
                     id='add-liquidity-stake' 
+                    :disabled="currentPool == 'susdv2' && slippage < -0.03 || depositingZeroWarning || isZeroSlippage || slippage < -0.1"
                     @click = 'justDeposit = false; deposit_stake()'>
                     Deposit & stake in gauge <span class='loading line' v-show='loadingAction == 2'></span>
                 </button>

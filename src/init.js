@@ -82,7 +82,7 @@ let wallets = [
     walletName: "ledger",
     rpcUrl:
       "https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b",
-    LedgerTransport: TransportU2F,
+    //LedgerTransport: TransportU2F,
   },
   { walletName: "dapper" },
   { walletName: "coinbase" },
