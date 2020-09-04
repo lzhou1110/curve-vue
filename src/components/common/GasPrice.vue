@@ -77,7 +77,7 @@
             	return this.gasPrice
             },
             errorMessage() {
-                setTimeout(() => errorState.txError = null, 2200)
+                setTimeout(() => errorState.txError = null, 5000)
                 return errorState.txError
             },
 		},
