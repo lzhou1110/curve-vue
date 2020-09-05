@@ -130,7 +130,7 @@
         <fieldset class='info-message gentle-message' v-show = "['susdv2', 'sbtc', 'iearn', 'y'].includes(currentPool) && oldRewardsBalance > 0">
             <p>
                 You have {{ oldRewardsBalanceFormat }} {{ currentPool }} LP tokens in old rewards contract.
-                Please withdraw from old staking contract an stake again
+                Please withdraw from old staking contract and stake again
             </p>
             <button @click='withdrawOldStaking'>Unstake from old contract</button>
         </fieldset>

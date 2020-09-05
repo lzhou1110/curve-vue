@@ -734,9 +734,9 @@
 				Vue.set(this.balances, 'sbtc', this.balances.sbtc + ((+decoded[len-2] * decoded[15]) / 1e36) * this.btcPrice)
 				Vue.set(this.balances, 'y', this.balances.y + (+decoded[len-1] * decoded[5]) / 1e36)
 
-				for(let pool of Object.values(this.poolInfo)) {
+				for(let [i, pool] of Object.values(this.poolInfo).entries()) {
 					let callsGauges = calls.slice(callslen)
-					let balance = +decodedGaugeBalances[callsGauges.findIndex(callGauge => callGauge[0] == pool.gauge)]
+					let balance = +decodedGaugeBalances[callsGauges.findIndex(callGauge => callGauge[0] == pool.gauge)] * (decoded[i*2 + 1] / 1e18)
 					if(['ren', 'sbtc'].includes(pool.name))
 						balance *= this.btcPrice
 					Vue.set(this.balances, pool.name, this.balances[pool.name] + balance / 1e18)

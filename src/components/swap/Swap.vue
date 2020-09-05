@@ -528,8 +528,9 @@
                     let calls = [
                         [currentContract.swap._address, currentContract.swap.methods.balances(i).encodeABI()],
                     ]
-                    if(!this.swapwrapped && !['susdv2', 'tbtc', 'ren'].includes(this.currentPool))
+                    if(!this.swapwrapped && !['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc'].includes(this.currentPool)) {
                         calls.push([currentContract.swap._address, currentContract.swap.methods.get_dy_underlying(i, j, dx).encodeABI()])
+                    }
                     else {
                         //dx = cBN(dx).times(currentContract.c_rates[i])
                         calls.push([currentContract.swap._address, currentContract.swap.methods.get_dy(i, j, dx).encodeABI()])
