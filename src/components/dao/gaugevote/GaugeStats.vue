@@ -28,33 +28,29 @@
 						</tr>
 						<tr v-show='futureCRVAPYs.sbtc' v-for='(pool, i) in Object.values(gaugesNames)'>
 							<td>
-								<a :href="'https://curve.fi/' + pool">
+								<a :href="pool == 'usdt' ? 'https://curve.fi' : 'https://curve.fi/' + pool">
 									{{ i }}.
 								</a>
 							</td>
 							<td>
-								<a :href="'https://curve.fi/' + pool">
+								<a :href="pool == 'usdt' ? 'https://curve.fi' : 'https://curve.fi/' + pool">
 									{{ pool }}
 								</a>
 							</td>
 							<td>
-								<a :href="'https://curve.fi/' + pool">
-									<span>
+								<a :href="pool == 'usdt' ? 'https://curve.fi' : 'https://curve.fi/' + pool">
 										{{ currentCRVAPYs[pool] && currentCRVAPYs[pool].toFixed(2) }}% 
 										<span v-show="currentCRVAPYs[pool] > 0">
 											to {{ currentCRVAPYs[pool] && (currentCRVAPYs[pool] * 2.5).toFixed(2) }}%
 										</span>
-									</span>
 								</a>
 							</td>
 							<td>
-								<a :href="'https://curve.fi/' + pool">
-									<span>
+								<a :href="pool == 'usdt' ? 'https://curve.fi' : 'https://curve.fi/' + pool">
 										{{ futureCRVAPYs[pool] && futureCRVAPYs[pool].toFixed(2) }}% 
 										<span v-show="futureCRVAPYs[pool] > 0">
 											to {{ futureCRVAPYs[pool] && (futureCRVAPYs[pool] * 2.5).toFixed(2) }}%
 										</span>
-									</span>
 								</a>
 							</td>
 

@@ -494,8 +494,6 @@
 
 			async claim() {
 				let gas = await gaugeStore.state.minter.methods.mint(this.gauge.gauge).estimateGas()
-				if(['susdv2', 'sbtc'].includes(this.gauge.name))
-					gas = 1000000
 
 				var { dismiss } = notifyNotification(`Please confirm claiming CRV from ${this.gauge.name} gauge`)
 

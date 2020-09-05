@@ -318,6 +318,8 @@
 			newAPY: null,
 
 			isCalculating: false,
+
+			time_total: null,
 		}),
 
 		async created() {
@@ -396,7 +398,7 @@
 		    vote() {
 		    	return {
 		    		voteNumber: 1,
-		    		timeLeft: 1599091200 - (Date.now()) / 1000,
+		    		timeLeft: this.time_total - (Date.now()) / 1000,
 		    		executed: false,
 		    	}
 		    },
@@ -415,6 +417,7 @@
 					[this.votingEscrow._address, this.votingEscrow.methods.locked__end(contract.default_account).encodeABI()],
 					[this.gaugeController._address, this.gaugeController.methods.vote_user_power(contract.default_account).encodeABI()],
 					[this.votingEscrow._address, this.votingEscrow.methods.totalSupply().encodeABI()],
+					[this.gaugeController._address, this.gaugeController.methods.time_total().encodeABI()],
 				]
 				let aggcalls = await contract.multicall.methods.aggregate(calls).call()
 				let decoded = aggcalls[1].map(hex => web3.eth.abi.decodeParameter('uint256', hex))
@@ -423,6 +426,8 @@
 				this.power_used = +decoded[2]
 				this.next_time = ((Date.now() / 1000) + WEEK) / WEEK * WEEK
 				this.totalveCRV = +decoded[3]
+
+				this.time_total = +decoded[4]
 
 				this.getVotes()
 
@@ -474,7 +479,7 @@
 
 				let QUERY = `
 					{
-					  gaugeVotes(where: { time_gt: 1598486400 }, orderBy: time, orderDirection: desc) {
+					  gaugeVotes(where: { time_gt: ${this.time_total - 7 * 86400} }, orderBy: time, orderDirection: desc) {
 					    id
 					    time
 					    user
@@ -495,7 +500,7 @@
 					QUERY = `
 
 						{
-						  gaugeVotes(where: { time_gt: 1598486400 }, orderBy: time, orderDirection: desc) {
+						  gaugeVotes(where: { time_gt: ${this.time_total - 7 * 86400} }, orderBy: time, orderDirection: desc) {
 						    id
 						    time
 						    user

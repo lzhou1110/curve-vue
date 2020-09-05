@@ -61,6 +61,8 @@
 
 		<component :is='voteComponent' class='votecomponent' @showRootModal='emitShowRootModal' @makeCall='makeCall'></component>
 
+		<gas-price></gas-price>
+
 	</div>
 </template>
 
@@ -75,6 +77,9 @@
 	import { helpers as voteHelpers, OWNERSHIP_APP_ADDRESS, PARAMETER_APP_ADDRESS, OWNERSHIP_AGENT, PARAMETER_AGENT } from '../voteStore'
 
 	import * as radspec from 'radspec'
+
+	import * as gasPriceStore from '../../common/gasPriceStore'
+    import GasPrice from '../../common/GasPrice.vue'
 
 	const radspecFormat = {
 		userHelpers: {
@@ -124,6 +129,7 @@
 			PoolProxyVote,
 			RegistryVote,
 			VestingVote,
+			GasPrice,
 		},
 
 		mixins: [RootModalMixin],
@@ -176,6 +182,12 @@
 				if(this.type == 6) return 'VestingVote'
 				return 'PoolVote'
 			},
+			gasPrice() {
+                return gasPriceStore.state.gasPrice
+            },
+            gasPriceWei() {
+                return gasPriceStore.state.gasPriceWei
+            },
 		},
 
 		methods: {
@@ -239,7 +251,6 @@
 				let call = web3.eth.abi.encodeFunctionCall(abi, params)
 				console.log(call, "CALL")
 
-
 				let agent_abi = daoabis.agent_abi.find(abi => abi.name == 'execute')
 				let agentcall = web3.eth.abi.encodeFunctionCall(agent_abi, [contractAddress, 0, call])
 
@@ -247,10 +258,21 @@
 				agent = agent.toLowerCase()
 				voteApp = voteApp.toLowerCase()
 
+
 				console.log(agent, "THE AGENT")
 				console.log(contractAddress, call, "CONTRACT ADDRESS CALL DATA")
+				console.log(agentcall, "THE AGENT CALL")
 
-				let calldata = voteHelpers.encodeCallsScript([{ to: agent, data: agentcall}])
+				let encodeData = [{ to: agent, data: agentcall}]
+				if(method == 'commit_smart_wallet_checker') {
+					let applyabi = daoabis[abiname+'_abi'].find(abi => abi.name == 'apply_smart_wallet_checker')
+					let applycall = web3.eth.abi.encodeFunctionCall(applyabi, [])
+					let applyagentcall = web3.eth.abi.encodeFunctionCall(agent_abi, [contractAddress, 0, applycall])
+					encodeData.push({ to: agent, data: applyagentcall })
+				}
+
+				let calldata = voteHelpers.encodeCallsScript(encodeData)
+
 
 				let intent
 				try {
@@ -272,7 +294,7 @@
 					},
 				}, radspecFormat)
 
-				this.description = desc
+				this.description = ''
 				this.showRootModal = true
 
 				state.proposeLoading = null

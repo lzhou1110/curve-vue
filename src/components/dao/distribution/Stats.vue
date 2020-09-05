@@ -246,7 +246,7 @@
 					    },
 					    tooltip: {
 					    	pointFormatter() {
-					    		let value = helpers.formatNumber(this.y)
+					    		let value = this.y
 
 					    		return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${value}%</b><br/>`
 					    	},

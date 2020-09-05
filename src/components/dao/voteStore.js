@@ -213,6 +213,28 @@ export async function getAllVotes() {
 
 	console.log(votes, lastCreated, "VOTES LAST CREATED")
 
+	votes = votes.filter(vote => ![7,8].includes(vote.voteCountSeq))
+
+	votes.find(vote => vote.voteCountSeq == 9).metadata = 'Assign burn role of Emergency DAO tokens to Curve DAO'
+
+	for(let vote of votes) {
+
+		if(vote.metadata.startsWith('ipfs:')) {
+			let hash = vote.metadata.slice(5)
+			if(hash.startsWith('Qm')) {
+				try {
+					let getText = await fetch('https://gateway.pinata.cloud/ipfs/' + hash)
+					let ipfsText = await getText.json()
+					ipfsText = ipfsText.text
+					vote.metadata = ipfsText
+				}
+				catch(err) {
+					console.error(err)
+				}
+			}
+		}
+	}
+
 	state.votes = decorateVotes(votes)
 
 	lastCreated = groupBy(lastCreated.sort((a,b) => a.startDate - b.startDate), 'appAddress')
@@ -354,6 +376,10 @@ export async function getVote(app, voteId) {
 				console.error(err)
 			}
 		}
+	}
+
+	if(vote.voteCountSeq == 9) {
+		vote.metadata = 'Assign burn role of Emergency DAO tokens to Curve DAO'
 	}
 
 

@@ -2,6 +2,8 @@ import { notify, notifyHandler, notifyNotification } from '../../../init'
 
 import { state, getVotingAppName, getSupportQuorum } from '../voteStore'
 
+import * as gasPriceStore from '../../common/gasPriceStore'
+
 export default {
 
 	data: () => ({
@@ -34,12 +36,17 @@ export default {
     	executeVote() {
     		return state.executeVote
     	},
-
+    	gasPrice() {
+            return gasPriceStore.state.gasPrice
+        },
+        gasPriceWei() {
+            return gasPriceStore.state.gasPriceWei
+        },
 	},
 
 	methods: {
 		async createVote() {
-			let data = this.transactionPath.transactions[0]
+			let data = {...this.transactionPath.transactions[0], gasPrice: this.gasPriceWei}
 
 
 			try {

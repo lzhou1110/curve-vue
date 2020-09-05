@@ -52,7 +52,7 @@
           <router-link to="/audits">Audits</router-link>
           <a href="https://curve.fi/events">Events</a>
           <a href="https://curve.fi/contracts">Contracts</a>
-          <a href="https://curve.fi/bugbounty">Bug</a>
+          <a href="https://curve.fi/bugbounty">Bug Bounty</a>
           <a href="https://curve.fi/rootfaq">FAQ</a>
           <a href="https://curve.fi/integrations">Integrations</a>
           <a href="https://curve.fi/donate">Donate</a>

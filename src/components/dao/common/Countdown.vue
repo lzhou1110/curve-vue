@@ -27,7 +27,21 @@
 					this.startTimer()
 				},
 				immediate: true,
-			}
+			},
+			timeLeft: {
+				handler(val) {
+					this.startTimer()
+				},
+				immediate: true,
+			},
+			vote: {
+				handler(val) {
+					this.timeLeft = val.timeLeft
+					this.startTimer()
+				},
+				immediate: true,
+				deep: true,
+			},
 		},
 
 		mounted() {

@@ -442,7 +442,7 @@
 
 				let agent = OWNERSHIP_AGENT
 				let votingApp = OWNERSHIP_APP_ADDRESS
-				if(parameter_actions.includes(this.callMethod)) {
+				if(parameter_actions.includes(method)) {
 					agent = PARAMETER_AGENT
 					votingApp = PARAMETER_APP_ADDRESS
 				}

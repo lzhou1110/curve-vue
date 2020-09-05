@@ -399,6 +399,8 @@
 
 				CRVLockedPercentage: null,
 
+				votingEscrows: [],
+
 			}
 
 		},
@@ -600,7 +602,7 @@
 					this.increaseLock = new Date(Date.now() + 604800 * 1000)
 				}
 				if(Date.parse(this.increaseLock) > Date.now() + 126144000 * 1000) {
-					this.increaseLock = new Date()
+					this.increaseLock = new Date(this.lockTime * 1000)
 				}
 				this.crvBalance = BN(decoded[2])
 				this.deposit = this.crvBalance.div(1e18).toFixed(0,1)
@@ -650,6 +652,7 @@
 
 
 				let results = await this.wrapper.performQuery(QUERY)
+				this.results = results.data.votingEscrows
 				//console.log(results, "THE RESULTS")
 				let events = results.data.votingEscrows
 				let CRVstats = await fetch(`https://pushservice.curve.fi/crv/circulating_supply`)
@@ -991,7 +994,16 @@
 			},
 
 			newVotingPower() {
-				return veStore.newVotingPower().toFixed(2,0)
+				let startTime = Date.now() / 1000
+				if(this.votingEscrows.length) {
+					startTime = +this.votingEscrows[0].timestamp
+				}
+				let endTime = this.increaseLock / 1000
+
+				let CRVBalance = +this.myLockedCRV + (+this.deposit * 1e18)
+
+				let veCRV = Math.abs(CRVBalance * (endTime - startTime) / (86400 * 365) / 4)
+				return (veCRV / 1e18).toFixed(2)
 			},
 
 			getEventType(event) {

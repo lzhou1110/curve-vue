@@ -46,6 +46,7 @@
 				<legend>
 					Vote info
 				</legend>
+				{{ vote.script }}
 				<div v-show='vote && vote.id' class='voteinfo'>
 					<div class='title'>
 						<div>	
@@ -159,7 +160,7 @@
 									<div>
 										For <img class='icon' :src="publicPath + 'vote-yea-solid.svg'">
 									</div>
-									<button @click='showChart(1)'>Show chart</button>
+									<button class='simplebutton' @click='showChart(1)'>Show chart</button>
 								</div>
 								<table class='tui-table'>
 									<thead>
@@ -189,7 +190,7 @@
 									<div>
 										Against <img class='icon' :src="publicPath + 'vote-nay-solid.svg'">
 									</div> 
-									<button @click='showChart(0)'>Show chart</button>
+									<button class='simplebutton' @click='showChart(0)'>Show chart</button>
 								</div>
 								<table class='tui-table'>
 									<thead>
@@ -231,6 +232,7 @@
 								<button @click='voteno'> No <span class='loading line' v-show='loadingno'></span></button>
 							</div>
 						</div>
+						<gas-price v-show='canVote() && (vote.mycasts && !vote.mycasts.length || !vote.mycasts)'></gas-price>
 						<div class='myvote info-message gentle-message' v-show='hadNoBalanceAt'>
 							You didn't have enough veCRV balance({{ balanceOfAtFormat}} / {{ MIN_BALANCE }} required) when vote was created on block snapshot 
 							<a :href="'https://etherscan.io/block/' + vote.snapshotBlock"> <b> {{ vote.snapshotBlock }} </b> </a>
@@ -322,11 +324,15 @@
 
 	import VoteCastsChart from './VoteCastsChart'
 
+	import * as gasPriceStore from '../../common/gasPriceStore'
+    import GasPrice from '../../common/GasPrice.vue'
+
 	export default {
 		components: {
 			Countdown,
 			EnactVote,
 			VoteCastsChart,
+			GasPrice,
 		},
 
 		mixins: [RootModalMixin],

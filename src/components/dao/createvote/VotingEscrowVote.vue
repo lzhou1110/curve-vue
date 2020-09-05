@@ -29,7 +29,7 @@
 					<div>
 						<fieldset>
 							<legend>
-								commit_smart_wallet_checker
+								commit_smart_wallet_checker & apply
 								<span class='tooltip'> [?]
 									<span class='tooltiptext long'>
 										Commit smart wallet checker
