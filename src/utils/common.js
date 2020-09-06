@@ -1,3 +1,5 @@
+
+
 import Vue from "vue";
 import BigNumber from 'bignumber.js'
 window.BN = BigNumber
@@ -309,13 +311,16 @@ export async function multiInitState(calls, contract, initContracts = false) {
     let web3 = currentContract.web3 || new Web3(infura_url)
     let multicall = new web3.eth.Contract(multicall_abi, multicall_address)
     var default_account = currentContract.default_account;
+    console.log(calls, "THE CALLS")
     let aggcalls;
     try {
         aggcalls = await multicall.methods.aggregate(calls).call()
     }
     catch(err) {
         console.error(err)
+        console.log(calls.slice(1), "THE CALLS HERE")
         aggcalls = await multicall.methods.aggregate(calls.slice(1)).call()
+        console.log("FAILS HERE")
         aggcalls[1] = [web3.eth.abi.encodeParameter('uint256', cBN(1e18).toFixed(0)), ...aggcalls[1]] 
     }
     var block = +aggcalls[0]
@@ -346,7 +351,7 @@ export async function multiInitState(calls, contract, initContracts = false) {
         contract.curveStakedBalance = decoded[0]
         decoded = decoded.slice(1)
     }
-    if(initContracts && ['tbtc', 'ren', 'sbtc', 'hbtc'].includes(contract.currentContract)) {
+    if(initContracts && ['tbtc', 'ren', 'sbtc', 'hbtc', 'pool3'].includes(contract.currentContract)) {
         contract.initial_A = +decoded[0];
         contract.initial_A_time = +decoded[1];
         contract.future_A_time = +decoded[2];
