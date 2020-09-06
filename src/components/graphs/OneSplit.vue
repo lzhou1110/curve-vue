@@ -143,8 +143,8 @@
                             <input id='sbtcpool' type='checkbox' value='sbtc' v-model='pools'/>
                             <label for='sbtcpool'>sBTC</label>
 
-                            <input id='hbtcpool' type='checkbox' value='hbtc' v-model='pools'/>
-                            <label for='hbtcpool'>HBTC</label>
+                            <!-- <input id='hbtcpool' type='checkbox' value='hbtc' v-model='pools'/>
+                            <label for='hbtcpool'>HBTC</label> -->
                         </div>
                         <div v-show='fromInput > 0' id='max_slippage'><span>Max slippage:</span> 
                             <input id="slippage05" type="radio" name="slippage" value='0.005' @click='maxSlippage = 0.5; customSlippageDisabled = true'>

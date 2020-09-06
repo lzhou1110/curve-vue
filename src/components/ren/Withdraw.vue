@@ -48,7 +48,7 @@
                         Minimum withdraw amount in BTC is {{ minOrderSize }}
                     </div>
                 </li>
-                <li v-show = "!['susd','susdv2','tbtc','ren'].includes(currentPool)">
+                <li v-show = "!['susd','susdv2', 'sbtc', 'tbtc','ren'].includes(currentPool)">
                     <input id="withdrawc" type="checkbox" name="withdrawc" v-model='withdrawc'>
                     <label for="withdrawc">Withdraw wrapped</label>
                 </li>
@@ -153,6 +153,17 @@
                 Claim {{(pendingSNXRewards / 1e18).toFixed(2)}} SNX
                 <span v-show="currentPool == 'sbtc'"> + {{(pendingRENRewards / 1e18).toFixed(2)}} REN</span>
             </button>
+            <button id='claim-snx-gauge'
+                @click='claim_SNX_Gauge()'
+                v-show="+claimableSNXGauge > 0"
+            >
+                Claim {{ claimableSNXGaugeFormat }} {{ currentPool == 'susdv2' ? 'SNX' : 'BPT'}}
+            </button>
+            <button id='claim-CRV'
+                @click='claim_CRV()'
+                v-show='claimableCRV > 0'>
+                Claim {{ (claimableCRV / 1e18).toFixed(2) }} CRV       
+            </button>
             <button id='unstake-snx'
                 @click='handle_remove_liquidity(true, true)'
                 v-show="['susdv2', 'sbtc'].includes(currentPool) && staked_balance > 0"
@@ -238,6 +249,7 @@
             pendingSNXRewards: 0,
             pendingRENRewards: 0,
             balancerPool: null,
+            oldRewardsBalance: null,
             show_loading: false,
             waitingMessage: '',
             showWithdrawSlippage: false,
@@ -252,6 +264,13 @@
             loadingAction: false,
             warninglow: false,
     		slippagePromise: helpers.makeCancelable(Promise.resolve()),
+
+            claimableCRV: null,
+
+            claimableSNX: null,
+            claimedSNX: null,
+
+            minter: null,
     	}),
         created() {
             this.$watch(()=>currentContract.default_account, (val, oldval) => {
@@ -336,6 +355,15 @@
             checkAddress() {
                 return validate(this.btcAddress) !== false
             },
+            claimableSNXGauge() {
+                return +this.claimableSNX - +this.claimedSNX
+            },
+            claimableSNXGaugeFormat() {
+                return this.toFixed(this.claimableSNXGauge / 1e18)
+            },
+            oldRewardsBalanceFormat() {
+                return this.oldRewardsBalance && this.toFixed(this.oldRewardsBalance / 1e18)
+            },
         },
         async mounted() {
             this.$emit('loaded')
@@ -352,6 +380,29 @@
                 if(this.currentPool == 'sbtc') this.showstaked = true
             	currentContract.showSlippage = false;
         		currentContract.slippage = 0;
+
+                let gaugeCalls = [
+                    [currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimable_tokens(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()],
+                ]
+                if(['susdv2', 'sbtc'].includes(this.currentPool)) {
+                    gaugeCalls.push(...[
+                        [currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimable_reward(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()],
+                        [currentContract.gaugeContract._address, currentContract.gaugeContract.methods.claimed_rewards_for(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()],
+                    ])
+                }
+                console.log(gaugeCalls, "GAUGE CALLS")
+                let aggGaugeCalls = await currentContract.multicall.methods.aggregate(gaugeCalls).call()
+                let decodedGaugeCalls = aggGaugeCalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
+                console.log(decodedGaugeCalls, "DECODED GAUGE CALLS")
+                this.claimableCRV = decodedGaugeCalls[0]
+                if(['susdv2', 'sbtc', 'iearn', 'y'].includes(this.currentPool)) {
+                    this.oldRewardsBalance = +(await currentContract.curveRewards.methods.balanceOf(currentContract.default_account || '0x0000000000000000000000000000000000000000').call())
+                    console.log(this.oldRewardsBalance, "OLD REWARDS BALANCE", currentContract.curveRewards._address)
+                }
+                if(['susdv2', 'sbtc'].includes(this.currentPool)) {
+                    this.claimableSNX = decodedGaugeCalls[1]
+                    this.claimedSNX = decodedGaugeCalls[2]
+                }
 
                 let curveRewards = currentContract.curveRewards
                 if(['sbtc'].includes(this.currentPool)) {
@@ -444,7 +495,7 @@
 			    for (let i = 0; i < currentContract.N_COINS; i++) {
 			    	calls.push([currentContract.swap._address ,currentContract.swap.methods.balances(i).encodeABI()])
 			    }
-		    	if(['susdv2', 'sbtc'].includes(this.currentPool)) calls.push([currentContract.curveRewards._address, currentContract.curveRewards.methods.balanceOf(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()])
+		    	if(['susdv2', 'sbtc'].includes(this.currentPool)) calls.push([currentContract.gaugeContract._address, currentContract.gaugeContract.methods.balanceOf(currentContract.default_account || '0x0000000000000000000000000000000000000000').encodeABI()])
 				calls.push([currentContract.swap_token._address ,currentContract.swap_token.methods.totalSupply().encodeABI()])
 				let aggcalls = await currentContract.multicall.methods.aggregate(calls).call()
 				let decoded = aggcalls[1].map(hex => currentContract.web3.eth.abi.decodeParameter('uint256', hex))
@@ -576,6 +627,56 @@
                 }
 
             },
+            async claim_SNX_Gauge() {
+                let gas = await currentContract.gaugeContract.methods.claim_rewards(currentContract.default_account).estimateGas()
+                // if(['susdv2', 'sbtc'].includes(this.gauge.name))
+                //  gas = 1000000
+
+                var { dismiss } = notifyNotification(`Please confirm claiming ${this.currentPool == 'susdv2' ? 'SNX' : 'BPT'}`)
+
+                await currentContract.gaugeContract.methods.claim_rewards(currentContract.default_account).send({
+                    from: currentContract.default_account,
+                    gasPrice: this.gasPriceWei,async claim_CRV() {
+                let gas = await currentContract.minter.methods.mint(currentContract.gaugeContract._address).estimateGas()
+                if(['susdv2', 'sbtc'].includes(currentContract.currentContract))
+                    gas = 1000000
+
+                var { dismiss } = notifyNotification(`Please confirm claiming CRV from ${currentContract.currentContract} gauge`)
+
+                await currentContract.minter.methods.mint(currentContract.gaugeContract._address).send({
+                    from: currentContract.default_account,
+                    gasPrice: this.gasPriceWei,
+                    gas: gas * 1.5 | 0,
+                })
+                .once('transactionHash', hash => {
+                    dismiss()
+                    notifyHandler(hash)
+                })
+            },
+                    gas: 500000,
+                })
+                .once('transactionHash', hash => {
+                    dismiss()
+                    notifyHandler(hash)
+                })
+            },
+            async claim_CRV() {
+                let gas = await currentContract.minter.methods.mint(currentContract.gaugeContract._address).estimateGas()
+                if(['susdv2', 'sbtc'].includes(currentContract.currentContract))
+                    gas = 1000000
+
+                var { dismiss } = notifyNotification(`Please confirm claiming CRV from ${currentContract.currentContract} gauge`)
+
+                await currentContract.minter.methods.mint(currentContract.gaugeContract._address).send({
+                    from: currentContract.default_account,
+                    gasPrice: this.gasPriceWei,
+                    gas: gas * 1.5 | 0,
+                })
+                .once('transactionHash', hash => {
+                    dismiss()
+                    notifyHandler(hash)
+                })
+            },
             async unstake(amount, exit = false, unstake_only = false) {
                 if(unstake_only)
                     this.waitingMessage = `
@@ -583,7 +684,7 @@
                     `
                 else 
                     this.waitingMessage = `
-                    Need to unstake ${this.toFixed(amount.div(BN(1e18)))} tokens from Mintr for withdrawal.
+                    Unstaking ${this.toFixed(amount.div(BN(1e18)))} tokens for withdrawal.
                     <br>
                     A bit more tokens are needed to unstake to ensure that withdrawal is successful.
                     You'll see them in your unstaked balance afterwards.
@@ -593,11 +694,11 @@
 
                 try {
                     await new Promise((resolve, reject) => {
-                        currentContract.curveRewards.methods.withdraw(amount.toFixed(0,1))
+                        currentContract.gaugeContract.methods.withdraw(amount.toFixed(0,1))
                             .send({
                                 from: currentContract.default_account,
                                 gasPrice: this.gasPriceWei,
-                                gas: 125000,
+                                gas: 1000000,
                             })
                             .once('transactionHash', hash => {
                                 dismiss()
@@ -615,7 +716,7 @@
                             })
                     })
                     if(exit) {
-                        this.claim_SNX()
+                        this.claim_CRV()
                     }
                 }
                 catch(err) {
