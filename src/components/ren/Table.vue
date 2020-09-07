@@ -118,6 +118,12 @@
 							</div>
 						</div>
 						<div class='confirm-wrapper info-message'>
+							<p v-show='fireUser === null && incognito'>
+								<input  id='confirmCheckboxIncognito' type='checkbox' v-model='confirmCheckboxIncognito'>
+								<label for='confirmCheckboxIncognito'>
+									Confirm: I am on incognito mode and risk losing funds if not using <button @click='useFirestore'>permanent storage</button>
+								</label>
+							</p>
 							<input id='confirmCheckbox' type='checkbox' v-model='confirmCheckbox'>
 							<label for='confirmCheckbox'>
 								Confirm: I have access to this ETH address
@@ -465,7 +471,26 @@
         	recovertx: null,
         	newtxhash: '',
         	newvout: '',
+
+        	incognito: false,
+
+        	confirmCheckboxIncognito: false,
 		}),
+
+		async mounted() {
+			if ('storage' in navigator && 'estimate' in navigator.storage) {
+	      		const {usage, quota} = await navigator.storage.estimate();
+
+		      	if(quota < 120000000){
+					this.incognito = true;
+				} 
+			}
+			  
+		  	var db = indexedDB.open("test");
+			db.onerror = function(){
+				this.incognito = true
+			};
+		},
 
 		computed: {
 			transactions() {
@@ -546,7 +571,7 @@
 			},
 
 			proceedTx() {
-				if(this.confirmCheckbox)
+				if((this.confirmCheckbox && !this.incognito) || (this.confirmCheckbox && this.incognito && this.confirmCheckboxIncognito))
 					this.showModal1 =false
 				this.confirmCheckbox = false
 			},

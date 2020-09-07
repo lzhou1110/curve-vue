@@ -82,7 +82,7 @@ let wallets = [
     walletName: "ledger",
     rpcUrl:
       "https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b",
-    //LedgerTransport: TransportU2F,
+    LedgerTransport: TransportU2F,
   },
   { walletName: "dapper" },
   { walletName: "coinbase" },
@@ -117,6 +117,7 @@ let wallets = [
   { walletName: "meetone" },
   { walletName: "mykey", rpcUrl: 'https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b' },
   { walletName: "huobiwallet", rpcUrl: 'https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b' },
+  { walletName: "hyperpay" },
 ]
 
 let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
