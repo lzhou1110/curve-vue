@@ -529,7 +529,7 @@ export function getSupportQuorum(appName) {
 		}
 	if(appName.toLowerCase().includes('parameter'))
 		return {
-			support: 70, quorum: 15,
+			support: 60, quorum: 15,
 		}
 }
 

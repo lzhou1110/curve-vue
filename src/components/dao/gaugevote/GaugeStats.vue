@@ -2,13 +2,13 @@
 	<div>
 		
 		<div :class="{'window white': !included}">
-			<proposed-gauge-weight :future_weights='future_weights'></proposed-gauge-weight>
+			<proposed-gauge-weight :future_weights='future_weights' :next_time='next_time'></proposed-gauge-weight>
 		</div>
 		<div :class="{'window white': !included, 'futureCRVAPYs': true}">
 			<fieldset class='poolsdialog'>
 				<legend>
 					Proposed future <img class='icon small' :src="publicPath + 'logo.png'"> CRV APYs
-					<br> taking effect on {{ formatDate(nextTime).split(' ')[0] }} UTC
+					<br> taking effect on {{ formatDate(next_time).split(' ')[0] }} UTC
 				</legend>
 				<table class='tui-table'>
 					<thead>
@@ -111,6 +111,10 @@
 			included: {
 				type: Boolean,
 				default: false,
+			},
+			next_time: {
+				type: Number,
+				default: 0,
 			},
 		},
 
@@ -254,9 +258,6 @@
 		computed: {
 			publicPath() {
                 return process.env.BASE_URL
-            },
-            nextTime() {
-            	return 1599091200
             },
 		},
 

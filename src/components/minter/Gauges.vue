@@ -3,7 +3,7 @@
 		<div class='window white' v-if='showChart'>
 			<highcharts :options="piechartdata" ref='piecharts'></highcharts>
 		</div>
-		<div class='window white' v-if='showChart'>
+		<div class='window white'>
 			<highcharts :options="piegaugechartdata" ref='piegaugecharts'></highcharts>
 		</div>
 		<div class='window white'>
@@ -259,6 +259,21 @@
 					return +a + balance
 				}, 0)
 
+				let gaugeSum = Object.values(gaugeStore.state.pools).reduce((a,b) => +a + +b.gauge_relative_weight, 0)
+				let piegauges = Object.values(gaugeStore.state.pools).map(v => ({ name: v.name, y: v.gauge_relative_weight / gaugeSum}))
+
+				let highest = piegauges.map(data=>data.y).indexOf(Math.max(...piegauges.map(data => data.y)))
+				piegauges[highest].sliced = true;
+				piegauges[highest].selected = true;
+
+				this.piegaugechart.addSeries({
+					name: 'Gauge relative weights',
+					data: piegauges,
+				})
+
+
+				this.piegaugechart.hideLoading()
+				
 				if(total == 0) {
 					this.showChart = false
 					return;
@@ -283,20 +298,6 @@
 
 				this.piechart.hideLoading()
 
-				let gaugeSum = Object.values(gaugeStore.state.pools).reduce((a,b) => +a + +b.gauge_relative_weight, 0)
-				let piegauges = Object.values(gaugeStore.state.pools).map(v => ({ name: v.name, y: v.gauge_relative_weight / gaugeSum}))
-
-				let highest = piegauges.map(data=>data.y).indexOf(Math.max(...piegauges.map(data => data.y)))
-				piegauges[highest].sliced = true;
-				piegauges[highest].selected = true;
-
-				this.piegaugechart.addSeries({
-					name: 'Gauge relative weights',
-					data: piegauges,
-				})
-
-
-				this.piegaugechart.hideLoading()
 
 			},
 

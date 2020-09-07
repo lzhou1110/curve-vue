@@ -47,6 +47,10 @@
 				type: Boolean,
 				default: false,
 			},
+			next_time: {
+				type: Number,
+				default: 0,
+			},
 		},
 
 		data: () => ({
@@ -67,7 +71,6 @@
 			weight: 1,
 			balance: null,
 			lock_end: null,
-			next_time: null,
 			last_user_vote: null,
 			old_slope: null,
 			power_used: null,
@@ -122,15 +125,19 @@
 				console.log("FUTURE WEIGHTS")
 				if(val.length)
 					this.mounted()
-			}
+			},
+			next_time(val) {
+				this.piechart.update({
+					title: {
+						text: `Proposed future gauge weight changes <br> taking effect on ${this.formatDate(this.next_time).split(' ')[0]} UTC`,
+					},
+				}, true, false, false)
+			},
 		},
 
 		computed: {
 			publicPath() {
                 return process.env.BASE_URL
-            },
-            nextTime() {
-            	return 1599091200
             },
 		},
 
@@ -158,11 +165,11 @@
 				})
 
 				if(!this.ismodal) {
-					this.piechart.update({
-						title: {
-							text: `Proposed future gauge weight changes <br> taking effect on ${this.formatDate(this.nextTime).split(' ')[0]} UTC`,
-						},
-					})
+					// this.piechart.update({
+					// 	title: {
+					// 		text: `Proposed future gauge weight changes <br> taking effect on ${this.formatDate(this.next_time).split(' ')[0]} UTC`,
+					// 	},
+					// })
 				}
 				else {
 					this.piechart.update({

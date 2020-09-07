@@ -46,7 +46,6 @@
 				<legend>
 					Vote info
 				</legend>
-				{{ vote.script }}
 				<div v-show='vote && vote.id' class='voteinfo'>
 					<div class='title'>
 						<div>	
@@ -71,9 +70,25 @@
 										{{ formattedMetadata }}
 									</p>
 									<div v-show = 'formattedMetadata && vote.metadata.length > formattedMetadata.length'>
-										<p v-show='showMore'>
+										<div v-show='showMore' class='showMore'>
 											{{ vote.metadata }}
-										</p>
+											<div v-show='vote.voteCountSeq == 12'>
+												As gas prices become increasingly problematic for users to interact, this non lending pool aims to create a highly liquid pool which is less expensive to deposit and swap with.
+												<br>
+												Whilst its design is similar to the current sUSD pool, not having sUSD in this pool should help ease pressure off sUSD which has struggled to keep up with demand.
+
+												<p>This pool also has new improvements:</p>
+												<blockquote>
+													<ul>
+													<li>A new rampable A parameter (like on BTC pools) which can adjust liquidity density without causing losses to the virtual price (and to LPs)</li>
+													<li>Gas optimised</li>
+													<li>Will be used as a base pool for meta pools (which would essentially allow some pools to seemingly trade against underlying “base” pools without diluting liquidity)</li>
+													<li>This pool is capable of handling transfer fees</li>
+													<li>By only having the three most liquid stable coins in crypto, this pool should grow to become the most liquid and offer the best prices</li>
+													</ul>
+												</blockquote>
+											</div>
+										</div>
 										<button class='simplebutton showmore' @click='showMore = !showMore'>{{ showMore ? 'Hide' : 'Show more' }}</button>
 									</div>
 								</div>
@@ -99,6 +114,11 @@
 							</div>
 							<div v-show='vote.voteCountSeq == 5' class='discusson'>
 								<a href='https://gov.curve.fi/t/cip-5-add-hbtc-wbtc-pool-and-a-liquidity-gauge-for-that-pool/162' rel='noopener noreferrer'>
+									Discuss on gov.curve.fi
+								</a>
+							</div>
+							<div v-show='vote.voteCountSeq == 12' class='discusson'>
+								<a href='https://gov.curve.fi/t/cip-13-add-a-new-tri-pool-and-a-liquidity-gauge-for-it-dai-usdc-usdt/629' rel='noopener noreferrer'>
 									Discuss on gov.curve.fi
 								</a>
 							</div>
@@ -727,6 +747,16 @@
 		justify-content: space-between;
 	}
 	.discusson {
+		margin-top: 1em;
+	}
+	blockquote ul li {
+		list-style: initial;
+		margin-top: 0.4em;
+	}
+	.showMore {
+		margin-top: 1em;
+	}
+	.showMore + button {
 		margin-top: 1em;
 	}
 </style>

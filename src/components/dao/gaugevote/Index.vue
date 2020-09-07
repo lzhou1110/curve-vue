@@ -39,7 +39,7 @@
 			<p class='info-message gentle-message' v-show='tooMuchPower'>
 				You alrady used too much power for this gauge
 			</p>
-			<gauge-stats class='gaugeStats' :included='true'></gauge-stats>
+			<gauge-stats class='gaugeStats' :included='true' :next_time='time_total'></gauge-stats>
 			<p class='info-message gentle-message' v-show='+balance > 0'>
 				You're voting with {{ balanceFormat }} veCRV
 			</p>

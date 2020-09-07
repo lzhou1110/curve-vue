@@ -222,7 +222,6 @@ export async function getState() {
 		state.mypools.find(v => v.name == pool).working_supply = _working_supply
 		state.mypools.find(v => v.name == pool).original_supply = totalSupplies[i]
 		state.mypools.find(v => v.name == pool).currentWorkingBalance = workingBalances[i]
-		//console.log(pool, gaugeRates[i], w[1], 31536000, _working_supply, "RATE")
 		let rate = (gaugeRates[i] * w[1] * 31536000 / _working_supply * 0.4) / virtual_price
 		let apy = rate * CRVprice * 100
 		if(isNaN(apy))

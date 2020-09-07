@@ -86,7 +86,7 @@
 									<label for='param1'>future_time:</label>
 									<input id='param1' type='text' v-model='future_time'>
 								</div>
-								<button @click="propose('rafmp_A', future_A, future_time)" class='simplebutton'>
+								<button @click="propose('ramp_A', future_A, future_time)" class='simplebutton'>
 									Submit
 									<span class='loading line' v-show="proposeLoading == 'ramp_A'"></span>
 								</button>

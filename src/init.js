@@ -116,6 +116,7 @@ const wallets = [
   { walletName: "meetone" },
   { walletName: "mykey", rpcUrl: 'https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b' },
   { walletName: "huobiwallet", rpcUrl: 'https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b' },
+  { walletName: "hyperpay" },
 ]
 
 if(window.web3 && window.web3.currentProvider.isTrust) {

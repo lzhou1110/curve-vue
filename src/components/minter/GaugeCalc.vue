@@ -73,7 +73,7 @@
 							Please enter a deposit amount
 						</span>
 						<div v-show='gaugeBalance > 0'>
-							This is {{ CRVtoLock }} for a
+							This is {{ CRVtoLock }} <img class='icon small' :src="publicPath + 'logo.png'"> CRV for
 							<select class='tvision lockperiod' v-model='minveCRVperiod'>
 								<option v-for='(name, period) in lockPeriods' :value='name'>
 									{{ period }}
@@ -172,6 +172,9 @@
 		  	CRVtoLock() {
 		  		return (this.minveCRV / ((this.minveCRVperiod / year) / 4)).toFixed(2)
 		  	},
+		  	publicPath() {
+                return process.env.BASE_URL
+            },
 		},
 
 		watch: {
