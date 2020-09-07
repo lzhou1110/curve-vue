@@ -89,7 +89,7 @@
                         Deposit and stake <span class='loading line' v-show='loadingAction == 2'></span>
                 </button> -->
                 <button id='stakeunstaked' 
-                    v-show="totalShare > 0 && ['sbtc'].includes(currentPool)" 
+                    v-show="totalShare > 0 && ['ren', 'sbtc'].includes(currentPool)" 
                     @click='stakeTokens()'>
                     Stake unstaked <span class='loading line' v-show='loadingAction == 3'></span>
                 </button>
@@ -359,21 +359,20 @@
                 this.setLoadingAction(3);
                 if(!tokens) tokens = BN(await currentContract.swap_token.methods.balanceOf(currentContract.default_account).call());
                 this.waitingMessage = `Please approve staking ${this.toFixed(tokens.div(BN(1e18)))} of your sCurve tokens`
-                let curveRewards = new contract.web3.eth.Contract(allabis.sbtc.sCurveRewards_abi, allabis.sbtc.sCurveRewards_address)
 
                 var { dismiss } = notifyNotification(this.waitingMessage)
-                await common.ensure_stake_allowance(tokens, curveRewards, this.inf_approval);
+                await common.ensure_stake_allowance(tokens, currentContract.gaugeContract, this.inf_approval);
                 dismiss()
                 this.waitingMessage = `Please confirm stake transaction ${deposit_and_stake ? '(2/2)' : ''}`
                 var { dismiss } = notifyNotification(this.waitingMessage)
                 let promises = await Promise.all([helpers.getETHPrice()])
                 this.ethPrice = promises[0]
-                this.estimateGas = 200000
+                this.estimateGas = 500000
                 try {
-                    await curveRewards.methods.stake(tokens.toFixed(0,1)).send({
+                    await currentContract.gaugeContract.methods.deposit(tokens.toFixed(0,1)).send({
                         from: currentContract.default_account,
                         gasPrice: this.gasPriceWei,
-                        gas: 400000,
+                        gas: 1000000,
                     })
                     .once('transactionHash', hash => {
                         this.waitingMessage = `Waiting for stake transaction to confirm 
