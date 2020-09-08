@@ -57,6 +57,7 @@
 			<button @click='type=4' :class="{'simplebutton': type==4}">PoolProxy</button>
 			<button @click='type=5' :class="{'simplebutton': type==5}">Registry</button>
 			<button @click='type=6' :class="{'simplebutton': type==6}">Vesting</button>
+			<button @click='type=7' :class="{'simplebutton': type==7}">SmartWallet Checker</button>
 		</div>
 
 		<component :is='voteComponent' class='votecomponent' @showRootModal='emitShowRootModal' @makeCall='makeCall'></component>
@@ -111,6 +112,7 @@
 	import PoolProxyVote from '../createvote/PoolProxyVote'
 	import RegistryVote from '../createvote/RegistryVote'
 	import VestingVote from '../createvote/VestingVote'
+	import SmartWalletChecker from '../createvote/SmartWalletChecker'
 
 	let ownership_actions = ['unkill_me', 'commit_transfer_ownership', 'revert_transfer_ownership', 'set_aave_referral', 'donate_admin_fees']
 
@@ -130,6 +132,7 @@
 			RegistryVote,
 			VestingVote,
 			GasPrice,
+			SmartWalletChecker,
 		},
 
 		mixins: [RootModalMixin],
@@ -180,6 +183,7 @@
 				if(this.type == 4) return 'PoolProxyVote'
 				if(this.type == 5) return 'RegistryVote'
 				if(this.type == 6) return 'VestingVote'
+				if(this.type == 7) return 'SmartWalletChecker'
 				return 'PoolVote'
 			},
 			gasPrice() {

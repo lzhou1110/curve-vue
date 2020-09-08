@@ -1860,6 +1860,32 @@ export let minter_abi = [{"name":"Minted","inputs":[{"type":"address","name":"re
 
 export let minter_address = '0xd061D61a4d941c39E5453435B6345Dc261C2fcE0' //'0x6f7A42E1f6C64C992B68815511f4aBFb648AEC6D'
 
+export let smartwallet_checker_abi = [{"inputs":[{"internalType":"address","name":"_dao","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"","type":"address"}],"name":"ApproveWallet","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"","type":"address"}],"name":"RevokeWallet","type":"event"},{"constant":false,"inputs":[],"name":"applySetChecker","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"_wallet","type":"address"}],"name":"approveWallet","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"_wallet","type":"address"}],"name":"check","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"checker","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"_checker","type":"address"}],"name":"commitSetChecker","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"dao","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"future_checker","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"_wallet","type":"address"}],"name":"revokeWallet","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"wallets","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"}]
+
+export let smartwallet_checker_natspec = {
+  "methods": {
+    "commitSetChecker(address)": {
+      "notice": "Commit set smart contract checker `@address(_checker, 'to')`",
+      "signature": "0x943f35a4",
+    },
+    "applySetChecker": {
+      "notice": "Apply commited smart contract checker",
+      "signature": "0x3daa1dde",
+    },
+    "approveWallet": {
+      "notice": "Approve wallet `@address(_wallet, '')` to be able to lock and vote",
+      "signature": "0x0fcb0ae5",
+    },
+    "revokeWallet": {
+      "notice": "Revoke wallet `@address(_wallet, '')` from being able to lock and vote",
+      "signature": "0x808a9d40",
+    },
+  }
+}
+
+export let smartwallet_checker_address = '0xca719728Ef172d0961768581fdF35CB116e0B7a4'
+
+
 export default {
 	poolproxy_abi,
 	poolproxy_address,
@@ -1897,5 +1923,10 @@ export default {
 
   minter_abi,
   minter_address,
+
+  smartwallet_checker_abi,
+  smartwallet_checker_address,
+  smartwallet_checker_natspec,
+
 
 }
