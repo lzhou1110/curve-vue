@@ -462,9 +462,9 @@
 		                		</div>
 	                    	</span>
 	                    </span>
-	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.susd && volumes.susd[0] < 0}">
-	                    	<span v-show='volumes.susd && volumes.susd[0] >= 0'>${{(volumes.susd && volumes.susd[0] | 0) | formatNumber(0)}}</span>
-	                    	<span v-show='!volumes.susd && volumes.susd[0]'>$0</span>
+	                    <span class='volume'>Vol: <span :class="{'loading line': volumes['3pool'] && volumes['3pool'][0] < 0}">
+	                    	<span v-show='volumes["3pool"] && volumes["3pool"][0] >= 0'>${{(volumes["3pool"] && volumes["3pool"][0] | 0) | formatNumber(0)}}</span>
+	                    	<span v-show='!volumes["3pool"] && volumes["3pool"][0]'>$0</span>
                	 		</span></span>
                	 		<span class='balance'>
            	 				<span class='showmobile' v-show='balances["3pool"] > 0'>Balance: ${{(balances["3pool"] && balances["3pool"].toFixed(2)) | formatNumber(0)}} </span>
