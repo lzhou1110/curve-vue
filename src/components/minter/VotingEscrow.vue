@@ -587,14 +587,18 @@
 					[this.votingEscrow._address, this.votingEscrow.methods.balanceOf(getters.default_account()).encodeABI()],
 					[this.votingEscrow._address, this.votingEscrow.methods.locked__end(getters.default_account()).encodeABI()],
 					[this.CRV._address, this.CRV.methods.balanceOf(getters.default_account()).encodeABI()],
+					[this.votingEscrow._address, this.votingEscrow.methods.locked(getters.default_account()).encodeABI()],
 				]
 				//console.log(calls, "THE CALLS")
 				let aggcalls = await contract.multicall.methods.aggregate(calls).call()
-				let decoded = aggcalls[1].map(hex => web3.eth.abi.decodeParameter('uint256', hex))
+				let decoded = aggcalls[1].slice(0, aggcalls[1].length - 1).map(hex => web3.eth.abi.decodeParameter('uint256', hex))
 				this.vecrvBalance = BN(decoded[0])
 				this.lockTime = +decoded[1]
 				this.lockEnd = +decoded[1]
 				this.loaded = true
+				let LockedBalance = web3.eth.abi.decodeParameters(['int128', 'uint256'], aggcalls[1][aggcalls[1].length-1])
+				if(getters.default_account() != '0x0000000000000000000000000000000000000000')
+					this.myLockedCRV = LockedBalance[0]
 				//console.log(this.lockEnd, "LOCK END")
 				this.increaseLock = new Date((this.lockTime + 604800)* 1000)
 				if(this.lockTime == 0) {
@@ -663,7 +667,7 @@
 				this.DAOPower = results.data.lastDAOPower[0].totalPower
 				let lastUnlockTime = results.data.lastUnlockTime[0].unlock_time
 				if(results.data.votingPower)
-					this.myLockedCRV = results.data.votingPower.power
+					//this.myLockedCRV = results.data.votingPower.power
 				if(this.showvelock && this.showchart) {
 					if(events.length) {
 						this.events = events
