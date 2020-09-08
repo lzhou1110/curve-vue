@@ -9621,4 +9621,4 @@ export let minter_ABI = [{"name":"Minted","inputs":[{"type":"address","name":"re
 
 export let minter_address = '0xd061D61a4d941c39E5453435B6345Dc261C2fcE0'
 
-export default {compound, usdt, iearn, y: iearn, busd, susd, susdv2, pax, tbtc, ren, sbtc, hbtc, pool3}
+export default {compound, usdt, iearn, y: iearn, busd, susd, susdv2, pax, tbtc, ren, sbtc, hbtc, '3pool': pool3}

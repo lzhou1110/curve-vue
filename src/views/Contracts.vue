@@ -40,7 +40,7 @@
 		                		<img class='icon' :src="getTokenUrl(i)"> 
 		                		<span class='text'>[{{tokenNames[i].ticker}}] {{tokenNames[i].name}} token address</span>
 		                	</a>
-		                	<a :href = "'https://etherscan.io/address/' + depositZaps[i].deposit" v-show="!['ren', 'sbtc'].includes(allPools[i])">
+		                	<a :href = "'https://etherscan.io/address/' + depositZaps[i].deposit" v-show="!['ren', 'sbtc', 'hbtc', '3pool'].includes(allPools[i])">
 		                		<img class='icon' :src="getTokenUrl(i)"> <span class='text'>deposit address</span>
 		                	</a>
 		                	<a :href= "'https://etherscan.io/address/' + rewardsAddresses[allPools[i]]" v-show="['susdv2', 'sbtc', 'y', 'iearn'].includes(allPools[i])">
@@ -108,7 +108,7 @@
 
 	export default {
 		data: () => ({
-			allPools: ['compound', 'usdt', 'y', 'busd', 'susdv2', 'pax', 'ren', 'sbtc'],
+			allPools: ['compound', 'usdt', 'y', 'busd', 'susdv2', 'pax', 'ren', 'sbtc', 'hbtc', '3pool'],
 			tokenNames: [
 				{ name: 'cCurve', ticker: 'cCrv' },
 				{ name: 'tCurve', ticker: 'tCrv' },
@@ -119,17 +119,19 @@
 				// { name: 'tbtcCurve', ticker: 'tbtcCrv' },
 				{ name: 'renCurve', ticker: 'renCrv' },
 				{ name: 'sbtcCurve', ticker: 'sbtcCrv' },
+				{ name: 'hbtcCurve', ticker: 'hbtcCrv' },
+				{ name: '3poolCurve', ticker: '3poolCrv' },
 			],
 			showContracts: 1,
 		}),
 		computed: {
 			contractAddresses() {
-				return Object.keys(allabis).filter(pool => !['y', 'susd', 'tbtc', 'hbtc'].includes(pool)).map(pool => 
+				return Object.keys(allabis).filter(pool => !['y', 'susd', 'tbtc'].includes(pool)).map(pool => 
 					({swap: allabis[pool].swap_address, token: allabis[pool].token_address})
 				)
 			},
 			depositZaps() {
-				return Object.keys(allabis).filter(pool => !['y', 'susd', 'tbtc', 'hbtc'].includes(pool)).map(pool => 
+				return Object.keys(allabis).filter(pool => !['y', 'susd', 'tbtc'].includes(pool)).map(pool => 
 					({deposit: allabis[pool].deposit_address, token: allabis[pool].token_address})
 				)
 			},
@@ -183,6 +185,14 @@
 					{
 						name: "sbtc",
 						address: "0x705350c4BcD35c9441419DdD5d2f097d7a55410F",
+					},
+					{
+						name: "hbtc",
+						address: "0x4c18E409Dc8619bFb6a1cB56D114C3f592E0aE79",
+					},
+					{
+						name: "3pool",
+						address: "0xbFcF63294aD7105dEa65aA58F8AE5BE2D9d0952A",
 					},
 				]
 			},

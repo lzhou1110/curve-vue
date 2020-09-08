@@ -114,7 +114,6 @@
           	let pools = {...contracts};
           	delete pools.y
           	delete pools.tbtc
-          	delete pools.hbtc
           	return pools;
           },
           error() {
@@ -122,7 +121,7 @@
           },
           filteredCurrencies() {
           	return Object.fromEntries(Object.entries(this.allCurrencies).filter(
-			      ([key, val])=>!['tbtc', 'hbtc'].includes(key)
+			      ([key, val])=>!['tbtc'].includes(key)
 			   ))
           }
         },
@@ -183,7 +182,7 @@
 				        */
 			         	if (contract.tethered && contract.tethered[i] 
 			         		&& contract.use_lending && !contract.use_lending[i] 
-			         		|| key == 'susdv2' || (key == 'pax' && i == 3) || key == 'tbtc' || key == 'ren' || key == 'sbtc' || key == 'hbtc') {
+			         		|| key == 'susdv2' || (key == 'pax' && i == 3) || key == 'tbtc' || key == 'ren' || key == 'sbtc' || key == 'hbtc' || key == '3pool') {
 			            	this.all_c_rates[key].c_rates[i] = 1 / contract.coin_precisions[i]
 			         	}
 			         	else {
@@ -384,14 +383,25 @@
 					}
 					if(key == 'hbtc') {
 						let N_COINS = contracts[key].N_COINS
-						let start = 108
+						let start = 119
 						let slice = decoded.slice(start)
 						for(let i = 0; i < N_COINS; i++) {
 							let calcBalance = this.all_c_rates[key].c_rates[i] * (slice[i])
 							this.bal_infos[key].push(calcBalance)
 							total += calcBalance
 						}
-						ind = 103
+						ind = 113
+					}
+					if(key == '3pool') {
+						let N_COINS = contracts[key].N_COINS
+						let start = 129
+						let slice = decoded.slice(start)
+						for(let i = 0; i < N_COINS; i++) {
+							let calcBalance = this.all_c_rates[key].c_rates[i] * (slice[i])
+							this.bal_infos[key].push(calcBalance)
+							total += calcBalance
+						}
+						ind = 124
 					}
 				    this.totals.push(total)
 				    this.virtual_prices.push(+decoded[ind+8] / 1e18)

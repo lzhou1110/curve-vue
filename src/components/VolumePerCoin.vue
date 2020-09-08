@@ -30,7 +30,10 @@
 				<label for='sbtcpool'>sBTC</label>
 
 				<input id='hbtcpool' type='checkbox' value='hbtc' v-model='piepools'/>
-				<label for='hbtcpool'>sBTC</label>
+				<label for='hbtcpool'>hBTC</label>
+
+				<input id='3pool' type='checkbox' value='3pool' v-model='piepools'/>
+				<label for='3pool'>3pool</label>
 
 				<button @click='selectPools'>Select</button>
 			</div>
@@ -203,7 +206,7 @@
 			    	enabled: true,
 			    }
 			},
-			piepools: ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren', 'sbtc', 'hbtc'],
+			piepools: ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren', 'sbtc', 'hbtc', '3pool'],
 			currencies: ['DAI', 'USDC', 'USDT', 'TUSD', 'BUSD', 'sUSD', 'PAX', 'TBTC', 'WBTC', 'HBTC', 'renBTC', 'sBTC'],
 			volumes: [],
 			period: 'week',
@@ -245,6 +248,7 @@
 				this.volumes = await volumeWorker.getVolumePerCoin(filteredData, pools, allabis)
 			},
 			async mounted() {
+				console.log(this.volumes, "VOLUMES")
 				while(this.chart && this.chart.series[0])
 					this.chart.series[0].remove()
 				for(let [i,volume] of this.volumes.entries()) {
@@ -329,5 +333,8 @@
 	}
 	.poolselect > label {
 		margin-left: 1em;
+	}
+	label[for='hbtcpool'] {
+		margin-left: 0;
 	}
 </style>

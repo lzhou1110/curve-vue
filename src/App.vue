@@ -26,6 +26,8 @@
         tbtc: 'TBTC',
         ren: 'renBTC',
         sbtc: 'sBTC',
+        hbtc: 'hBTC',
+        '3pool': '3pool',
     }
 
 	export default {

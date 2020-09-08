@@ -115,7 +115,7 @@
                     </li>
                     <li>
                         <input id='swapw' type='checkbox' name='swapw' v-model = 'swapwrapped'>
-                        <label for='swapw' v-show = "!['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc', 'pool3'].includes(currentPool)">Swap wrapped</label>
+                        <label for='swapw' v-show = "!['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc', '3pool'].includes(currentPool)">Swap wrapped</label>
                     </li>
                 </ul>
                 <div>
@@ -606,7 +606,7 @@
                 var { dismiss } = notifyNotification(this.waitingMessage)
                 min_dy = cBN(min_dy).toFixed(0);
                 let exchangeMethod = currentContract.swap.methods.exchange_underlying
-                if(this.swapwrapped || ['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc', 'pool3'].includes(this.currentPool)) exchangeMethod = currentContract.swap.methods.exchange
+                if(this.swapwrapped || ['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc', '3pool'].includes(this.currentPool)) exchangeMethod = currentContract.swap.methods.exchange
                 try {
                     await helpers.setTimeoutPromise(100)
                     await exchangeMethod(i, j, dx, BN(min_dy).toFixed(0,1))

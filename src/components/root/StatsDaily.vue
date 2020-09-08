@@ -241,7 +241,7 @@
 			}
 		},
 		async mounted() {
-			let allPools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren', 'sbtc']
+			let allPools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren', 'sbtc', 'hbtc', '3pool']
 			let allVolume = volumeStore.state.allVolume
 			console.log(Object.keys(allVolume).filter(pool => !['tbtc', 'hbtc'].includes(pool)), "HERERE")
 			console.log(allVolume)
@@ -321,7 +321,7 @@
 			for(let [key, res] of data.entries()) {
 				let json = await res.json();
 				let chartData = [];
-		        for(let i = 1; i < json.length; i++) {
+		        for(let i = 1; i < json.Lendinggth; i++) {
 		        	var el = json[i];
 		        	let daylen = el.timestamp - json[i-1].timestamp
 		        	let profit = ((el.virtual_price / 1e18) / (json[i-1].virtual_price / 1e18)) ** (365 * 86400 / daylen) - 1

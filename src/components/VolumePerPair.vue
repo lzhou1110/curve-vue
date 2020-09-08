@@ -29,6 +29,12 @@
 				<input id='sbtcpool' type='checkbox' value='sbtc' v-model='piepools'/>
 				<label for='sbtcpool'>sBTC</label>
 
+				<input id='hbtcpool' type='checkbox' value='hbtc' v-model='piepools'/>
+				<label for='hbtcpool'>hBTC</label>
+
+				<input id='3pool' type='checkbox' value='3pool' v-model='piepools'/>
+				<label for='3pool'>3pool</label>
+
 				<button @click='selectPools'>Select</button>
 			</div>
 
@@ -52,7 +58,7 @@
 
 
 			
-			<volume-per-coin-stats :data = 'pairVolumes && pairVolumes[selectpair]' :currency = 'selectpair' :loaded = 'loaded' :embedded = 'true'></volume-per-coin-stats>
+			<volume-per-coin-stats :data = 'pairVolume' :currency = 'selectpair' :loaded = 'loaded' :embedded = 'true'></volume-per-coin-stats>
 		</div>
 	</div>
 </template>
@@ -215,7 +221,7 @@
 			    	enabled: true,
 			    }
 			},
-			piepools: ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren', 'sbtc'],
+			piepools: ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren', 'sbtc', 'hbtc', '3pool'],
 			selectpair: 'DAI ⇄ USDC',
 			volumes: [],
 			pairVolumes: {},
@@ -257,6 +263,12 @@
 				}
 				return allPairs
 			},
+			pairVolume() {
+				if(this.pairVolumes && this.pairVolumes[this.selectpair])
+					return this.pairVolumes[this.selectpair]
+				if(this.pairVolumes && this.pairVolumes[this.pairReverse(this.selectpair)])
+					return this.pairVolumes[this.pairReverse(this.selectpair)]
+			},
 		},
 		methods: {
 			async created() {
@@ -271,6 +283,7 @@
 
 				pools = Object.entries(filteredData)
 				this.pairVolumes = await volumeWorker.getVolumePerPair(filteredData, pools, allabis)
+				console.log(this.pairVolumes, "PAIR VOLUMES")
 
 			},
 			async mounted() {
@@ -328,6 +341,7 @@
 				let highest = piechartdata.map(data=>data.y).indexOf(Math.max(...piechartdata.map(data => data.y)))
 				piechartdata[highest].sliced = true;
 				piechartdata[highest].selected = true;
+				console.log(piechartdata, "PIE CHART DATA")
 				this.piechart.addSeries({
 					name: 'Trading Volume %',
 					data: piechartdata,
@@ -336,6 +350,9 @@
 			},
 			selectPools() {
 				this.created();
+			},
+			pairReverse(pair) {
+				return pair.split(' ⇄ ')[1] + ' ⇄ ' + pair.split(' ⇄ ')[0]
 			},
 		}
 	}
@@ -358,5 +375,8 @@
 	}
 	.poolselect > label {
 		margin-left: 1em;
+	}
+	label[for='hbtcpool'] {
+		margin-left: 0;
 	}
 </style>

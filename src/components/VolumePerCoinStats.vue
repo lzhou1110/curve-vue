@@ -128,13 +128,16 @@
 			this.chart = this.$refs.highcharts.chart;
 			this.chart.showLoading()
 			this.chart.setTitle({
-				text: `Total trading volume per day for ${this.currency} ${this.btcs.includes(this.currency.toLowerCase()) ? 'in USD' : ''}`,
+				text: `Total trading volume per day for ${this.currency} ${this.btcs.includes(this.currency.toLowerCase().split(' ⇄ ')[0]) || this.btcs.includes(this.currency.toLowerCase().split(' ⇄ ')[1]) ? 'in USD' : ''}`,
 			})
 		},
 		
 		methods: {
 			async mounted() {
 				this.chart.series[0].setData(this.data, false, false)
+				this.chart.setTitle({
+					text: `Total trading volume per day for ${this.currency} ${this.btcs.includes(this.currency.toLowerCase().split(' ⇄ ')[0]) || this.btcs.includes(this.currency.toLowerCase().split(' ⇄ ')[1]) ? 'in USD' : ''}`,
+				})
 				this.chart.hideLoading()
 			},
 		}

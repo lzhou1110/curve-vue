@@ -399,23 +399,23 @@
                	 		</span>
 	                </router-link>
 	            </div>
-	            <!-- <div :class="{selected: activePoolLink == 5}">
+	            <div :class="{selected: activePoolLink == 5}">
 	                <router-link to = '/hbtc'>
-	                	<span class='index'>5.</span>  
+	                	<span class='index'>7.</span>  
 	                    <span class='pooltext'>hbtc</span>
 	                    <span class='pools'>[hBTC, wBTC]</span>  
 	                    <span class='apr'>
 	                    	<span class='tooltip'>APY:
 	                    		<span class='tooltiptext long'>
 		                    		<div>Pool APY + Lending APY (annualized)</div>
-		                    		<div>Daily APY: {{daily_apy[8]}}%</div>
-		                    		<div>Weekly APY: {{weekly_apy[8]}}%</div>
-		                    		<div>Monthly APY: {{monthly_apy[8]}}%</div>
-		                    		<div>Total APY: {{apy[8]}}%</div>
+		                    		<div>Daily APY: {{daily_apy[9]}}%</div>
+		                    		<div>Weekly APY: {{weekly_apy[9]}}%</div>
+		                    		<div>Monthly APY: {{monthly_apy[9]}}%</div>
+		                    		<div>Total APY: {{apy[9]}}%</div>
 		                    	</span>
 	                    	</span> 
-	                    	<span :class="{'loading line': !daily_apy[8]}">{{daily_apy[8]}}</span>%
-	                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.hbtc && (CRVAPYs.hbtc[0]).toFixed(2)}}% <br> to {{CRVAPYs.hbtc && (CRVAPYs.hbtc[1]).toFixed(2)}}%
+	                    	<span :class="{'loading line': !daily_apy[9]}">{{daily_apy[9]}}</span>%
+	                    	<div v-show='CRVAPYs.hbtc && CRVAPYs.hbtc[0]' :class="{'incentive-apr': true}">(+{{CRVAPYs.hbtc && (CRVAPYs.hbtc[0]).toFixed(2)}}% <br> to {{CRVAPYs.hbtc && (CRVAPYs.hbtc[1]).toFixed(2)}}%
 	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
 	                                <span class='tooltiptext long'>
 	                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.hbtc && CRVAPYs.hbtc[2].toFixed(2) }})
@@ -434,7 +434,47 @@
                	 			</span>
                	 		</span>
 	                </router-link>
-	            </div> -->
+	            </div>
+	            <div :class="{selected: activePoolLink == 4}">
+	                <router-link to = '/3pool'>
+	                	<span class='index'>8.</span>  
+	                    <span class='pooltext'>3pool</span>
+	                    <span class='pools'>[DAI, USDC, USDT]</span>  
+	                    <span class='apr'>
+	                    	<span>
+	                    		<span class='tooltip'>APY:
+	                    			<span class='tooltiptext long'>
+			                    		<div>Pool APY + Lending APY (annualized)</div>
+			                    		<div>Daily APY: {{daily_apy[10]}}%</div>
+			                    		<div>Weekly APY: {{weekly_apy[10]}}%</div>
+			                    		<div>Monthly APY: {{+monthly_apy[10] == 0 ? 'N/A' : monthly_apy[10]}}%</div>
+			                    		<div>Total APY: {{apy[10]}}%</div>
+			                    	</span>
+	                    		</span> 
+	                    		<span :class="{'loading line': !daily_apy[10]}">{{daily_apy[10]}}%</span>
+	                    		<div v-show="CRVAPYs['3pool'] && CRVAPYs['3pool'][0]" :class="{'incentive-apr': true}">(+{{CRVAPYs["3pool"] && (CRVAPYs["3pool"][0]).toFixed(2)}}% <br> to {{CRVAPYs["3pool"] && (CRVAPYs["3pool"][1]).toFixed(2)}}%
+                    				<span v-show='CRVAPYs["3pool"] && CRVAPYs["3pool"][3]'><br>my: {{CRVAPYs["3pool"] && CRVAPYs["3pool"][3] > 0 && CRVAPYs["3pool"][3].toFixed(2)}}%&nbsp;</span>
+		                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
+		                                <span class='tooltiptext long'>
+		                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs["3pool"] && CRVAPYs["3pool"][2].toFixed(2) }})
+		                                </span>
+		                            </span>)
+		                		</div>
+	                    	</span>
+	                    </span>
+	                    <span class='volume'>Vol: <span :class="{'loading line': volumes.susd && volumes.susd[0] < 0}">
+	                    	<span v-show='volumes.susd && volumes.susd[0] >= 0'>${{(volumes.susd && volumes.susd[0] | 0) | formatNumber(0)}}</span>
+	                    	<span v-show='!volumes.susd && volumes.susd[0]'>$0</span>
+               	 		</span></span>
+               	 		<span class='balance'>
+           	 				<span class='showmobile' v-show='balances["3pool"] > 0'>Balance: ${{(balances["3pool"] && balances["3pool"].toFixed(2)) | formatNumber(0)}} </span>
+               	 			<span class='tooltip' v-show='balances["3pool"] > 0'>
+               	 				<img :src="publicPath + 'dollar-sign-solid.svg'">
+               	 				<span class='tooltiptext'>Balance: ${{(balances["3pool"] && balances["3pool"].toFixed(2)) | formatNumber(0)}}</span>
+               	 			</span>
+               	 		</span>
+	                </router-link>
+	            </div>
 	        </fieldset>
 	    </div>
 
@@ -468,7 +508,7 @@
 		},
 		data: () => ({
 			activePoolLink: -1,
-			pools: ['compound','usdt','y','busd','susdv2','pax','ren', 'sbtc', 'hbtc'],
+			pools: ['compound','usdt','y','busd','susdv2','pax','ren', 'sbtc', 'hbtc', '3pool'],
 			daily_apy: [],
 			weekly_apy: [],
 			monthly_apy: [],
@@ -485,6 +525,8 @@
 				tbtc: [-1, -1],
 				ren: [-1, -1],
 				sbtc: [-1, -1],
+				hbtc: [-1, -1],
+				'3pool': [-1, -1],
 			},
 			balances: {
 				compound: -1,
@@ -496,6 +538,8 @@
 				tbtc: -1,
 				ren: -1,
 				sbtc: -1,
+				hbtc: -1,
+				'3pool': -1,
 			},
 			snxRewards: null,
 			sbtcRewards: null,
@@ -603,6 +647,18 @@
 						swap_token: '0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3',
 						name: 'sbtc',
 						gauge: '0x705350c4BcD35c9441419DdD5d2f097d7a55410F',
+					},
+					hbtc: {
+						swap: '0x4CA9b3063Ec5866A4B82E437059D2C43d1be596F',
+						swap_token: '0xb19059ebb43466C323583928285a49f558E572Fd',
+						name: 'hbtc',
+						gauge: '0x4c18E409Dc8619bFb6a1cB56D114C3f592E0aE79',
+					},
+					'3pool': {
+						swap: '0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7',
+						swap_token: '0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490',
+						name: '3pool',
+						gauge: '0xbFcF63294aD7105dEa65aA58F8AE5BE2D9d0952A',
 					},
 				}
 			},
@@ -768,7 +824,7 @@
 	            }
 			},
 			async getAPY() {
-				let pools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc','ren2','rens','hbtc']
+				let pools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc','ren2','rens','hbtc','3pool']
 	            let requests = await Promise.all([fetch(`${window.domain}/raw-stats/apys.json`), helpers.retry(fetch(`https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd`), 300)])
 	            let res = await Promise.all(requests.map(request => request.json()))
 	            let stats = res[0]
@@ -806,7 +862,7 @@
 				let gaugeController_address = '0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB'
 				let gauge_relative_weight = '0x6207d866000000000000000000000000'
 
-				let pools = ['compound','usdt','iearn','busd','susdv2','pax','ren','sbtc']
+				let pools = ['compound','usdt','iearn','busd','susdv2','pax','ren','sbtc','hbtc','3pool']
 
 				let prices = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,curve-dao-token&vs_currencies=usd')
 				prices = await prices.json()

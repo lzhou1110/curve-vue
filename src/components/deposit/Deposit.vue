@@ -12,7 +12,7 @@
                                     :src='getTokenIcon(currency)'>
                                 <span v-show='depositc'>{{currencies[currency]}}
     	                        	<span v-show="!(currency == 'usdt' && currentPool == 'usdt' || currency == 'pax') 
-    	                        					&& !['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc', 'pool3'].includes(currentPool)"> 
+    	                        					&& !['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc', '3pool'].includes(currentPool)"> 
     	                        		(in {{currency | capitalize}}) 
     	                        	</span>
     	                        </span>
@@ -79,7 +79,7 @@
                     	</span>
                     </label>
                 </li>
-                <li v-show = "!['susd','susdv2','tbtc','ren','sbtc','hbtc', 'pool3'].includes(currentPool)">
+                <li v-show = "!['susd','susdv2','tbtc','ren','sbtc','hbtc', '3pool'].includes(currentPool)">
                     <input id="depositc" type="checkbox" name="inf-approval" checked v-model='depositc'>
                     <label for="depositc">Deposit wrapped</label>
                 </li>
@@ -329,7 +329,7 @@
             return this.inputs.filter(v=>+v==0).length == this.N_COINS && !this.disabledButtons
           },
           isPlain() {
-            return ['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc', 'pool3'].includes(this.currentPool)
+            return ['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc', '3pool'].includes(this.currentPool)
           },
           transferableBalanceText() {
             return this.toFixed((this.transferableBalance / 1e18))
@@ -418,7 +418,7 @@
 
             async mounted(oldContract) {
 
-            	if(['susd', 'susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc', 'pool3'].includes(currentContract.currentContract)) this.depositc = true;
+            	if(['susd', 'susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc', '3pool'].includes(currentContract.currentContract)) this.depositc = true;
                 else this.depositc = false;
             	this.changeSwapInfo(this.depositc)
             	currentContract.showSlippage = false;

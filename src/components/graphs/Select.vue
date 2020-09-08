@@ -28,8 +28,11 @@
 			<input id='sbtcpool' type='checkbox' value='sbtc' v-model='pools'/>
 			<label for='sbtcpool'>sBTC</label>
 
-			<!-- <input id='hbtcpool' type='checkbox' value='hbtc' v-model='pools'/>
-			<label for='hbtcpool'>hBTC</label> -->
+			<input id='hbtcpool' type='checkbox' value='hbtc' v-model='pools'/>
+			<label for='hbtcpool'>hBTC</label>
+
+			<input id='3pool' type='checkbox' value='3pool' v-model='pools'/>
+			<label for='3pool'>3pool</label>
 		</div>
 
 		<select class='tvision' v-model='pair'>

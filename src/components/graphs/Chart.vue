@@ -447,6 +447,8 @@
 							amount = 1/1e4
 							get_method = 'get_dy'
 						}
+						if(['3pool'].includes(pool))
+							get_method = 'get_dy'
 						return [
 							abis[pool].swap_address, 
 							window[pool].swap.methods[get_method](this.fromCurrency, 
