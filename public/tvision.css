@@ -750,7 +750,7 @@ li.coins label:hover {
 /* Modal Content/Box */
 .modal-content {
   background-color: #fefefe;
-  margin: 15% auto; /* 15% from the top and centered */
+  /*margin: 15% auto;  15% from the top and centered */
   padding: 20px;
   width: 200px; /* Could be more or less, depending on screen size */
 }

@@ -451,6 +451,10 @@ export function decorateVotes(votes) {
 			else if(!hasQuorum(vote))
 				vote.rejectedReason = 2
 		}
+		if(vote.voteCountSeq == 13) {
+			vote.contractName = null
+			vote.description = null
+		}
 		return vote
 	})
 }
@@ -512,6 +516,8 @@ export async function decodeCall(vote) {
 			console.error(err)
 		}
 	}
+	if(vote.voteCountSeq == 13)
+		desc = null
 	Vue.set(vote, 'description', desc)
 }
 

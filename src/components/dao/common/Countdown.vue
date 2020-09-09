@@ -69,11 +69,11 @@
 				let str = ''
 				if(this.days > 0)
 					str += String(this.days).padStart(2, '0') + 'D:'
-				if(this.hours > 0)
+				if(this.hours > 0 || this.days > 0)
 					str += String(this.hours).padStart(2, '0') + 'H:'
-				if(this.minutes >= 0)
+				if(this.minutes >= 0 || (this.hours > 0 || this.days > 0))
 					str += String(this.minutes).padStart(2, '0') + 'M:'
-				if(this.seconds >= 0)
+				if(this.seconds >= 0 || (this.minutes > 0 || this.hours > 0 || this.days > 0))
 					str += String(this.seconds).padStart(2, '0') + 'S'
 				return str
 			},

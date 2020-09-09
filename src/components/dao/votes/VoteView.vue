@@ -88,6 +88,9 @@
 													</ul>
 												</blockquote>
 											</div>
+											<div v-show='vote.voteCountSeq == 13'>
+												
+											</div>
 										</div>
 										<button class='simplebutton showmore' @click='showMore = !showMore'>{{ showMore ? 'Hide' : 'Show more' }}</button>
 									</div>
@@ -107,18 +110,23 @@
 							<span v-show='!vote.contractName && vote.description'>
 								<span v-html='vote.description'></span>
 							</span>
-							<div v-show='vote.voteCountSeq == 3' class='discusson'>
+							<div v-show='vote.voteCountSeq == 3' class='discussion'>
 								<a href='https://gov.curve.fi/t/add-smartwalletwhitelist-with-dao-maintained-whitelist/25' rel='noopener noreferrer'>
 									Discuss on gov.curve.fi
 								</a>
 							</div>
-							<div v-show='vote.voteCountSeq == 5' class='discusson'>
+							<div v-show='vote.voteCountSeq == 5' class='discussion'>
 								<a href='https://gov.curve.fi/t/cip-5-add-hbtc-wbtc-pool-and-a-liquidity-gauge-for-that-pool/162' rel='noopener noreferrer'>
 									Discuss on gov.curve.fi
 								</a>
 							</div>
-							<div v-show='vote.voteCountSeq == 12' class='discusson'>
+							<div v-show='vote.voteCountSeq == 12' class='discussion'>
 								<a href='https://gov.curve.fi/t/cip-13-add-a-new-tri-pool-and-a-liquidity-gauge-for-it-dai-usdc-usdt/629' rel='noopener noreferrer'>
+									Discuss on gov.curve.fi
+								</a>
+							</div>
+							<div v-show='vote.voteCountSeq == 13' class='discussion'>
+								<a href='https://gov.curve.fi/t/cip-13-implement-an-admin-fee-of-50-0-02-across-all-pools-to-be-distributed-to-vecrv-holders/690' rel='noopener noreferrer'>
 									Discuss on gov.curve.fi
 								</a>
 							</div>
@@ -473,7 +481,7 @@
 			},
 			formattedMetadata() {
 				if(!this.vote.metadata) return ''
-				return this.vote.metadata && helpers.truncate(this.vote.metadata, 100, true)
+				return this.vote.metadata && helpers.truncate(this.vote.metadata, 400, true)
 			},
 			totalVotingPowerFormat() {
 				return this.vote.votingPower / 1e18
@@ -746,7 +754,7 @@
 		display: flex;
 		justify-content: space-between;
 	}
-	.discusson {
+	.discussion {
 		margin-top: 1em;
 	}
 	blockquote ul li {

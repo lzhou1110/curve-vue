@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import Web3  from 'web3'
 
 Vue.filter('capitalize', capitalize)
 
@@ -9,6 +10,12 @@ Vue.filter('toFixed2', function (value) {
 })
 
 Vue.filter('toUpper', val => val.toUpperCase())
+
+import { infura_url, chainlink_abi, chainlink_address } from '../allabis'
+
+let web3 = new Web3(infura_url)
+
+let ETHUSDOracle = new web3.eth.Contract(chainlink_abi, chainlink_address)
 
 export function capitalize(value) {
   let capitalizations = {
@@ -216,9 +223,17 @@ export function formatNumber(number, dec = 2, dsep, tsep) {
 }
 
 export async function getETHPrice() {
-  let req = await fetch('https://api.coinpaprika.com/v1/tickers/eth-ethereum');
-  let res = await req.json()
-  return res.quotes.USD.price
+  let req = await Promise.race([fetch('https://api.coinpaprika.com/v1/tickers/eth-ethereum'), fetch('http://pushservice.curve.fi/getETHPrice'), ETHUSDOracle.methods.latestAnswer().call()]);
+  let res
+  if(req.json)
+    res = await req.json()
+  else
+    res = req / 1e8
+  if(res.price)
+    return res.price
+  if(res.quotes)
+    return res.quotes.USD.price
+  return res
 }
 
 export function findClosestIndex(timestamp, data) {
@@ -373,6 +388,10 @@ export function truncate(str, n, useWordBoundary ){
   return (useWordBoundary 
     ? subString.substr(0, subString.lastIndexOf(" ")) 
     : subString) + "...";
+}
+
+export function unique(array, propertyName) {
+   return array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i);
 }
 
 

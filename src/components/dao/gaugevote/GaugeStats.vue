@@ -296,6 +296,7 @@
 					let change = this.futureWeights[pool] / this.currentWeights[pool]
 					if(!isFinite(change)) change = 0
 					Vue.set(this.futureCRVAPYs, pool, this.currentCRVAPYs[pool] * change)
+					statsStore.state.oldCRVAPYs[Object.values(this.poolInfo).find(v => v.name == pool).gauge] = this.currentCRVAPYs[pool]
 					statsStore.state.currentCRVAPYs[Object.values(this.poolInfo).find(v => v.name == pool).gauge] = this.currentCRVAPYs[pool] * change
 				}
 				console.log(this.futureCRVAPYs)				

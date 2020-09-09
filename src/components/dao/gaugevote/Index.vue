@@ -27,19 +27,19 @@
 			<p class='info-message gentle-message'>
 				You can vote for gauge weight with your veCRV tokens(locked CRV tokens in <router-link to="/locker">Locker</router-link>). Gauge weights are used to determine how much CRV does each pool get
 			</p>
+			<p class='info-message gentle-message' v-show='lockExpiresSoon'>
+				Your lock expires soon. You need to lock at least for a week in <router-link to="/locker">Locker</router-link>
+			</p>
 			<p class='info-message gentle-message' v-show='+balance == 0'>
 				You need to have CRV locked in <router-link to="/locker">Locker</router-link> in order to vote for gauge weights
 			</p>
-			<p class='info-message gentle-message' v-show='lockExpiresSoon'>
-				Your lock expires soon. You need to lock at least for a week in <router-link to="/locker">Locker</router-link>
+			<gauge-stats class='gaugeStats' :included='true' :next_time='time_total'></gauge-stats>
+			<p class='info-message gentle-message' v-show='tooMuchPower'>
+				You'll be using too much power - {{ newPowerUsed && newPowerUsed.toFixed(2) }}%
 			</p>
 			<p class='info-message gentle-message' v-show='voteIsOften'>
 				You can vote only once in 10 days
 			</p>
-			<p class='info-message gentle-message' v-show='tooMuchPower'>
-				You alrady used too much power for this gauge
-			</p>
-			<gauge-stats class='gaugeStats' :included='true' :next_time='time_total'></gauge-stats>
 			<p class='info-message gentle-message' v-show='+balance > 0'>
 				You're voting with {{ balanceFormat }} veCRV
 			</p>
@@ -53,6 +53,30 @@
 					<div class='weight'>
 						<p v-show='myVoteWeightUsed !== null'>
 							Vote weight % used: {{ myVoteWeightUsed && myVoteWeightUsed.toFixed(2) }}%
+							<button v-show='myVoteWeightUsed !== null' @click='showMyAllocationHandler'>
+								Show my allocation
+								<span class='tooltip'> [?]
+									<span class='tooltiptext long'>
+										Your vote allocation from previous votes is remembered. If you want to change it and you have votes allocated to a gauge, you can set its new allocation to 0
+									</span>
+								</span>
+							</button>
+							<div v-show='showMyAllocation'>
+								<table class='tui-table'>
+									<thead>
+										<tr>
+											<th>Gauge</th>
+											<th>Weight</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for='vote in uniqueGaugeVotes'>
+											<td>{{ getGaugeName(vote.gauge) }}</td>
+											<td>{{ vote.weight / 100 }}%</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 						</p>
 						<label for='weight'>Vote weight: </label>
 						<input id='weight' type='text' :class="{'invalid': isInvalidWeight}" v-model='weight'>
@@ -68,16 +92,58 @@
 				</p>
 
 				<div>
-					<button :disabled='disabled' @click='calculate'>Calculate <span :class="{'loading line': isCalculating}"></span></button>
-					<button :disabled='disabled' @click='submit' class='submitVote'>Submit</button>
+					<!-- <button :disabled='disabled' @click='calculate'>Calculate <span :class="{'loading line': isCalculating}"></span></button> -->
+					<button :disabled='disabled' @click='calculate' class='submitVote'><span :class="{'loading line': isCalculating}"></span>Submit</button>
 				</div>
 
-				<div v-show='outcomeWeights.length'>
-					<p>
-						<img class='icon small' :src="publicPath + 'logo.png'"> CRV APY change: 
-						<span class='greentext'> {{ oldAPY && oldAPY.toFixed(2) }}% → {{ newAPY && newAPY.toFixed(2) }}% </span>
-					</p>
-					<highcharts class='outcomeCharts' :options='piechartdata' ref='piecharts'></highcharts>
+				<div class='modal rootmodal' v-show='showOutcomeModal' @click.self='hideOutcomeModal'>
+					<div class='modal-content window white'>
+						<fieldset>
+							<div class='legend2 hoverpointer' @click='hideOutcomeModal'>
+								[<span class='greentext'>■</span>]
+							</div>
+							<legend>Vote Outcome</legend>
+							<div class='content'>
+								<p>
+									<img class='icon small' :src="publicPath + 'logo.png'"> CRV APY change: 
+									<span class='greentext'> {{ oldAPY && oldAPY.toFixed(2) }}% → {{ newAPY && newAPY.toFixed(2) }}% </span>
+								</p>
+								<table class='tui-table fullwidth'>
+									<thead>
+										<tr>
+											<th></th>
+											<th>Pool</th>
+											<th>Future <img class='icon small' :src="publicPath + 'logo.png'"> CRV APY</th>
+											<th>Outcome <img class='icon small' :src="publicPath + 'logo.png'"> CRV APY</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for='([gauge, pool], i) in Object.entries(gaugesNames).slice(1)'>
+											<td> 
+												{{ i }}. 
+											</td>
+											<td>
+												{{ pool }}
+											</td>
+											<td>
+												{{ futureCRVAPYs[gauge] && futureCRVAPYs[gauge].toFixed(2) }}%
+												to
+												{{ futureCRVAPYs[gauge] && (futureCRVAPYs[gauge] * 2.5).toFixed(2) }}%
+											</td>
+											<td>
+												{{ outcomeCRVAPYs[gauge] && outcomeCRVAPYs[gauge].toFixed(2) }}%
+												to
+												{{ outcomeCRVAPYs[gauge] && (outcomeCRVAPYs[gauge] * 2.5).toFixed(2) }}%
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								<highcharts class='outcomeCharts' :options='piechartdata' ref='piecharts'></highcharts>
+							</div>
+							<button @click='hideOutcomeModal'>Hide</button>
+							<button @click='submit' class='submitVote'>Submit</button>
+						</fieldset>
+					</div>
 				</div>
 			</div>
 
@@ -99,9 +165,9 @@
 
 
 			<button @click='showMyVotes' v-show='!showvotes'>Show my votes</button>
-			<button @click='showvotes=false;getVotes()' v-show='showvotes'>Show all votes</button>
+			<button @click='showAllVotes' v-show='showvotes'>Show all votes</button>
 
-			<table class='tui-table'>
+			<table class='tui-table fullwidth'>
 				<thead>
 					<tr>
 						<th>Voter</th>
@@ -137,7 +203,7 @@
 						</td>
 						<td>
 							<a :href="'https://etherscan.io/address/' + vote.gauge" rel='noopener noreferrer'>
-								{{ getGaugeAddress(vote.gauge) }}
+								{{ getGaugeName(vote.gauge) }}
 							</a>
 						</td>
 						<td>
@@ -320,6 +386,18 @@
 			isCalculating: false,
 
 			time_total: null,
+
+			myVotes: [],
+
+			showMyAllocation: false,
+
+			uniqueGaugeVotes: [],
+
+			outcomeCRVAPYs: [],
+
+			showOutcomeModal: false,
+
+			selectedPool: '',
 		}),
 
 		async created() {
@@ -343,6 +421,7 @@
 				this.outcomeWeights = []
 				this.oldAPY = null
 				this.newAPY = null
+				this.seletedPool = ''
 
 				this.last_user_vote = await this.gaugeController.methods.last_user_vote(contract.default_account, this.selectedGauge).call()
 				this.old_slope = await this.gaugeController.methods.vote_user_slopes(contract.default_account, this.selectedGauge).call()
@@ -357,22 +436,25 @@
 				return this.lock_end <= this.next_time
 			},
 			voteIsOften() {
-				return +this.last_user_vote > 0 && +this.last_user_vote + WEIGHT_VOTE_DELAY < Date.now() / 1000
+				return +this.last_user_vote > 0 && +this.last_user_vote + WEIGHT_VOTE_DELAY > Date.now() / 1000
 			},
 			balanceFormat() {
 				return (this.balance / 1e18).toFixed(2)
 			},
 			isInvalidWeight() {
-				return this.weight <= 0 || this.weight > 100 || isNaN(+this.weight)
+				return this.weight < 0 || this.weight > 100 || isNaN(+this.weight)
 			},
 			weightAllocated() {
-				return (this.weight / 100 * this.balance / 1e18).toFixed(8)
+				return (this.weight / 100 * this.balance / 1e18).toFixed(2)
 			},
-			tooMuchPower() {
+			newPowerUsed() {
 				if(this.old_slope === null) return false
 				let power_used = this.power_used
-				power_used = power_used + this.weight * 100 - +this.old_slope.power
-				return !(power_used >= 0 || power_used <= 10000)
+				power_used = power_used + +this.weight * 100 - +this.old_slope.power
+				return power_used / 100
+			},
+			tooMuchPower() {
+				return this.newPowerUsed >= 100
 			},
 			gasPrice() {
                 return gasPriceStore.state.gasPrice
@@ -387,7 +469,7 @@
 			  return this.votes.length && Math.ceil(this.votes.length / this.perPage) - 1
 		    },
 	  		changePaginationTrigger() {
-	  		  return this.page, this.perPage, Date.now()
+	  		  return this.votes, this.page, this.perPage, Date.now()
 		    },
 		    totalveCRVvoteFormat() {
 		    	return helpers.formatNumber(this.totalveCRVvote / 1e18)
@@ -404,6 +486,9 @@
 		    },
 		    publicPath() {
                 return process.env.BASE_URL
+            },
+            futureCRVAPYs() {
+            	return statsStore.state.currentCRVAPYs
             },
 		},
 
@@ -428,6 +513,8 @@
 				this.totalveCRV = +decoded[3]
 
 				this.time_total = +decoded[4]
+
+				this.myVoteWeightUsed = this.power_used / 100
 
 				this.getVotes()
 
@@ -533,44 +620,48 @@
 					`
 				}
 
-				if(address) {
-					QUERY = gql`
-						{
-						  gaugeVotes(where: { user: "${address.toLowerCase()}" }, orderBy: time, orderDirection: desc) {
-						    id
-						    time
-						    user
-						    gauge
-						    weight
-						    gauge_weights {
-						      gauge
-						      gauge_weight
-						    }
-						    total_weight
-						    veCRV
-						    totalveCRV
-						  }
-						}
-					`
-				}
+				// if(address) {
+				// 	QUERY = gql`
+				// 		{
+				// 		  gaugeVotes(where: { user: "${address.toLowerCase()}" }, orderBy: time, orderDirection: desc) {
+				// 		    id
+				// 		    time
+				// 		    user
+				// 		    gauge
+				// 		    weight
+				// 		    gauge_weights {
+				// 		      gauge
+				// 		      gauge_weight
+				// 		    }
+				// 		    total_weight
+				// 		    veCRV
+				// 		    totalveCRV
+				// 		  }
+				// 		}
+				// 	`
+				// }
 
 				let results = await wrapper.performQuery(QUERY)
 				this.votes = results.data.gaugeVotes
+				this.allVotes = results.data.gaugeVotes
 				this.totalveCRVvote = this.votes.filter((v,i,a)=>a.findIndex(t=>(t.user === v.user))===i).reduce((a, b) => +a + +b.veCRV, 0)
-				if(results.data.myVotes)
-					this.myVoteWeightUsed = results.data.myVotes.reduce((a, b) => +a + +b.weight, 0) / 100
-				else
-					this.myVoteWeightUsed = results.data.gaugeVotes.reduce((a, b) => +a + +b.weight, 0) / 100
+				this.myVotes = results.data.myVotes
+				//this.myVoteWeightUsed = results.data.myVotes.reduce((a, b) => +a + +b.weight, 0) / 100
 				console.log(results, this.votes.length, "THE RESULTS")
 				this.changePagination()
 			},
 
 			showMyVotes() {
 				this.showvotes = true
-				this.getVotes(contract.default_account)
+				this.votes = this.myVotes
 			},
 
-			getGaugeAddress(gauge) {
+			showAllVotes() {
+				this.showvotes = false
+				this.votes = this.allVotes
+			},
+
+			getGaugeName(gauge) {
 				return this.gaugesNames[web3.utils.toChecksumAddress(gauge)]
 			},
 
@@ -675,11 +766,26 @@
 
 				let change = outcome_weights.find(v => v.id.toLowerCase() == this.selectedGauge.toLowerCase()).y / statsStore.state.pieGaugeWeights[web3.utils.toChecksumAddress(this.selectedGauge)]
 
+				this.outcomeCRVAPYs = outcome_weights.map(v => ({gauge: web3.utils.toChecksumAddress(v.id), apy: statsStore.state.currentCRVAPYs[web3.utils.toChecksumAddress(v.id)] * v.y / statsStore.state.pieGaugeWeights[web3.utils.toChecksumAddress(v.id)]})).reduce((a, b) => (a[b.gauge] = b.apy, a), {})
+
+				this.selectedPool = this.gaugesNames[web3.utils.toChecksumAddress(this.selectedGauge)]
+
 				this.oldAPY = statsStore.state.currentCRVAPYs[web3.utils.toChecksumAddress(this.selectedGauge)]
 
 				this.newAPY =  this.oldAPY * change
 
 				this.isCalculating = false
+
+				this.showOutcomeModal = true
+			},
+
+			showMyAllocationHandler() {
+				this.showMyAllocation = !this.showMyAllocation
+				this.uniqueGaugeVotes = helpers.unique(this.myVotes, 'gauge')
+			},
+
+			hideOutcomeModal() {
+				this.showOutcomeModal = false
 			},
 		},
 	}
@@ -718,8 +824,15 @@
 	}
 
 	table {
-		width: 100%;
 		margin-top: 0.4em;
+	}
+	table.fullwidth {
+		width: 100%;
+	}
+	table:not(.fullwidth) tr td {
+		padding-top: 0;
+		padding-left: 1em;
+		padding-right: 1em;
 	}
 	tbody tr td a {
 		display: inline-block;
