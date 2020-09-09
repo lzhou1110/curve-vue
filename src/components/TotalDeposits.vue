@@ -598,6 +598,7 @@
 				  "0xB1F2cdeC61db658F091671F5f199635aEF202CAC",
 				  "0xA90996896660DEcC6E997655E065b23788857849",
 				  "0x705350c4BcD35c9441419DdD5d2f097d7a55410F",
+				  "0x4c18E409Dc8619bFb6a1cB56D114C3f592E0aE79",
 				]
 			},
 			poolInfo() {
@@ -940,11 +941,13 @@
 				calls.push([allabis.iearn.sCurveRewards_address, '0x70a08231000000000000000000000000' + contract.default_account.slice(2)])
 				let callslen = calls.length
 				calls.push(...this.decodedGauges.map(gauge => [gauge, '0x70a08231000000000000000000000000' + contract.default_account.slice(2)]))
+				console.log(calls, "THE CALLS")
 				let aggcalls = await contract.multicall.methods.aggregate(calls).call()
 				let decoded = aggcalls[1].map(hex => web3.eth.abi.decodeParameter('uint256', hex))
 				let btcPrice = await helpers.retry(priceStore.getBTCPrice())
 				//this.balances = []
 				let decodedGaugeBalances = decoded.slice(callslen)
+				console.log(decodedGaugeBalances, "DECODED GAUGE BALANCES")
 				decoded = decoded.slice(0, callslen)
 				helpers.chunkArr(decoded, 2).slice(0,pools.length).map((v, i) => {
 					let key = pools[i]
@@ -959,7 +962,7 @@
 				for(let [i, pool] of Object.values(this.poolInfo).entries()) {
 					let callsGauges = calls.slice(callslen)
 					let balance = +decodedGaugeBalances[callsGauges.findIndex(callGauge => callGauge[0] == pool.gauge)] * (decoded[i*2 + 1] / 1e18)
-					if(['ren', 'sbtc'].includes(pool.name))
+					if(['ren', 'sbtc', 'hbtc'].includes(pool.name))
 						balance *= btcPrice
 					Vue.set(this.balances, pool.name, this.balances[pool.name] + balance / 1e18)
 				}
