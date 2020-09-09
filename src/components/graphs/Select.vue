@@ -28,8 +28,8 @@
 			<input id='sbtcpool' type='checkbox' value='sbtc' v-model='pools'/>
 			<label for='sbtcpool'>sBTC</label>
 
-			<!-- <input id='hbtcpool' type='checkbox' value='hbtc' v-model='pools'/>
-			<label for='hbtcpool'>hBTC</label> -->
+			<input id='hbtcpool' type='checkbox' value='hbtc' v-model='pools'/>
+			<label for='hbtcpool'>hBTC</label>
 		</div>
 
 		<select class='tvision' v-model='pair'>
@@ -133,7 +133,6 @@
 			allPairs() {
 				let currencies = Object.assign({}, this.filteredCurrencies)
 				delete currencies.susd
-				delete currencies.hbtc
 				let pairs = Object.values(currencies).filter(p=>p != 'susd').map(v=>Object.keys(v))
 				let allPairs = []
 				for(let pair of pairs) {
@@ -178,7 +177,7 @@
 			filteredCurrencies() {
 			return allCurrencies;
           	return Object.fromEntries(Object.entries(allCurrencies).filter(
-			      ([key, val])=>!['tbtc', 'hbtc'].includes(key)
+			      ([key, val])=>!['tbtc'].includes(key)
 			   ))
           	}
 		}

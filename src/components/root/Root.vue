@@ -399,23 +399,23 @@
                	 		</span>
 	                </router-link>
 	            </div>
-	            <!-- <div :class="{selected: activePoolLink == 5}">
+	            <div :class="{selected: activePoolLink == 5}">
 	                <router-link to = '/hbtc'>
-	                	<span class='index'>5.</span>  
+	                	<span class='index'>7.</span>  
 	                    <span class='pooltext'>hbtc</span>
 	                    <span class='pools'>[hBTC, wBTC]</span>  
 	                    <span class='apr'>
 	                    	<span class='tooltip'>APY:
 	                    		<span class='tooltiptext long'>
 		                    		<div>Pool APY + Lending APY (annualized)</div>
-		                    		<div>Daily APY: {{daily_apy[8]}}%</div>
-		                    		<div>Weekly APY: {{weekly_apy[8]}}%</div>
-		                    		<div>Monthly APY: {{monthly_apy[8]}}%</div>
-		                    		<div>Total APY: {{apy[8]}}%</div>
+		                    		<div>Daily APY: {{daily_apy[9]}}%</div>
+		                    		<div>Weekly APY: {{weekly_apy[9]}}%</div>
+		                    		<div>Monthly APY: {{monthly_apy[9]}}%</div>
+		                    		<div>Total APY: {{apy[9]}}%</div>
 		                    	</span>
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[8]}">{{daily_apy[8]}}</span>%
-	                    	<div :class="{'incentive-apr': true}">(+{{CRVAPYs.hbtc && (CRVAPYs.hbtc[0]).toFixed(2)}}% <br> to {{CRVAPYs.hbtc && (CRVAPYs.hbtc[1]).toFixed(2)}}%
+	                    	<div :class="{'incentive-apr': true}" v-show='CRVAPYs.hbtc && CRVAPYs.hbtc[0]'>(+{{CRVAPYs.hbtc && (CRVAPYs.hbtc[0]).toFixed(2)}}% <br> to {{CRVAPYs.hbtc && (CRVAPYs.hbtc[1]).toFixed(2)}}%
 	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
 	                                <span class='tooltiptext long'>
 	                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.hbtc && CRVAPYs.hbtc[2].toFixed(2) }})
@@ -434,7 +434,7 @@
                	 			</span>
                	 		</span>
 	                </router-link>
-	            </div> -->
+	            </div>
 	        </fieldset>
 	    </div>
 
@@ -485,6 +485,7 @@
 				tbtc: [-1, -1],
 				ren: [-1, -1],
 				sbtc: [-1, -1],
+				hbtc: [-1, -1],
 			},
 			balances: {
 				compound: -1,
@@ -496,6 +497,7 @@
 				tbtc: -1,
 				ren: -1,
 				sbtc: -1,
+				hbtc: -1,
 			},
 			snxRewards: null,
 			sbtcRewards: null,
@@ -552,6 +554,7 @@
 				  "0xB1F2cdeC61db658F091671F5f199635aEF202CAC",
 				  "0xA90996896660DEcC6E997655E065b23788857849",
 				  "0x705350c4BcD35c9441419DdD5d2f097d7a55410F",
+				  "0x4c18E409Dc8619bFb6a1cB56D114C3f592E0aE79",
 				]
 			},
 			poolInfo() {
@@ -603,6 +606,12 @@
 						swap_token: '0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3',
 						name: 'sbtc',
 						gauge: '0x705350c4BcD35c9441419DdD5d2f097d7a55410F',
+					},
+					hbtc: {
+						swap: '0x4CA9b3063Ec5866A4B82E437059D2C43d1be596F',
+						swap_token: '0xb19059ebb43466C323583928285a49f558E572Fd',
+						name: 'hbtc',
+						gauge: '0x4c18E409Dc8619bFb6a1cB56D114C3f592E0aE79',
 					},
 				}
 			},
@@ -737,7 +746,7 @@
 				for(let [i, pool] of Object.values(this.poolInfo).entries()) {
 					let callsGauges = calls.slice(callslen)
 					let balance = +decodedGaugeBalances[callsGauges.findIndex(callGauge => callGauge[0] == pool.gauge)] * (decoded[i*2 + 1] / 1e18)
-					if(['ren', 'sbtc'].includes(pool.name))
+					if(['ren', 'sbtc', 'hbtc'].includes(pool.name))
 						balance *= this.btcPrice
 					Vue.set(this.balances, pool.name, this.balances[pool.name] + balance / 1e18)
 				}

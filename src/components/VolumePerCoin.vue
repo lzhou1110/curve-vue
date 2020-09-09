@@ -30,7 +30,7 @@
 				<label for='sbtcpool'>sBTC</label>
 
 				<input id='hbtcpool' type='checkbox' value='hbtc' v-model='piepools'/>
-				<label for='hbtcpool'>sBTC</label>
+				<label for='hbtcpool'>hBTC</label>
 
 				<button @click='selectPools'>Select</button>
 			</div>
@@ -329,5 +329,8 @@
 	}
 	.poolselect > label {
 		margin-left: 1em;
+	}
+	label[for='hbtcpool'] {
+		margin-left: 0;
 	}
 </style>

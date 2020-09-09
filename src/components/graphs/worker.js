@@ -56,7 +56,7 @@ const currencies = {
 		sbtc: 'sBTC',
 	},
 	hbtc: {
-		hbtc: 'HBTC',
+		hbtc: 'hBTC',
 		wbtc: 'WBTC',
 	},
 }
@@ -75,7 +75,7 @@ let normalizeCoinIdx = (i, pool) => {
 	if(pool == 'sbtc' && i == 0) return 8;
 	if(pool == 'sbtc' && i == 1) return 10;
 	if(pool == 'sbtc' && i == 2) return 11;
-	if(pool == 'hbtc' && i == 1) return 12;
+	if(pool == 'hbtc' && i == 0) return 9;
 	if(pool == 'ren' && i == 0) return 10;
 	if(pool == 'ren' && i == 1) return 8;
 	if(pool == 'tbtc' && i == 0) return 7;
@@ -84,6 +84,7 @@ let normalizeCoinIdx = (i, pool) => {
 	if(pool == 'pax' && i == 3) return 6;
 	if(pool == 'susd' && i == 3) return 5;
 	if(pool == 'busd' && i == 3) return 4;
+	if(pool == 'hbtc' && i == 1) return 8;
 	return i;
 }
 
@@ -146,8 +147,10 @@ let getVolumePerPair = (data, pools, allabis) => {
 			let vol = Object.entries(v.volume)
 			for(let [pair, val] of vol) {
 				let pairName = pairToName(pair, pool)
-				if(!volumes[pairName]) volumes[pairName] = []
+				if(!volumes[pairName] && !volumes[pairReverse(pairName)]) volumes[pairName] = []
 				//if(!volumes[pairReverse(pairName)]) volumes[pairReverse(pairName)] = []
+				if(volumes[pairReverse(pairName)] && volumes[pairReverse(pairName)].length)
+					pairName = pairReverse(pairName)
 				volumes[pairName].push([
 					v.timestamp * 1000,
 					val[0] / allabis[key == 'susd' ? 'susdv2' : key].coin_precisions[pair.split('-')[0]]

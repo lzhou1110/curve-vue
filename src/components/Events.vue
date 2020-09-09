@@ -33,6 +33,9 @@
 
 					<input id='sbtcpool' type='checkbox' value='sbtc' v-model='pools'/>
 					<label for='sbtcpool'>sBTC</label>
+
+					<input id='hbtcpool' type='checkbox' value='hbtc' v-model='pools'/>
+					<label for='hbtcpool'>hBTC</label>
 				</div>
 
 				<button @click="selectPoolsHandler" id='select'>Select</button>
@@ -483,13 +486,14 @@
 		tbtc: [],
 		ren: [],
 		sbtc: [],
+		hbtc: [],
 	})
 
 	export default {
 		data: () => ({
-			allPools: ['compound', 'usdt', 'iearn', 'busd', 'susdv2', 'pax', 'tbtc', 'ren', 'sbtc'],
-			pools: ['compound', 'usdt', 'iearn', 'busd', 'susdv2', 'pax', 'tbtc', 'ren', 'sbtc'],
-			createdAtBlocks: [9554040, 9456293, 9476468, 9567295, 9906598, 10041041, 10074719, 10068305],
+			allPools: ['compound', 'usdt', 'iearn', 'busd', 'susdv2', 'pax', 'tbtc', 'ren', 'sbtc', 'hbtc',],
+			pools: ['compound', 'usdt', 'iearn', 'busd', 'susdv2', 'pax', 'tbtc', 'ren', 'sbtc', 'hbtc',],
+			createdAtBlocks: [9554040, 9456293, 9476468, 9567295, 9906598, 10041041, 10074719, 10068305, 10276641, 10732328],
 			allEvents: ['Exchange', 'Deposit', 'Withdraw'],
 			event: 0,
 			displayedEvent: 0,
@@ -545,6 +549,7 @@
 					tbtc: '0x423f6495a08fc652425cf4ed0d1f9e37e571d9b9529b1c1c23cce780b2e7df0d',
 					ren: '0x26f55a85081d24974e85c6c00045d0f0453991e95873f52bff0d21af4079a768',
 					sbtc: '0x423f6495a08fc652425cf4ed0d1f9e37e571d9b9529b1c1c23cce780b2e7df0d',
+					hbtc: '0x26f55a85081d24974e85c6c00045d0f0453991e95873f52bff0d21af4079a768',
 				}
 			},
 			removeLiquidityTopics() {
@@ -587,6 +592,12 @@
 					sbtc: [
 						'0xa49d4cf02656aebf8c771f5a8585638a2a15ee6c97cf7205d4208ed7c1df252d',
 						'0x173599dbf9c6ca6f7c3b590df07ae98a45d74ff54065505141e7de6c46a624c2',
+						'0x9e96dd3b997a2a257eec4df9bb6eaf626e206df5f543bd963682d143300be310',
+					],
+
+					hbtc: [
+						'0x7c363854ccf79623411f8995b362bce5eddff18c927edc6f5dbbb5e05819a82c',
+						'0x2b5508378d7e19e0d5fa338419034731416c4f5b219a10379956f764317fd47e',
 						'0x9e96dd3b997a2a257eec4df9bb6eaf626e206df5f543bd963682d143300be310',
 					],
 				}
@@ -638,7 +649,7 @@
 				return this.pools.map(pool => {
 					let topics = [];
 					if(this.event == 0) {
-						if(['tbtc', 'ren', 'sbtc'].includes(pool)) {
+						if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(pool)) {
 							topics = [
 								this.swapContracts[this.allPools.indexOf(pool)]
 									.getPastEvents(this.tokenExchangeEvent, 
@@ -855,7 +866,7 @@
 				for(let [i, pool] of pools.entries()) {
 					let abi = allabis[pool]
 					//usdt in usdt pool and susdv2 pool are already in the array, no need to calculate
-					if(['susdv2', 'tbtc', 'ren', 'sbtc'].includes(pool)) continue;
+					if(['susdv2', 'tbtc', 'ren', 'sbtc', 'hbtc'].includes(pool)) continue;
 					else if(['iearn', 'busd', 'pax'].includes(pool)) {
 						let len = 4;
 						if(pool == 'pax') len = 3
@@ -884,7 +895,7 @@
 			isPlain(i, abi, pool) {
 				return abi.tethered && abi.tethered[i] 
 						&& abi.use_lending && !abi.use_lending[i] 
-						|| pool == 'susdv2' || abi.is_plain[i];
+						|| ['susdv2', 'ren', 'sbtc', 'hbtc'].includes(pool) || abi.is_plain[i];
 			},
 			isBTC(event) {
 				return [allabis.tbtc.swap_address.toLowerCase(), allabis.ren.swap_address.toLowerCase()].includes(event.address.toLowerCase())

@@ -26,6 +26,7 @@
         tbtc: 'TBTC',
         ren: 'renBTC',
         sbtc: 'sBTC',
+        hbtc: 'hBTC',
     }
 
 	export default {

@@ -143,8 +143,8 @@
                             <input id='sbtcpool' type='checkbox' value='sbtc' v-model='pools'/>
                             <label for='sbtcpool'>sBTC</label>
 
-                            <!-- <input id='hbtcpool' type='checkbox' value='hbtc' v-model='pools'/>
-                            <label for='hbtcpool'>HBTC</label> -->
+                            <input id='hbtcpool' type='checkbox' value='hbtc' v-model='pools'/>
+                            <label for='hbtcpool'>HBTC</label>
                         </div>
                         <div v-show='fromInput > 0' id='max_slippage'><span>Max slippage:</span> 
                             <input id="slippage05" type="radio" name="slippage" value='0.005' @click='maxSlippage = 0.5; customSlippageDisabled = true'>
@@ -335,7 +335,7 @@
                         renbtc: 'renBTC',
                         wbtc: 'wBTC',
                         sbtc: 'sBTC',
-                        //hbtc: 'HBTC',
+                        hbtc: 'HBTC',
                         // tbtc: 'tBTC',
                         // hbtc: 'hBTC',
                         // wbtc: 'wBTC',
@@ -379,7 +379,7 @@
                 return ['compound', 'y', 'busd', 'susd', 'pax', 'ren', 'sbtc', 'hbtc', '1split'][this.bestPool]
             },
             selldisabled() {
-                //if((this.from_currency == 10 && this.to_currency != 8) || (this.to_currency == 8 && this.from_currency != 10)) return true
+                if((this.from_currency == 10 && this.to_currency != 8) || (this.to_currency == 8 && this.from_currency != 10)) return true
                 if(this.from_currency <= 6 && this.to_currency >= 7 || this.to_currency <= 6 && this.from_currency >= 7) return true
                 // if([7,8,9].includes(this.from_currency) && ![7,8,9].includes(this.to_currency) 
                 //     || [7,8,9].includes(this.to_currency) && ![7,8,9].includes(this.from_currency)) return true
