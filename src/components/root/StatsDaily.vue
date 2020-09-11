@@ -244,8 +244,10 @@
 		async mounted() {
 			let allPools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren', 'sbtc', 'hbtc']
 			let allVolume = volumeStore.state.allVolume
+
 			console.log(allVolume)
 			this.$watch(()=>Object.keys(allVolume).filter(pool => !['tbtc'].includes(pool)).every(pool => {
+
 				return allVolume[pool].length > 0
 			}), val => {
 

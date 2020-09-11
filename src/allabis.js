@@ -5883,6 +5883,7 @@ var susd = {
 
   swap_address: '0xeDf54bC005bc2Df0Cc6A675596e843D28b16A966',
   token_address: '0x2b645a6A426f22fB7954dC15E583e3737B8d1434',
+  gauge_address: '0xBC89cd85491d81C6AD2954E6d0362Ee29fCa8F53',
   N_COINS: 2, 
   tethered: [false, false],
   use_lending: [true, true],

@@ -213,6 +213,9 @@ export const gas = {
 			withdrawShare: 3500000,
 			withdrawImbalance: x => (276069*x + 516861)*2.5 | 0,
 		},
+		susd: {
+			withdrawShare: 3000000,
+		},
 		susdv2: {
 			deposit: x => (172664*x + 471691)*1.5 | 0,
 			withdraw: 800000,

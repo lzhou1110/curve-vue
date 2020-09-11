@@ -416,6 +416,7 @@
 	                    	</span> 
 	                    	<span :class="{'loading line': !daily_apy[8]}">{{daily_apy[8]}}</span>%
 	                    	<div :class="{'incentive-apr': true}" v-show='CRVAPYs.hbtc && CRVAPYs.hbtc[0]'>(+{{CRVAPYs.hbtc && (CRVAPYs.hbtc[0]).toFixed(2)}}% <br> to {{CRVAPYs.hbtc && (CRVAPYs.hbtc[1]).toFixed(2)}}%
+	                    		<span v-show='CRVAPYs.hbtc && CRVAPYs.hbtc[3]'><br>my: {{CRVAPYs.hbtc && CRVAPYs.hbtc[3] > 0 && CRVAPYs.hbtc[3].toFixed(2)}}%&nbsp;</span>
 	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
 	                                <span class='tooltiptext long'>
 	                                    CRV LP reward annualized(max APY can be reached with max boost of {{ CRVAPYs.hbtc && CRVAPYs.hbtc[2].toFixed(2) }})
@@ -849,7 +850,7 @@
 					let virtual_price = decodedVirtualPrices.find(v => v[0].toLowerCase() == swap_address.toLowerCase())[1]
 					let _working_supply = workingSupplies[i]
 					let totalSupply = totalSupplies[i]
-					if(['ren', 'sbtc'].includes(pool)) {
+					if(['ren', 'sbtc', 'hbtc'].includes(pool)) {
 						_working_supply *= btcPrice
 						totalSupply *= btcPrice
 					}
@@ -993,6 +994,6 @@
 		height: 12px;
 	}
 	.poolsdialog > div {
-		margin-top: 0.1em;
+		margin-top: 1em;
 	}
 </style>
