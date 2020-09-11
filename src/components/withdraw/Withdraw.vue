@@ -679,6 +679,10 @@
                     ${['y', 'iearn'].includes(this.currentPool) ? 'YFI' : 'SNX'}`
                 if(this.currentPool == 'sbtc')
                     this.waitingMessage += ` and ${(this.pendingRENRewards / 1e18).toFixed(2)} REN`
+                if(this.currentPool == 'sbtc' && (!claim_bpt_only || !unstake)) {
+                    this.waitingMessage = `Please confirm claiming ${(this.withdrawSNXPool / 1e18).toFixed(2)}SNX 
+                        and ${(this.withdrawRENPool / 1e18).toFixed(2)} REN`
+                }
                 
                 var { dismiss } = notifyNotification(this.waitingMessage)
                 let promises = await Promise.all([helpers.getETHPrice()])
