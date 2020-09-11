@@ -606,11 +606,11 @@ export default {
 		        }
 		    }
 		    console.timeEnd('timer')
-		    // !this.cancel && localStorage.setItem(this.currentPool + 'lastDepositBlock', lastBlock);
-		    // !this.cancel && localStorage.setItem(this.currentPool + 'dlastAddress', default_account)
-		    // !this.cancel && localStorage.setItem(this.currentPool + 'lastDeposits', depositUsdSum);
-		    // !this.cancel && localStorage.setItem(this.currentPool + 'lastDepositsUSD', allDepositsUSD);
-		    // !this.cancel && localStorage.setItem(this.currentPool + 'dversion', this.version);
+		    !this.cancel && localStorage.setItem(this.currentPool + 'lastDepositBlock', lastBlock);
+		    !this.cancel && localStorage.setItem(this.currentPool + 'dlastAddress', default_account)
+		    !this.cancel && localStorage.setItem(this.currentPool + 'lastDeposits', depositUsdSum);
+		    !this.cancel && localStorage.setItem(this.currentPool + 'lastDepositsUSD', allDepositsUSD);
+		    !this.cancel && localStorage.setItem(this.currentPool + 'dversion', this.version);
 		    return depositUsdSum;
 
 		},
@@ -730,11 +730,11 @@ export default {
 
 
 		    }
-		    // !this.cancel && localStorage.setItem(this.currentPool + 'lastWithdrawalBlock', lastBlock);
-		    // !this.cancel && localStorage.setItem(this.currentPool + 'lastWithdrawals', withdrawals);
-		    // !this.cancel && localStorage.setItem(this.currentPool + 'lastWithdrawalsUSD', allWithdrawalsUSD);
-		    // !this.cancel && localStorage.setItem(this.currentPool + 'wlastAddress', default_account);
-		    // !this.cancel && localStorage.setItem(this.currentPool + 'wversion', this.version);
+		    !this.cancel && localStorage.setItem(this.currentPool + 'lastWithdrawalBlock', lastBlock);
+		    !this.cancel && localStorage.setItem(this.currentPool + 'lastWithdrawals', withdrawals);
+		    !this.cancel && localStorage.setItem(this.currentPool + 'lastWithdrawalsUSD', allWithdrawalsUSD);
+		    !this.cancel && localStorage.setItem(this.currentPool + 'wlastAddress', default_account);
+		    !this.cancel && localStorage.setItem(this.currentPool + 'wversion', this.version);
 		    console.log("WITHDRAWALS", withdrawals)
 		    return withdrawals;
 		},

@@ -1180,20 +1180,30 @@ export async function mintThenDeposit({ id, amounts, min_amount, params, utxoAmo
 
 export async function stakeTokens(transaction, receipt, dismissWaitStake) {
 	//DepositMintedCurve
+	console.log(receipt, "DEPOSIT RECEIPT")
 	let tokens
 	if(dismissWaitStake) dismissWaitStake()
 	if(!transaction.mintedTokens) {
 		let mintData
 		try {
 			mintData = Object.values(receipt.events)
-					.filter(event => event.raw.topics[0] == '0x0882f81e7e1d407c41100a8a53cd546a2f6ffff18d00dc1268ee70f1640932cc')[0].raw.data
+					.filter(event => 
+						['0x0882f81e7e1d407c41100a8a53cd546a2f6ffff18d00dc1268ee70f1640932cc', 
+						'0xb63ee4e2dff3cbbb52522328732dbe3e3e783a81f3d0d6165307085749521e35'].includes(event.raw.topics[0]))[0].raw.data
 		}
 		catch(err) {
 			console.error(err)
 			mintData = Object.values(receipt.logs)
-					.filter(event => event.topics[0] == '0x0882f81e7e1d407c41100a8a53cd546a2f6ffff18d00dc1268ee70f1640932cc')[0].data
+					.filter(event => 
+						['0x0882f81e7e1d407c41100a8a53cd546a2f6ffff18d00dc1268ee70f1640932cc', 
+						'0xb63ee4e2dff3cbbb52522328732dbe3e3e783a81f3d0d6165307085749521e35'].includes(event.topics[0]))[0].data
 		}
-		tokens = BN(contract.web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256'], mintData)[1])
+		try {
+			tokens = BN(contract.web3.eth.abi.decodeParameters(['uint256', 'uint256', 'uint256'], mintData)[1])
+		}
+		catch(err) {
+			tokens = BN(contract.web3.eth.abi.decodeParameters(['uint256', 'uint256'], mintData)[1])
+		}
 		transaction.mintedTokens = tokens
 		upsertTx(transaction)
 	}
