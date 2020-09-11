@@ -4,7 +4,7 @@
             <legend>
             	Share of liquidity (%)
         		<input id='showstaked' type='checkbox' name='showstaked' v-model = 'showstaked'>
-        		<label for='showstaked' v-show="['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)"> Show staked </label>
+        		<label for='showstaked'> Show staked </label>
             </legend>
             <ul>
                 <li>

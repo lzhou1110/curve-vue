@@ -81,13 +81,13 @@
                 <button id="add-liquidity" :disabled='amountAfterBTC < 0 && +inputs[0] > 0' @click='handle_add_liquidity()'>
                 		Deposit <span class='loading line' v-show='loadingAction == 1'></span>
                 </button>
-                <!-- <button 
+                <button 
                     id="add-liquidity-stake" 
                     :disabled='amountAfterBTC < 0 && +inputs[0] > 0' 
                     v-show="['sbtc'].includes(currentPool)"
                     @click='handle_add_liquidity(true)'>
                         Deposit and stake <span class='loading line' v-show='loadingAction == 2'></span>
-                </button> -->
+                </button>
                 <button id='stakeunstaked' 
                     v-show="totalShare > 0 && ['ren', 'sbtc'].includes(currentPool)" 
                     @click='stakeTokens()'>
@@ -231,6 +231,15 @@
           },
           gasPriceWei() {
             return gasPriceStore.state.gasPriceWei
+          },
+          allSwapTokens() {
+            return Object.values(allabis).map(pool => pool.token_address)
+          },
+          allDepositZaps() {
+            return Object.values(allabis).filter(pool => pool.deposit_address).map(pool => pool.deposit_address)
+          },
+          allGauges() {
+            return Object.values(allabis).filter(pool => pool.gauge_address)
           },
         },
         mounted() {
@@ -391,6 +400,15 @@
                 this.waitingMessage = ''
                 this.show_loading = false;
             },
+            filterEvent(event) {
+                console.log(event, "THE EVENT")
+                return (this.allSwapTokens.map(swap_token => swap_token.toLowerCase()).find(swap_token => swap_token == event.address.toLowerCase()) !== undefined
+                )
+                && event.raw.topics[1] == "0x0000000000000000000000000000000000000000000000000000000000000000" 
+                || (
+                    this.allDepositZaps.map(deposit_zap => deposit_zap.toLowerCase()).find(deposit_zap => deposit_zap == event.address.toLowerCase()) !== undefined
+                    )
+            },
 			async handle_add_liquidity(stake = false) {
                 let actionType = stake == false ? 1 : 2;
                 if(this.loadingAction == actionType) return;
@@ -491,23 +509,15 @@
                     if(!stake ) this.show_loading = false
                     if(stake) {
                         try {
-                            minted = BN(
-                                Object.values(receipt.events).filter(event => {
-                                    return (event.address.toLowerCase() == allabis.sbtc.token_address.toLowerCase())
-                                            && event.raw.topics[1] == "0x0000000000000000000000000000000000000000000000000000000000000000" 
-                                            && event.raw.topics[2].toLowerCase() == '0x000000000000000000000000' + currentContract.default_account.slice(2).toLowerCase()
-                                })[0].raw.data)
+                        minted = BN(
+                            Object.values(receipt.events).filter(event => this.filterEvent(event))[0].raw.data)
                             await helpers.setTimeoutPromise(100)
                             await this.stakeTokens(minted, true)
                         }
                         catch(err) {
                             try {
                                 minted = BN(
-                                    Object.values(receipt.logs).filter(event => {
-                                        return (event.address.toLowerCase() == allabis.sbtc.token_address.toLowerCase())
-                                                && event.topics[1] == "0x0000000000000000000000000000000000000000000000000000000000000000" 
-                                                && event.topics[2].toLowerCase() == '0x000000000000000000000000' + currentContract.default_account.slice(2).toLowerCase()
-                                    })[0].data)
+                                    Object.values(receipt.logs).filter(event => this.filterEvent(event))[0].data)
                                 await helpers.setTimeoutPromise(100)
                                 await this.stakeTokens(minted, true)
                             }

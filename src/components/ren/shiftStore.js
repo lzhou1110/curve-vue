@@ -19,7 +19,7 @@ let Box
 import BN from 'bignumber.js'
 import { notify, notifyHandler, notifyNotification } from '../../init'
 import { getters, allCurrencies, contract, gas } from '../../contract'
-import allabis, { ERC20_abi } from '../../allabis'
+import allabis, { ERC20_abi, liquiditygauge_ABI } from '../../allabis'
 import * as common from '../../utils/common'
 import * as helpers from '../../utils/helpers'
 import * as subscriptionStore from '../common/subscriptionStore'
@@ -100,6 +100,9 @@ let adapters = [oldrenAdapter, renAdapter, oldsbtcAdapter, sbtcAdapter, renAdapt
 let renSwap = new contract.web3.eth.Contract(allabis.ren.swap_abi, allabis.ren.swap_address)
 let sbtcSwap = new contract.web3.eth.Contract(allabis.sbtc.swap_abi, allabis.sbtc.swap_address)
 
+let renGaugeContract = new contract.web3.eth.Contract(liquiditygauge_ABI, allabis.ren.gauge_address)
+let sbtcGaugeContract = new contract.web3.eth.Contract(liquiditygauge_ABI, allabis.sbtc.gauge_address)
+
 let swaps = {
 	ren: renSwap,
 	sbtc: sbtcSwap,
@@ -107,6 +110,21 @@ let swaps = {
 
 state.address = state.default_account =  contract.default_account
 state.sdk = sdk
+
+let allSwapTokens = Object.values(allabis).map(pool => pool.token_address)
+
+
+let allDepositZaps = Object.values(allabis).filter(pool => pool.deposit_address).map(pool => pool.deposit_address)
+
+function filterEvent(event) {
+    console.log(event, "THE EVENT")
+    return (allSwapTokens.map(swap_token => swap_token.toLowerCase()).find(swap_token => swap_token == event.address.toLowerCase()) !== undefined
+    )
+    && event.raw.topics[1] == "0x0000000000000000000000000000000000000000000000000000000000000000" 
+    || (
+        allDepositZaps.map(deposit_zap => deposit_zap.toLowerCase()).find(deposit_zap => deposit_zap == event.address.toLowerCase()) !== undefined
+        )
+}
 
 async function init() {
 	// if(contract.currentContract != 'ren') {
@@ -1186,14 +1204,17 @@ export async function stakeTokens(transaction, receipt, dismissWaitStake) {
     await helpers.setTimeoutPromise(100)
 	let waitingMessage = `Please approve staking ${tokens.div(BN(1e18)).toFixed(8)} of your sCurve tokens`
     var { dismiss } = notifyNotification(waitingMessage)
-	await common.ensure_stake_allowance(tokens);
+    let gaugeContract = renGaugeContract
+    if(transaction.params.contractCalls[0].sendTo.toLowerCase() == sbtcAdapterBiconomy._address.toLowerCase())
+    	gaugeContract = sbtcGaugeContract
+	await common.ensure_stake_allowance(tokens, gaugeContract);
     dismiss()
     waitingMessage = 'Please confirm stake transaction'
     var { dismiss: dismissConfirmStake } = notifyNotification(waitingMessage)
-    await contract.curveRewards.methods.stake(tokens.toFixed(0,1)).send({
+    await gaugeContract.methods.deposit(tokens.toFixed(0,1)).send({
         from: state.default_account,
         gasPrice: gasPriceStore.state.gasPriceWei,
-        gas: 400000,
+        gas: 1000000,
     })
     .once('transactionHash', hash => {
         transaction.stakeTxHash = hash
