@@ -195,6 +195,8 @@
   const calcWorker = Comlink.wrap(worker);
   import * as priceStore from './common/priceStore'
 
+  import EventBus from './graphs/EventBus'
+
   export default {
     props: ['pool', 'bal_info', 'total', 'l_info', 'totalShare', 'fee', 'admin_fee', 'currencies', 'tokenSupply', 'tokenBalance', 'usdShare', 'staked_info', 'totalStake', 'usdStake', 'combinedstats', 'virtual_price', 'A', 'future_A', 'admin_actions_deadline'],
     data: () => ({
@@ -204,6 +206,7 @@
       lastPoint: null,
       lastPool: null,
       btcPrice: 0,
+      loadingShares: false,
     }),
     methods: {
       toFixed(num, precisions = 2, round = 4) {
@@ -227,33 +230,40 @@
         let req = await fetch(`${window.domain}/raw-stats/${pool}-1m.json`)
         this.lastPoint = await req.json()
         this.lastPoint = this.lastPoint[this.lastPoint.length - 1]
+        this.btcPrice = await priceStore.getBTCPrice()
         let N_COINS = allabis[this.currentPool].N_COINS;
-        this.realShare = 0;
-        this.realStake = 0;
+        if(this.loadingShares) return;
+        let prices = new Array(N_COINS).fill(1)
         for(let i = 0; i < N_COINS; i++) {
-          let price = 1
+          if(i == 1) continue
           let amount = 1
           let toPrecisions = 1e6
           if(['tbtc', 'ren', 'sbtc', 'hbtc'].includes(this.currentPool)) {
             amount = 0.0001
             toPrecisions = 1e8
           }
-          if(i != 1) {
-            let dy = await calcWorker.calcPrice({ 
-              ...this.lastPoint, 
-              N_COINS: allabis[this.currentPool].N_COINS,
-              PRECISION_MUL: allabis[this.currentPool].coin_precisions.map(p=>1e18/p),
-              PRECISION: 1e18,
-            }, i, 1, amount * allabis[this.currentPool].coin_precisions[i])
-            price = dy / toPrecisions / amount
-          }
-          this.realShare += +this.l_info[i] * price
-          this.realStake += +this.staked_info[i] * price
+          let dy = await calcWorker.calcPrice({ 
+            ...this.lastPoint, 
+            N_COINS: allabis[this.currentPool].N_COINS,
+            PRECISION_MUL: allabis[this.currentPool].coin_precisions.map(p=>1e18/p),
+            PRECISION: 1e18,
+          }, i, 1, amount * allabis[this.currentPool].coin_precisions[i])
+          let price = dy / toPrecisions / amount
+          prices[i] = price
+        }
+        if(this.loadingShares) return;
+        this.loadingShares = true
+        this.realShare = 0;
+        this.realStake = 0;
+        for(let i = 0; i < N_COINS; i++) {
+          this.realShare += +this.l_info[i] * prices[i]
+          this.realStake += +this.staked_info[i] * prices[i]
         }
         if(this.isBTC) {
           this.realShare *= this.btcPrice
           this.realStake *= this.btcPrice
         }
+        this.loadingShares = false
       },
     },
     async created() {
@@ -278,6 +288,9 @@
       }
       this.hasLoadedInfo && this.updateShares()
       this.$watch(() => this.hasLoadedInfo, val => this.updateShares())
+      EventBus.$on('updateShares', () => {
+        this.updateShares()
+      })
     },
     computed: {
       showShares: getters.showShares,

@@ -194,12 +194,12 @@ let routes = [
       {
         path: '',
         name: 'Withdraw',
-        component: Withdraw
+        component: WithdrawRouter
       },
       {
         path: '*',
         name: 'Withdraw',
-        component: Withdraw
+        component: WithdrawRouter
       }
     ]
   },

@@ -898,7 +898,7 @@
 						|| ['susdv2', 'ren', 'sbtc', 'hbtc'].includes(pool) || abi.is_plain[i];
 			},
 			isBTC(event) {
-				return [allabis.tbtc.swap_address.toLowerCase(), allabis.ren.swap_address.toLowerCase()].includes(event.address.toLowerCase())
+				return [allabis.tbtc.swap_address.toLowerCase(), allabis.ren.swap_address.toLowerCase(), allabis.sbtc.swap_address.toLowerCase(), allabis.hbtc.swap_address.toLowerCase()].includes(event.address.toLowerCase())
 			},
 			getCurrency(event, type) {
 				//type == 0 for sold
@@ -953,7 +953,7 @@
 			getSubscriptions() {
 				for(let pool of this.pools) {
 					if(this.event == 0) {
-						if(!['tbtc', 'ren', 'sbtc'].includes(pool)) {
+						if(!['tbtc', 'ren', 'sbtc', 'hbtc'].includes(pool)) {
 							this.subscriptions.push(
 								this.swapContracts[this.allPools.indexOf(pool)]
 								.events.TokenExchangeUnderlying()

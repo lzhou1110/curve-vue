@@ -10,6 +10,8 @@ import Web3 from "web3";
 import * as errorStore from '../components/common/errorStore'
 import { notify, notifyHandler } from '../init'
 
+import EventBus from '../components/graphs/EventBus'
+
 var cBN = (val) => new BigNumber(val);
 
 let requiresResetAllowance = ['0xdAC17F958D2ee523a2206206994597C13D831ec7', '0xC25a3A3b969415c80451098fa907EC722572917F', '0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3', '0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8']
@@ -441,6 +443,7 @@ export async function multiInitState(calls, contract, initContracts = false) {
 
         contract.totalStake = 0;
         if(contract.curveStakedBalance > 0) {
+            contract.staked_info = new Array(contract.N_COINS).fill(0)
             for (let i=0; i < contract.N_COINS; i++) {
                 var val = balances[i] * contract.c_rates[i] * contract.curveStakedBalance / token_supply;
                 Vue.set(contract.staked_info, i, val)
@@ -448,6 +451,7 @@ export async function multiInitState(calls, contract, initContracts = false) {
             }
             contract.usdStake = contract.curveStakedBalance * contract.virtual_price / 1e18;
         }
+        EventBus.$emit('updateShares')
     }
 }
 

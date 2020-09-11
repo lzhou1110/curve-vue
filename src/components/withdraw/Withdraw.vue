@@ -4,7 +4,7 @@
             <legend>
             	Share of liquidity (%)
         		<input id='showstaked' type='checkbox' name='showstaked' v-model = 'showstaked'>
-        		<label for='showstaked' v-show="['susdv2', 'sbtc', 'y', 'iearn'].includes(currentPool)"> Show staked </label>
+        		<label for='showstaked'> Show staked </label>
             </legend>
             <ul>
                 <li>
@@ -154,7 +154,6 @@
             <button 
                 id='remove-liquidity-unstake'
                 v-show = "staked_balance > 0 "
-                :disabled = 'slippage < -0.03'
                 @click='handle_remove_liquidity(true, false, true)'>
                 Withdraw & claim <span class='loading line' v-show='loadingAction == 2'></span>
             </button>
@@ -430,7 +429,10 @@
         mounted() {
     		this.showstaked = true
         	this.$watch(() => this.showstaked, this.handle_change_share)
-        	if(currentContract.currentContract == 'susd') this.withdrawc = true;
+        	if(currentContract.currentContract == 'susd') {
+                this.withdrawc = true;
+                this.showstaked = false
+            }
         	this.setInputStyles(true)
             if(currentContract.initializedContracts) this.mounted();
         },
@@ -934,7 +936,7 @@
 			        }
                     token_amount = BN(token_amount).times(BN(1).plus(this.calcFee))
 			        token_amount = BN(Math.floor(token_amount * this.getMaxSlippage).toString()).toFixed(0,1)
-                    if((this.token_balance.lt(BN(token_amount)) || unstake)) {
+                    if((this.token_balance.lt(BN(token_amount)) || unstake) && this.currentPool != 'susd') {
                         let unstakeAmount = BN(token_amount).minus(BN(this.token_balance))
                         if(unstake) unstakeAmount = BN(token_amount) 
                         await this.unstake(unstakeAmount, unstake && !unstake_only, unstake_only)
@@ -1023,7 +1025,7 @@
                     if(this.showstaked) balance = balance.plus(this.staked_balance)
                     var amount = BN(this.share).div(BN(100)).times(balance)
 
-                    if((this.token_balance.lt(amount) || unstake)) {
+                    if((this.token_balance.lt(amount) || unstake) && this.currentPool != 'susd') {
                         let unstakeAmount = BN(amount).minus(BN(this.token_balance))
                         if(unstake) unstakeAmount = BN(amount)
                         await this.unstake(unstakeAmount, unstake && !unstake_only, unstake_only)
@@ -1072,7 +1074,7 @@
                             errorStore.handleError(err)
                         }
 			        }
-			        else if(this.to_currency == 10) {
+			        else if(this.to_currency == 10 && this.currentPool != 'susd') {
                         this.waitingMessage = `Please approve ${this.toFixed(amount / 1e18)} Curve LP tokens for withdrawal`
                         var { dismiss } = notifyNotification(this.waitingMessage)
                         try {

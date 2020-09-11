@@ -82,6 +82,7 @@
 				tbtc: 'tbtc',
 				ren: 'ren',
 				sbtc: 'sbtc',
+				hbtc: 'hbtc',
 			},
 			chartdata: {
 				title: {
@@ -241,11 +242,11 @@
 			}
 		},
 		async mounted() {
-			let allPools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren', 'sbtc']
+			let allPools = ['compound', 'usdt', 'y', 'busd', 'susd', 'pax', 'tbtc', 'ren', 'sbtc', 'hbtc']
 			let allVolume = volumeStore.state.allVolume
-			console.log(Object.keys(allVolume).filter(pool => !['tbtc', 'hbtc'].includes(pool)), "HERERE")
+			console.log(Object.keys(allVolume).filter(pool => !['tbtc'].includes(pool)), "HERERE")
 			console.log(allVolume)
-			this.$watch(()=>Object.keys(allVolume).filter(pool => !['tbtc', 'hbtc'].includes(pool)).every(pool => {
+			this.$watch(()=>Object.keys(allVolume).filter(pool => !['tbtc'].includes(pool)).every(pool => {
 				console.log(allVolume[pool].length, "LENGTH")
 				return allVolume[pool].length > 0
 			}), val => {
