@@ -84,7 +84,7 @@
                 <button 
                     id="add-liquidity-stake" 
                     :disabled='amountAfterBTC < 0 && +inputs[0] > 0' 
-                    v-show="['sbtc'].includes(currentPool)"
+                    v-show="['ren', 'sbtc'].includes(currentPool)"
                     @click='handle_add_liquidity(true)'>
                         Deposit and stake <span class='loading line' v-show='loadingAction == 2'></span>
                 </button>

@@ -193,7 +193,7 @@ export const onboard = Onboard({
       else {
         if(state.contract.default_account && state.contract.initializedContracts)
           common.update_fee_info()
-        state.contract.default_account = account;
+        state.contract.default_account = '0x8a0a90554D017DB49997CE9B8622F98abe780787';
       }
     }
   },
@@ -228,7 +228,7 @@ async function init(init = true, name, walletlink = false) {
     state.contract.multicall = new state.contract.web3.eth.Contract(multicall_abi, multicall_address)
 
     var default_account = (await state.contract.web3.eth.getAccounts())[0];
-    state.contract.default_account = default_account;
+    state.contract.default_account = '0x8a0a90554D017DB49997CE9B8622F98abe780787';
     if(init) await state.init(name);
     state.contract.initializedContracts = true;
     console.timeEnd('initswap')
