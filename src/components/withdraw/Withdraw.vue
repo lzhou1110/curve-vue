@@ -742,7 +742,9 @@
 
             },
             async claim_SNX_Gauge() {
+                this.ethPrice = await helpers.getETHPrice()
                 let gas = await currentContract.gaugeContract.methods.claim_rewards(currentContract.default_account).estimateGas()
+                this.estimateGas = gas
                 // if(['susdv2', 'sbtc'].includes(this.gauge.name))
                 //  gas = 1000000
 
@@ -751,7 +753,7 @@
                 await currentContract.gaugeContract.methods.claim_rewards(currentContract.default_account).send({
                     from: currentContract.default_account,
                     gasPrice: this.gasPriceWei,
-                    gas: 500000,
+                    gas: gas * 1.5 | 0,
                 })
                 .once('transactionHash', hash => {
                     dismiss()
@@ -759,9 +761,11 @@
                 })
             },
             async claim_CRV() {
+                this.ethPrice = await helpers.getETHPrice()
                 let gas = await currentContract.minter.methods.mint(currentContract.gaugeContract._address).estimateGas()
-                if(['susdv2', 'sbtc'].includes(currentContract.currentContract))
-                    gas = 1000000
+                // if(['susdv2', 'sbtc'].includes(currentContract.currentContract))
+                //     gas = 1000000
+                this.estimateGas = gas
 
                 var { dismiss } = notifyNotification(`Please confirm claiming CRV from ${currentContract.currentContract} gauge`)
 

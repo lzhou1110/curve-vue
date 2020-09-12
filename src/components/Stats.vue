@@ -243,6 +243,7 @@
 			        var step_size = Math.max(Math.round(this.data.length / 500), 1);
 			        let start_index = this.data.findIndex(el => el.virtual_price > 0)
 			        if(subdomain == 'rens') start_index = 3
+			        if(subdomain == 'hbtc') start_index = 2
 			        this.virtual_price_0 = this.data[start_index].virtual_price;
 			        var start_profit = this.data[start_index].virtual_price / 1e18
 

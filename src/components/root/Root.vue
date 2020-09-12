@@ -414,7 +414,7 @@
 		                    		<div>Total APY: {{apy[9]}}%</div>
 		                    	</span>
 	                    	</span> 
-	                    	<span :class="{'loading line': !daily_apy[8]}">{{daily_apy[8]}}</span>%
+	                    	<span :class="{'loading line': !daily_apy[9]}">{{daily_apy[9]}}</span>%
 	                    	<div :class="{'incentive-apr': true}" v-show='CRVAPYs.hbtc && CRVAPYs.hbtc[0]'>(+{{CRVAPYs.hbtc && (CRVAPYs.hbtc[0]).toFixed(2)}}% <br> to {{CRVAPYs.hbtc && (CRVAPYs.hbtc[1]).toFixed(2)}}%
 	                    		<span v-show='CRVAPYs.hbtc && CRVAPYs.hbtc[3]'><br>my: {{CRVAPYs.hbtc && CRVAPYs.hbtc[3] > 0 && CRVAPYs.hbtc[3].toFixed(2)}}%&nbsp;</span>
 	                			<span class='tooltip'><img class='icon small' :src="publicPath + 'logo.png'"> CRV
