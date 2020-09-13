@@ -101,7 +101,7 @@
 								<span v-show='lastTransaction.to_currency == 2'>sBTC</span>
 							</span>
 							<span v-show='lastTransaction.type == 3'>
-								{{ (lastTransaction.min_amount / 1e18).toFixed(8) }} 
+								minimum {{ (lastTransaction.min_amount / 1e18).toFixed(8) }} 
 								Curve {{ lastTransaction.amounts.length == 2 ? 'ren' : 'sbtc' }} LP tokens
 							</span>
 						</div>
